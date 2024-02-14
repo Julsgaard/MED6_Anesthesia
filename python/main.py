@@ -1,6 +1,16 @@
 import cv2
 import dlib
 
+def calculate_polygon_area(points): #USES SHOELACE FORMULA https://en.wikipedia.org/wiki/Shoelace_formula
+    n = len(points)  # Number of points
+    area = 0.0
+    for i in range(n):
+        j = (i + 1) % n  # Next vertex index
+        area += points[i][0] * points[j][1]
+        area -= points[j][0] * points[i][1]
+    area = abs(area) / 2.0
+    return area
+
 def detect_faces_and_landmarks(video_source=0):
     # Initialize video capture with DirectShow API
     cap = cv2.VideoCapture(video_source, cv2.CAP_DSHOW)
@@ -34,13 +44,17 @@ def detect_faces_and_landmarks(video_source=0):
             # Use Dlib to get facial landmarks
             landmarks = predictor(gray, dlib_rect)
 
+            # Draw facial landmarks and calculate area for inner lip contour
+            lip_points = [(landmarks.part(n).x, landmarks.part(n).y) for n in range(60, 68)]
+            lip_area = calculate_polygon_area(lip_points)
+            print(f"Inner lip area: {lip_area}")
 
-            # Draw facial landmarks
-            for i, n in enumerate(range(48, 68)):  # Mouth landmarks in Dlib's 68 point model
+            for n in range(0, 68):  # There are 68 landmark points
                 x = landmarks.part(n).x
                 y = landmarks.part(n).y
-                cv2.circle(frame, (x, y), 1, (0, 255, 0), -1)  # Use a different color for mouth landmarks if you like
-                #cv2.putText(frame, str(n), (x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (0, 255, 0), 1)
+                cv2.circle(frame, (x, y), 1, (255, 0, 0), -1)
+                if n >= 60 and n <= 67:  # Optionally, draw numbers for the lip landmarks
+                    cv2.putText(frame, str(n), (x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (0, 255, 0), 1)
 
         # Display the resulting frame
         cv2.imshow('Facial Landmarks', frame)
