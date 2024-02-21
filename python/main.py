@@ -1,5 +1,17 @@
 import cv2
 import dlib
+import math
+from scipy.spatial import distance as dist
+
+def calculate_mouth_opening_area(points): #MOR/MAR is from https://www.researchgate.net/profile/Zaheed-Shaikh/publication/325228756_Driver_Fatigue_Detection_and_Alert_System_using_Non-Intrusive_Eye_and_Yawn_Detection/links/631f9b890a70852150eb4ae7/Driver-Fatigue-Detection-and-Alert-System-using-Non-Intrusive-Eye-and-Yawn-Detection.pdf
+    A = dist.euclidean(points[1], points[5])
+    B = dist.euclidean(points[2], points[4])
+    C = dist.euclidean(points[0], points[3])
+    mor = (A + B) / (2.0 * C)
+
+    print(f"Mouth opening area is {mor}")
+
+    return mor
 
 def calculate_polygon_area(points): #USES SHOELACE FORMULA https://en.wikipedia.org/wiki/Shoelace_formula
     n = len(points)  # Number of points
@@ -9,6 +21,7 @@ def calculate_polygon_area(points): #USES SHOELACE FORMULA https://en.wikipedia.
         area += points[i][0] * points[j][1]
         area -= points[j][0] * points[i][1]
     area = abs(area) / 2.0
+    print(f"Inner lip area: {area}")
     return area
 
 def detect_faces_and_landmarks(video_source=0):
@@ -46,8 +59,10 @@ def detect_faces_and_landmarks(video_source=0):
 
             # Draw facial landmarks and calculate area for inner lip contour
             lip_points = [(landmarks.part(n).x, landmarks.part(n).y) for n in range(60, 68)]
-            lip_area = calculate_polygon_area(lip_points)
-            print(f"Inner lip area: {lip_area}")
+            #lip_area = calculate_polygon_area(lip_points)
+
+
+            calculate_mouth_opening_area(lip_points)
 
             for n in range(0, 68):  # There are 68 landmark points
                 x = landmarks.part(n).x
@@ -69,3 +84,5 @@ def detect_faces_and_landmarks(video_source=0):
 
 # Ensure you have the 'shape_predictor_68_face_landmarks.dat' model file in your working directory or specify the correct path.
 detect_faces_and_landmarks()
+
+
