@@ -1,0 +1,6 @@
+@echo off
+echo Pulling latest changes from the repository...
+git pull
+pip install -r requirements.txt
+echo Running Python code...
+cmd /k "python main.py"
