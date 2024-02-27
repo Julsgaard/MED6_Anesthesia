@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'dart:async';
+import 'dart:io';
+import 'package:flutter/material.dart';
+
 
 List<CameraDescription>? cameras;
 late double _aspectRatio;
@@ -8,6 +14,7 @@ late double _aspectRatio;
 //TODO: Camera looks a bit stretched
 //TODO: Turn up the brightness of the camera like the camera app
 //TODO: Framerate is better in camera app
+//TODO: Camera not working anymore
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -56,14 +63,15 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   late CameraController _controller;
   late Future<void> _initializeControllerFuture;
-  late double _aspectRatio;
+  bool _isStreaming = false;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _controller = CameraController(
       widget.camera,
       ResolutionPreset.max,
@@ -72,16 +80,62 @@ class _MyHomePageState extends State<MyHomePage> {
       if (!mounted) {
         return;
       }
-      setState(() {
-        _aspectRatio = _controller.value.aspectRatio;
-      });
+      setState(() {});
+      _startStreaming();
     });
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _stopStreaming();
     _controller.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed) {
+      _startStreaming();
+    } else if (state == AppLifecycleState.paused) {
+      _stopStreaming();
+    }
+  }
+
+  void _startStreaming() {
+    _isStreaming = true;
+    _streamCameraFootage();
+  }
+
+  void _stopStreaming() {
+    _isStreaming = false;
+  }
+
+  Future<void> _streamCameraFootage() async {
+    while (_isStreaming) {
+      if (!_controller.value.isInitialized || _controller.value.isTakingPicture) {
+        await Future.delayed(Duration(milliseconds: 50));
+        continue;
+      }
+
+      try {
+        XFile file = await _controller.takePicture();
+        sendImageToServer(file);
+      } catch (e) {
+        print(e);
+      }
+    }
+  }
+
+  void sendImageToServer(XFile file) async {
+    var request = http.MultipartRequest('POST', Uri.parse('http://192.168.50.141:5000/upload'));
+    request.files.add(await http.MultipartFile.fromPath('picture', file.path));
+
+    var response = await request.send();
+    response.stream.transform(utf8.decoder).listen((value) {
+      print(value); // The string response from the server
+    });
   }
 
   @override
@@ -101,74 +155,3 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
-
-// OLD SHIT - COMMENTS MIGHT BE USEFUL
-// class _MyHomePageState extends State<MyHomePage> {
-//   int _counter = 0;
-//
-//   void _incrementCounter() {
-//     setState(() {
-//       // This call to setState tells the Flutter framework that something has
-//       // changed in this State, which causes it to rerun the build method below
-//       // so that the display can reflect the updated values. If we changed
-//       // _counter without calling setState(), then the build method would not be
-//       // called again, and so nothing would appear to happen.
-//       _counter++;
-//     });
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     // This method is rerun every time setState is called, for instance as done
-//     // by the _incrementCounter method above.
-//     //
-//     // The Flutter framework has been optimized to make rerunning build methods
-//     // fast, so that you can just rebuild anything that needs updating rather
-//     // than having to individually change instances of widgets.
-//     return Scaffold(
-//       appBar: AppBar(
-//         // TRY THIS: Try changing the color here to a specific color (to
-//         // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-//         // change color while the other colors stay the same.
-//         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-//         // Here we take the value from the MyHomePage object that was created by
-//         // the App.build method, and use it to set our appbar title.
-//         title: Text(widget.title),
-//       ),
-//       body: Center(
-//         // Center is a layout widget. It takes a single child and positions it
-//         // in the middle of the parent.
-//         child: Column(
-//           // Column is also a layout widget. It takes a list of children and
-//           // arranges them vertically. By default, it sizes itself to fit its
-//           // children horizontally, and tries to be as tall as its parent.
-//           //
-//           // Column has various properties to control how it sizes itself and
-//           // how it positions its children. Here we use mainAxisAlignment to
-//           // center the children vertically; the main axis here is the vertical
-//           // axis because Columns are vertical (the cross axis would be
-//           // horizontal).
-//           //
-//           // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-//           // action in the IDE, or press "p" in the console), to see the
-//           // wireframe for each widget.
-//           mainAxisAlignment: MainAxisAlignment.center,
-//           children: <Widget>[
-//             const Text(
-//               'You have pushed the button this many times:',
-//             ),
-//             Text(
-//               '$_counter',
-//               style: Theme.of(context).textTheme.headlineMedium,
-//             ),
-//           ],
-//         ),
-//       ),
-//       floatingActionButton: FloatingActionButton(
-//         onPressed: _incrementCounter,
-//         tooltip: 'Increment',
-//         child: const Icon(Icons.add),
-//       ), // This trailing comma makes auto-formatting nicer for build methods.
-//     );
-//   }
-// }
