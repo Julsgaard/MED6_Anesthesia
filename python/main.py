@@ -7,8 +7,8 @@ from datetime import datetime
 
 app = Flask(__name__)
 
-# Directory where uploaded images will be saved
-UPLOAD_FOLDER = 'uploaded_images'
+# Directory where images from the phone will be saved
+UPLOAD_FOLDER = 'logs/phone_images'
 
 # Shared resource for the latest image
 latest_image = None

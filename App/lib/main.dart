@@ -15,6 +15,7 @@ late double _aspectRatio;
 //TODO: Turn up the brightness of the camera like the camera app
 //TODO: Framerate is better in camera app
 //TODO: Camera not working anymore
+//TODO: Add comments
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
