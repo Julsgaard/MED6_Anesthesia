@@ -4,17 +4,12 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:async';
 import 'dart:io';
-import 'package:flutter/material.dart';
-
 
 List<CameraDescription>? cameras;
-late double _aspectRatio;
 
-//TODO: Camera stops working after switching to another app and back
 //TODO: Camera looks a bit stretched
 //TODO: Turn up the brightness of the camera like the camera app
 //TODO: Framerate is better in camera app
-//TODO: Camera not working anymore
 //TODO: Add comments
 
 void main() async {
@@ -81,7 +76,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       if (!mounted) {
         return;
       }
-      setState(() {});
+      setState(() {
+        // Update aspect ratio here
+      });
       _startStreaming();
     });
   }
@@ -98,7 +95,15 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
     if (state == AppLifecycleState.resumed) {
-      _startStreaming();
+      _controller.initialize().then((_) {
+        if (!mounted) {
+          return;
+        }
+        setState(() {
+          // Update aspect ratio here
+        });
+        _startStreaming();
+      });
     } else if (state == AppLifecycleState.paused) {
       _stopStreaming();
     }
@@ -145,8 +150,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       future: _initializeControllerFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
+          // Use aspect ratio from the controller
           return AspectRatio(
-            aspectRatio: _aspectRatio,
+            aspectRatio: _controller.value.isInitialized ? _controller.value.aspectRatio : 1,
             child: CameraPreview(_controller),
           );
         } else {
