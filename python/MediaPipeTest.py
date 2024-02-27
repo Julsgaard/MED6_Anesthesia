@@ -26,6 +26,8 @@ while cap.isOpened():
     # Process the image and find faces and their landmarks.
     results = face_mesh.process(image_rgb)
 
+
+
     # Draw face landmarks.
     if results.multi_face_landmarks:
         for face_landmarks in results.multi_face_landmarks:
