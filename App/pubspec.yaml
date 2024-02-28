@@ -32,6 +32,10 @@ dependencies:
     sdk: flutter
   camera: ^0.10.5+9
   http:
+  flutter_image_compress: ^2.1.0
+  image_picker: ^1.0.7
+  path_provider: ^2.1.2
+  dio: ^5.4.1
 
 
   # The following adds the Cupertino Icons font to your application.
