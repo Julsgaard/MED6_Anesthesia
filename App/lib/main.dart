@@ -10,6 +10,7 @@ List<CameraDescription>? cameras;
 //TODO: Camera looks a bit stretched
 //TODO: Turn up the brightness of the camera like the camera app
 //TODO: Framerate is better in camera app
+//TODO: It bugs if the app has been running while the server is down and then the server is started again (a lot of old images are sent)
 //TODO: Add comments
 
 void main() async {

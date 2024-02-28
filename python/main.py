@@ -71,6 +71,13 @@ if __name__ == '__main__':
 
     display_thread = threading.Thread(target=display_images)
     display_thread.start()
+
     print("Server starting...")
+
+    # Starts the server
     app.run(debug=False, host='0.0.0.0', port=5000)
+
+    # Close cv2 windows
+    # cv.destroyAllWindows()
+
     print("Server stopped.")
