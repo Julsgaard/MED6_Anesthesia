@@ -1,7 +1,7 @@
 from library import server, functions
 
 host_ip = '0.0.0.0'
-server_port = 8080
+server_port = 5000
 
 # TODO: Need comments
 
