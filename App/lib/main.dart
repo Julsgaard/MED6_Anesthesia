@@ -1,15 +1,10 @@
 import 'dart:async';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'camera_services.dart';
+import 'camera_services.dart'; // Assuming this is your updated CameraServices class with static isStreaming.
 
 List<CameraDescription>? cameras;
-//TODO: Camera looks a bit stretched
-//TODO: Turn up the brightness of the camera like the camera app
-//TODO: Framerate is better in camera app
-//TODO: It bugs if the app has been running while the server is down and then the server is started again (a lot of old images are sent)
-//TODO: Add comments
-//TODO: Plz put todos where they belong in the code
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   cameras = await availableCameras();
@@ -60,7 +55,6 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   late CameraController _controller;
   late Future<void> _initializeControllerFuture;
-  bool _isStreaming = false;
 
   @override
   void initState() {
@@ -75,14 +69,17 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         return;
       }
       setState(() {});
-      _startStreaming();
+      // Start streaming only if it is not already streaming
+      if (!CameraServices.isStreaming) {
+        CameraServices.streamCameraFootage(_controller);
+      }
     });
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    _stopStreaming();
+    CameraServices.isStreaming = false; // Ensure the stream is turned off when the widget is disposed
     _controller.dispose();
     super.dispose();
   }
@@ -91,41 +88,63 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
     if (state == AppLifecycleState.resumed) {
-      _controller.initialize().then((_) {
-        if (!mounted) {
-          return;
-        }
-        setState(() {});
-        _startStreaming();
-      });
+      // Only restart streaming if it was previously active
+      if (CameraServices.isStreaming) {
+        CameraServices.streamCameraFootage(_controller);
+      }
     } else if (state == AppLifecycleState.paused) {
-      _stopStreaming();
+      CameraServices.isStreaming = false; // Stop streaming when the app is paused
     }
-  }
-
-  void _startStreaming() {
-    _isStreaming = true;
-    CameraServices.streamCameraFootage(_controller, _isStreaming);
-  }
-
-  void _stopStreaming() {
-    _isStreaming = false;
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<void>(
-      future: _initializeControllerFuture,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.done) {
-          return AspectRatio(
-            aspectRatio: _controller.value.isInitialized ? _controller.value.aspectRatio : 1,
-            child: CameraPreview(_controller),
-          );
-        } else {
-          return Center(child: CircularProgressIndicator());
-        }
-      },
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.title),
+      ),
+      body: FutureBuilder<void>(
+        future: _initializeControllerFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            // The rest of your widget build method
+            return Stack(
+              children: <Widget>[
+                Positioned.fill(
+                  child: AspectRatio(
+                    aspectRatio: _controller.value.aspectRatio,
+                    child: CameraPreview(_controller),
+                  ),
+                ),
+                Positioned(
+                  bottom: 20,
+                  left: 0,
+                  right: 0,
+                  child: Center(
+                    child: FloatingActionButton(
+                      onPressed: () {
+                        setState(() {
+                          if (CameraServices.isStreaming) {
+                            CameraServices.isStreaming = false; // Stops the stream
+                          } else {
+                            CameraServices.streamCameraFootage(_controller); // Starts the stream
+                            CameraServices.isStreaming = true;
+                          }
+                        });
+                      },
+                      child: Icon(
+                        CameraServices.isStreaming ? Icons.stop : Icons.videocam,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          } else {
+            return Center(child: CircularProgressIndicator());
+          }
+        },
+      ),
     );
   }
 }

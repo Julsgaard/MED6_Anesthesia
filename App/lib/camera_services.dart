@@ -7,8 +7,11 @@ import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 
 class CameraServices {
-  static Future<void> streamCameraFootage(CameraController controller, bool isStreaming) async {
-    while (isStreaming) {
+  static bool isStreaming = false; // Now a static variable, accessible from anywhere
+
+  static Future<void> streamCameraFootage(CameraController controller) async {
+    isStreaming = true; // Start streaming when this method is called
+    while (isStreaming) { // Use the static variable here
       if (!controller.value.isInitialized || controller.value.isTakingPicture) {
         await Future.delayed(const Duration(milliseconds: 50));
         continue;
@@ -16,11 +19,10 @@ class CameraServices {
 
       try {
         XFile file = await controller.takePicture();
-
         XFile resizedFile = await resizeImage(file);
         await sendImageToServer(resizedFile);
       } catch (e) {
-        print(e);
+        print(e); // Consider logging or handling the error differently
       }
     }
   }
