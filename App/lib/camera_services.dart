@@ -37,8 +37,8 @@ class CameraServices {
       file.path,
       targetPath,
       quality: 50,
-      minWidth: 300,
-      minHeight: 300,
+      minWidth: 500,
+      minHeight: 500,
     );
 
     if (compressedFile == null) {
