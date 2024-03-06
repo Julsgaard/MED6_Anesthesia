@@ -1,9 +1,11 @@
-from library import server, functions
+from library import server, functions, newburgers_main
+import threading
+import queue
 
 host_ip = '0.0.0.0'
 server_port = 5000
 
-# TODO: Need comments
+image_queue = queue.Queue()
 
 
 if __name__ == '__main__':
@@ -13,7 +15,16 @@ if __name__ == '__main__':
 
     print("Server starting...")
 
-    # Starts the server
-    server.start_server(host_ip, server_port)
+    # Starts the server in a new thread
+    server_thread = threading.Thread(target=server.start_server, args=(host_ip, server_port, image_queue))
+    server_thread.start()
 
-    print("Server stopped.")
+
+while True:
+    # Get the image path from the queue
+    image_path = image_queue.get()
+    print(f"Image queue size: {image_queue.qsize()}")
+    print(f"Processing image: {image_path}")
+
+
+
