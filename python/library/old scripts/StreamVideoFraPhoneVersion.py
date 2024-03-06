@@ -28,10 +28,10 @@ def calculate_polygon_area(points): #USES SHOELACE FORMULA https://en.wikipedia.
 
 def detect_faces_and_landmarks(url):
     # Load Haar Cascade for face detection
-    face_cascade = cv2.CascadeClassifier('HaarCascadeData/haarcascade_frontalface_default.xml')
+    face_cascade = cv2.CascadeClassifier('../HaarCascadeData/haarcascade_frontalface_default.xml')
 
     # Initialize Dlib's facial landmark predictor
-    predictor_path = "FacialLandmarkData/shape_predictor_68_face_landmarks.dat"  # Path to the trained model
+    predictor_path = "../FacialLandmarkData/shape_predictor_68_face_landmarks.dat"  # Path to the trained model
     predictor = dlib.shape_predictor(predictor_path)
     detector = dlib.get_frontal_face_detector()
 
