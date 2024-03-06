@@ -2,7 +2,7 @@ import os
 from datetime import datetime
 import cv2 as cv
 import threading
-import queue
+import numpy as np
 
 # Directory where images from the phone will be saved
 logs_folder = 'logs/phone_images'
@@ -45,15 +45,22 @@ def display_images(display_image_queue):
         # Get the current image from the queue
         current_image = display_image_queue.get()
 
-        # print(f"Displaying image: {current_image}")
-        # Read the image from the provided path
-        # image = cv.imread(current_image)
+        # Check if current_image is a string (indicating it's a path)
+        if isinstance(current_image, str):
+            # Read the image from the provided path
+            image = cv.imread(current_image)
+        elif isinstance(current_image, np.ndarray):
+            # current_image is an actual image
+            image = current_image
+        else:
+            print("Invalid image or image path provided.")
+            continue
 
         # Display the image
-        cv.imshow('Live Image', current_image)
+        cv.imshow('Live Image', image)
 
         # Break the loop if 'q' is pressed
-        if cv.waitKey(10) & 0xFF == ord('q'):
+        if cv.waitKey(100) & 0xFF == ord('q'):
             break
 
     # Close the OpenCV window

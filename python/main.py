@@ -15,6 +15,9 @@ if __name__ == '__main__':
     functions.delete_empty_folders_in_logs()
     functions.create_session_folder()
 
+    # Initialize face and landmark data
+    face_cascade, predictor = FaceDetectionMethods.initialize_face_and_landmark_data()
+
     print("Server starting...")
 
     # Starts the server in a new thread
@@ -29,12 +32,13 @@ while True:
     image_path = server_image_queue.get()
     print(f"Processing image: {image_path}")
 
-    # Initialize face and landmark data
-    face_cascade, predictor = FaceDetectionMethods.initialize_face_and_landmark_data()
+    # display_image_queue.put(image_path)
+
     # Detect faces and landmarks
     face_landmarks, frame = FaceDetectionMethods.detect_faces_and_landmarks(image_path, face_cascade, predictor, is_image=True)
-    # Show the image
 
-    # Put the image path into the functions_image_queue
     display_image_queue.put(frame)
+
+    # print(f"Display image queue size: {display_image_queue.qsize()}")
+    # print(f"Server image queue size: {server_image_queue.qsize()}")
 
