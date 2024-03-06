@@ -1,6 +1,6 @@
 import cv2
 import dlib
-
+import os
 from library.MouthOpeningArea import calculate_mouth_opening_area
 from library.HeadAngle import calculate_face_ratio
 
@@ -8,13 +8,17 @@ from library.HeadAngle import calculate_face_ratio
 #TODO Måske ændre sådan at funktionerne virker på en række af billeder (måske 10) i stedet for en stream af billeder? Alternativt kunne man måske også bare lave en anden funktion til det HMMM
 
 
-def detect_faces_and_landmarks(source, face_cascade, predictor, is_image=False):
+def detect_faces_and_landmarks(source, cascade, shape_predictor, is_image=False):
     """Returns the facial landmarks and the frame with the landmarks drawn on it, needs the video
     capture, the face cascade and the landmark predictor"""
 
     # Read a frame from video capture or use the provided image
     if is_image:
-        frame = source
+        # Load the image from the path if source is a path
+        frame = cv2.imread(source)
+        if frame is None:
+            print(f"Failed to load image from {source}")
+            return None, None
     else:
         ret, frame = source.read()
         if not ret:
@@ -25,7 +29,7 @@ def detect_faces_and_landmarks(source, face_cascade, predictor, is_image=False):
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
     # Detect faces using Haar Cascade
-    faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
+    faces = cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
 
     if len(faces) == 0:
         return None, frame  # Return None for landmarks and the original frame if no faces are detected
@@ -33,7 +37,7 @@ def detect_faces_and_landmarks(source, face_cascade, predictor, is_image=False):
     # Convert faces to Dlib rectangles to use with the predictor
     for (x, y, w, h) in faces:
         dlib_rect = dlib.rectangle(int(x), int(y), int(x + w), int(y + h))
-        landmarks = predictor(gray, dlib_rect)
+        landmarks = shape_predictor(gray, dlib_rect)
 
         for n in range(0, 68):  # Draw the 68 facial landmarks
             x = landmarks.part(n).x
@@ -45,12 +49,14 @@ def detect_faces_and_landmarks(source, face_cascade, predictor, is_image=False):
 
 def initialize_face_and_landmark_data():
     """Initializes the face cascade and the landmark predictor and returns them as a tuple."""
-    # Load Haar Cascade for face detection
-    face_cascade = cv2.CascadeClassifier('HaarCascadeData/haarcascade_frontalface_default.xml')
-    # Initialize Dlib's facial landmark predictor
-    predictor_path = "FacialLandmarkData/shape_predictor_68_face_landmarks.dat"  # Path to the trained model
-    predictor = dlib.shape_predictor(predictor_path)
-    return face_cascade, predictor
+    # Constructing an absolute path to the HaarCascade and Dlib model files
+    base_dir = os.path.dirname(os.path.realpath(__file__))  # Gets the directory of the current script
+    haar_cascade_path = os.path.join(base_dir, 'HaarCascadeData', 'haarcascade_frontalface_default.xml')
+    dlib_predictor_path = os.path.join(base_dir, 'FacialLandmarkData', 'shape_predictor_68_face_landmarks.dat')
+
+    face_cas = cv2.CascadeClassifier(haar_cascade_path)
+    shape_predictor = dlib.shape_predictor(dlib_predictor_path)
+    return face_cas, shape_predictor
 
 
 if __name__ == "__main__":

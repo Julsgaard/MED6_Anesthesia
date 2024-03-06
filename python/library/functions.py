@@ -45,12 +45,12 @@ def display_images(display_image_queue):
         # Get the current image from the queue
         current_image = display_image_queue.get()
 
-        print(f"Displaying image: {current_image}")
+        # print(f"Displaying image: {current_image}")
         # Read the image from the provided path
-        image = cv.imread(current_image)
+        # image = cv.imread(current_image)
 
         # Display the image
-        cv.imshow('Live Image', image)
+        cv.imshow('Live Image', current_image)
 
         # Break the loop if 'q' is pressed
         if cv.waitKey(10) & 0xFF == ord('q'):
