@@ -1,5 +1,8 @@
 import os
 from datetime import datetime
+import cv2 as cv
+import threading
+import queue
 
 # Directory where images from the phone will be saved
 logs_folder = 'logs/phone_images'
@@ -29,3 +32,29 @@ def delete_empty_folders_in_logs():
         if not folder_name and not files:
             os.rmdir(folder_path)
             print(f"Deleted empty directory: {folder_path}")
+
+
+def start_display_thread(display_image_queue):
+    print("Starting display thread...")
+    display_thread = threading.Thread(target=display_images, args=(display_image_queue,))
+    display_thread.start()
+
+
+def display_images(display_image_queue):
+    while True:
+        # Get the current image from the queue
+        current_image = display_image_queue.get()
+
+        print(f"Displaying image: {current_image}")
+        # Read the image from the provided path
+        image = cv.imread(current_image)
+
+        # Display the image
+        cv.imshow('Live Image', image)
+
+        # Break the loop if 'q' is pressed
+        if cv.waitKey(10) & 0xFF == ord('q'):
+            break
+
+    # Close the OpenCV window
+    cv.destroyAllWindows()

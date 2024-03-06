@@ -5,8 +5,10 @@ import queue
 host_ip = '0.0.0.0'
 server_port = 5000
 
-image_queue = queue.Queue()
+server_image_queue = queue.Queue()
+display_image_queue = queue.Queue()
 
+current_image = None
 
 if __name__ == '__main__':
     functions.check_for_logs_folder()
@@ -16,24 +18,23 @@ if __name__ == '__main__':
     print("Server starting...")
 
     # Starts the server in a new thread
-    server_thread = threading.Thread(target=server.start_server, args=(host_ip, server_port, image_queue))
+    server_thread = threading.Thread(target=server.start_server, args=(host_ip, server_port, server_image_queue))
     server_thread.start()
 
+    # Starts the display_images function in a new thread with the functions_image_queue
+    functions.start_display_thread(display_image_queue)
 
 while True:
-    # Get the image path from the queue
-    image_path = image_queue.get()
-    print(f"Image queue size: {image_queue.qsize()}")
+    # Get the image path from the server_image_queue
+    image_path = server_image_queue.get()
     print(f"Processing image: {image_path}")
 
     # Initialize face and landmark data
-    face_cascade, predictor = FaceDetectionMethods.initialize_face_and_landmark_data()
+    # face_cascade, predictor = FaceDetectionMethods.initialize_face_and_landmark_data()
     # Detect faces and landmarks
-    face_landmarks, frame = FaceDetectionMethods.detect_faces_and_landmarks(image_path, face_cascade, predictor)
+    # face_landmarks, frame = FaceDetectionMethods.detect_faces_and_landmarks(image_path, face_cascade, predictor)
     # Show the image
-    # GO JULSGAARD
 
-
-
-
+    # Put the image path into the functions_image_queue
+    display_image_queue.put(image_path)
 
