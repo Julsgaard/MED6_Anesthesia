@@ -2,7 +2,10 @@ import cv2
 import dlib
 
 from library.MouthOpeningArea import calculate_mouth_opening_area
-from library.HeadAngle import calculate_default_face_angle
+from library.HeadAngle import calculate_face_ratio
+
+
+#TODO Måske ændre sådan at funktionerne virker på en række af billeder (måske 10) i stedet for en stream af billeder? Alternativt kunne man måske også bare lave en anden funktion til det HMMM
 
 
 def detect_faces_and_landmarks(source, face_cascade, predictor, is_image=False):
@@ -63,8 +66,8 @@ if __name__ == "__main__":
             lip_area = calculate_mouth_opening_area(face_landmarks)
             print(lip_area)
 
-            default_face_angle = calculate_default_face_angle(face_landmarks)
-            print(f"Default face ratio is {default_face_angle}")
+            face_ratio = calculate_face_ratio(face_landmarks)
+            print(f"Face ratio is {face_ratio}")
         else:  # Handle the case when no landmarks are detected
             print("No facial landmarks detected.")
 
