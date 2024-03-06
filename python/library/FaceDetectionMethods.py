@@ -6,12 +6,15 @@ from library.HeadAngle import calculate_default_face_angle
 
 
 # Method that returns the facial landmarks and the frame with the landmarks drawn on it, needs the video capture, the face cascade and the ladnmark predictor
-def detect_faces_and_landmarks(cap, face_cascade, predictor):
-    # Read a frame
-    ret, frame = cap.read()
-    if not ret:
-        print("Failed to grab frame")
-        return None, None  # Ensure that the function returns a tuple even when failing to read a frame
+def detect_faces_and_landmarks(source, face_cascade, predictor, is_image=False):
+    # Read a frame from video capture or use the provided image
+    if is_image:
+        frame = source
+    else:
+        ret, frame = source.read()
+        if not ret:
+            print("Failed to grab frame")
+            return None, None
 
     # Convert to grayscale
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -24,20 +27,49 @@ def detect_faces_and_landmarks(cap, face_cascade, predictor):
 
     # Convert faces to Dlib rectangles to use with the predictor
     for (x, y, w, h) in faces:
-        # Convert to a dlib rectangle
         dlib_rect = dlib.rectangle(int(x), int(y), int(x + w), int(y + h))
-
-        # Use Dlib to get facial landmarks
         landmarks = predictor(gray, dlib_rect)
 
-        for n in range(0, 68):  # There are 68 landmark points
+        for n in range(0, 68):  # Draw the 68 facial landmarks
             x = landmarks.part(n).x
             y = landmarks.part(n).y
             cv2.circle(frame, (x, y), 1, (255, 0, 0), -1)
             cv2.putText(frame, str(n), (x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (0, 255, 0), 1)
-            if n >= 60 and n <= 67:  # Optionally, draw numbers for the lip landmarks
-                cv2.putText(frame, str(n), (x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (0, 255, 0), 1)
-        return landmarks, frame  # Return the landmarks and modified frame if faces are detected
+        return landmarks, frame
+
+def initialize_face_and_landmark_data():
+    face_cascade = cv2.CascadeClassifier('HaarCascadeData/haarcascade_frontalface_default.xml')
+    predictor_path = "FacialLandmarkData/shape_predictor_68_face_landmarks.dat"
+    predictor = dlib.shape_predictor(predictor_path)
+    return face_cascade, predictor
+
+if __name__ == "__main__":
+    # Initialize video capture with DirectShow API
+    cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+    face_cascade, predictor = initialize_face_and_landmark_data()
+
+    while True:
+        # Read frame and detect landmarks
+        face_landmarks, frame = detect_faces_and_landmarks(cap, face_cascade, predictor)
+
+        # Process the detected landmarks
+        if face_landmarks is not None:
+            lip_area = calculate_mouth_opening_area(face_landmarks)
+            print(lip_area)
+
+            default_face_angle = calculate_default_face_angle(face_landmarks)
+            print(f"Default face ratio is {default_face_angle}")
+        else:
+            print("No facial landmarks detected.")
+
+        # Display the resulting frame
+        cv2.imshow('Facial Landmarks', frame)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+
+    # Cleanup
+    cap.release()
+    cv2.destroyAllWindows()
 
 
 
@@ -68,11 +100,6 @@ if __name__ == "__main__":
             print(f"Default face ratio is {default_face_angle}")
         else:  # Handle the case when no landmarks are detected
             print("No facial landmarks detected.")
-            # Here, you could also set lip_area and default_face_angle to some default values if needed
-            # For example:
-            # lip_area = 0
-            # default_face_angle = 0
-            # print("Lip area and default face angle set to default values due to lack of detection.")
 
         # Display the resulting frame
         cv2.imshow('Facial Landmarks', frame)

@@ -1,4 +1,4 @@
-from library import server, functions, newburgers_main
+from library import server, functions, FaceDetectionMethods
 import threading
 import queue
 
@@ -25,6 +25,15 @@ while True:
     image_path = image_queue.get()
     print(f"Image queue size: {image_queue.qsize()}")
     print(f"Processing image: {image_path}")
+
+    # Initialize face and landmark data
+    face_cascade, predictor = FaceDetectionMethods.initialize_face_and_landmark_data()
+    # Detect faces and landmarks
+    face_landmarks, frame = FaceDetectionMethods.detect_faces_and_landmarks(image_path, face_cascade, predictor)
+    # Show the image
+    # GO JULSGAARD
+
+
 
 
 
