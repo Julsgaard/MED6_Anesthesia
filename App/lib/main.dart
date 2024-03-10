@@ -1,9 +1,12 @@
 import 'dart:async';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'camera_services.dart'; // Assuming this is your updated CameraServices class with static isStreaming.
+import 'camera_services.dart';
+import 'package:sensors/sensors.dart';
+import 'dart:math' as math;
 
 List<CameraDescription>? cameras;
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -12,6 +15,10 @@ void main() async {
         (camera) => camera.lensDirection == CameraLensDirection.front,
   );
   runApp(MyApp(camera: frontCamera));
+}
+class GlobalVariables {
+  // Static variable to hold the tilt angle
+  static double tiltAngle = 0.0;
 }
 
 class MyApp extends StatelessWidget {
@@ -56,9 +63,22 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   late CameraController _controller;
   late Future<void> _initializeControllerFuture;
 
+  // Variable to hold the tilt angle
+
   @override
   void initState() {
     super.initState();
+
+    // Listener for accelerometer events
+    accelerometerEvents.listen((AccelerometerEvent event) {
+      // Assuming the phone is mostly upright, you can calculate the tilt
+      // angle around the x-axis using the arctan of the y/z acceleration values.
+      // This is a simplification and might need adjustment for your use case.
+      setState(() {
+        GlobalVariables.tiltAngle = math.atan2(event.y, event.z) * 180 / math.pi;
+      });
+    });
+
     WidgetsBinding.instance.addObserver(this);
     _controller = CameraController(
       widget.camera,
@@ -74,6 +94,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         CameraServices.streamCameraFootage(_controller);
       }
     });
+
   }
 
   @override
@@ -101,7 +122,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text('Tilt Angle: $GlobalVariables.tiltAngle degrees'),
       ),
       body: FutureBuilder<void>(
         future: _initializeControllerFuture,

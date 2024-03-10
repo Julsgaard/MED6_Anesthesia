@@ -40,6 +40,7 @@ dependencies:
   flutter_webrtc: ^0.9.48+hotfix.1
   web_socket_channel: ^2.4.4
   image: ^4.0.15
+  sensors: ^2.0.3
 
 
   # The following adds the Cupertino Icons font to your application.

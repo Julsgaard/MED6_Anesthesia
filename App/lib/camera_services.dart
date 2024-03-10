@@ -6,6 +6,8 @@ import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 
+import 'main.dart';
+
 class CameraServices {
   static bool isStreaming = false; // Now a static variable, accessible from anywhere
 
@@ -20,7 +22,8 @@ class CameraServices {
       try {
         XFile file = await controller.takePicture();
         XFile resizedFile = await resizeImage(file);
-        await sendImageToServer(resizedFile);
+        await sendImageToServer(
+            resizedFile);
       } catch (e) {
         print(e); // Consider logging or handling the error differently
       }
@@ -30,7 +33,9 @@ class CameraServices {
   static Future<XFile> resizeImage(XFile file) async {
     // Temporary file path for the compressed file
     final tempDir = await getTemporaryDirectory();
-    final targetPath = '${tempDir.path}/${DateTime.now().millisecondsSinceEpoch}.jpg';
+    final targetPath = '${tempDir.path}/${DateTime
+        .now()
+        .millisecondsSinceEpoch}.jpg';
 
     // Resize the image to 300x300 and reduce the quality
     final compressedFile = await FlutterImageCompress.compressAndGetFile(
@@ -51,8 +56,11 @@ class CameraServices {
   }
 
   static Future<void> sendImageToServer(XFile file) async {
-    var request = http.MultipartRequest('POST', Uri.parse('http://192.168.86.62:5000/upload'));
+    var request = http.MultipartRequest(
+        'POST', Uri.parse('http://192.168.86.65:5000/upload'));
     request.files.add(await http.MultipartFile.fromPath('picture', file.path));
+    // Add the tilt angle as a field in the request
+    request.fields['tiltAngle'] = GlobalVariables.tiltAngle.toString();
 
     var response = await request.send();
     response.stream.transform(utf8.decoder).listen((value) {
