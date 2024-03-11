@@ -6,11 +6,14 @@ from library import functions
 app = Flask(__name__)
 
 image_queue = None
+tilt_queue = None
 
 
-def start_server(host_ip, server_port, queue):
+def start_server(host_ip, server_port, temp_image_queue, temp_tilt_queue):
     global image_queue
-    image_queue = queue
+    global tilt_queue
+    image_queue = temp_image_queue
+    tilt_queue = temp_tilt_queue
     app.run(debug=False, host=host_ip, port=server_port, threaded=True)
 
 
@@ -31,11 +34,12 @@ def upload_file():
         # Here, convert tilt_angle from string to float, and handle potential conversion errors
         try:
             tilt_angle = float(tilt_angle)
+            tilt_queue.put(tilt_angle)
         except ValueError:
             # If there is an error, set a default value or handle it as needed
             tilt_angle = 0.0
 
-        print(f"Tilt angle: {tilt_angle}")
+        #print(f"Raw tilt angle: {tilt_angle}")
 
         if image_path:
             # Now you can use the tilt_angle along with the image

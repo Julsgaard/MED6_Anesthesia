@@ -8,7 +8,9 @@ import 'package:path_provider/path_provider.dart';
 
 import 'main.dart';
 
+
 class CameraServices {
+
   static bool isStreaming = false; // Now a static variable, accessible from anywhere
 
   static Future<void> streamCameraFootage(CameraController controller) async {
@@ -57,7 +59,7 @@ class CameraServices {
 
   static Future<void> sendImageToServer(XFile file) async {
     var request = http.MultipartRequest(
-        'POST', Uri.parse('http://192.168.86.65:5000/upload'));
+        'POST', Uri.parse(GlobalVariables.ipAddress));
     request.files.add(await http.MultipartFile.fromPath('picture', file.path));
     // Add the tilt angle as a field in the request
     request.fields['tiltAngle'] = GlobalVariables.tiltAngle.toString();

@@ -6,7 +6,12 @@ import 'package:sensors/sensors.dart';
 import 'dart:math' as math;
 
 List<CameraDescription>? cameras;
-
+class GlobalVariables {
+  // Static variable to hold the IP address
+  static var ipAddress = "http://192.168.86.65:5000/upload";
+  // Static variable to hold the tilt angle
+  static double tiltAngle = 0.0;
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,10 +21,7 @@ void main() async {
   );
   runApp(MyApp(camera: frontCamera));
 }
-class GlobalVariables {
-  // Static variable to hold the tilt angle
-  static double tiltAngle = 0.0;
-}
+
 
 class MyApp extends StatelessWidget {
   final CameraDescription camera;
@@ -122,7 +124,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Tilt Angle: $GlobalVariables.tiltAngle degrees'),
+        title: Text('Tilt Angle: ${GlobalVariables.tiltAngle} degrees'),
       ),
       body: FutureBuilder<void>(
         future: _initializeControllerFuture,
