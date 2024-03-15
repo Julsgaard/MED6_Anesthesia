@@ -3,6 +3,8 @@ from datetime import datetime
 import cv2 as cv
 import threading
 import numpy as np
+import torch
+
 
 # Directory where images from the phone will be saved
 logs_folder = 'logs/phone_images'
@@ -65,3 +67,23 @@ def display_images(display_image_queue):
 
     # Close the OpenCV window
     cv.destroyAllWindows()
+
+
+# Function to display the predicted images
+def imshow_cv(inp, title=None):
+    if isinstance(inp, torch.Tensor):
+        inp = inp.numpy().transpose((1, 2, 0))
+
+    # Reverse the normalization
+    mean = np.array([0.485, 0.456, 0.406])
+    std = np.array([0.229, 0.224, 0.225])
+    inp = inp * std + mean  # First reverse the normalization
+    inp = np.clip(inp, 0, 1)  # Then clip to the range [0, 1]
+
+    # Convert it to [0, 255] for display
+    inp = (inp * 255).astype(np.uint8)
+
+    # Display the image
+    cv.imshow(title if title else 'Image', inp)
+    cv.waitKey(0)  # Wait for a key press to proceed
+    cv.destroyAllWindows()  # Close the window after key press
