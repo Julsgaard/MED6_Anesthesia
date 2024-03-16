@@ -38,7 +38,6 @@ def prepare_image_data():
     print(f"Number of training samples: {len(train_dataset)}")
     print(f"Number of testing samples: {len(test_dataset)}")
 
-
     # # Display a few images from the training dataset
     # for i, (inputs, labels) in enumerate(train_loader):
     #     if i == 5:  # Display first 5 images
@@ -54,7 +53,7 @@ def prepare_image_data():
     return train_loader, test_loader
 
 
-def prepare_augmented_image_data():
+def prepare_augmented_image_data():  # TODO: Try this
     dataset_path = 'mallampati_dataset'
 
     # Augmented transformations for training

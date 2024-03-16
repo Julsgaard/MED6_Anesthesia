@@ -32,7 +32,7 @@ def run_mallampati_model():
 
     # Loss function and optimizer
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.fc.parameters(), lr=0.001)  # Only train the classifier parameters
+    optimizer = optim.Adam(model.fc.parameters(), lr=1e-3)  # Only train the classifier parameters
 
     # Learning rate scheduler - decay the learning rate by a factor of 0.1 every 7 epochs
     scheduler = StepLR(optimizer, step_size=7, gamma=0.1)
@@ -113,7 +113,7 @@ def run_mallampati_model():
 
         # Step the scheduler
         scheduler.step()
-        scheduler.get_last_lr()
+        print(f"Learning rate: {scheduler.get_last_lr()}")
 
     # load best model weights
     model.load_state_dict(best_model_wts)

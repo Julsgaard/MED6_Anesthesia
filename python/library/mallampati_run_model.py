@@ -5,11 +5,14 @@ from library.mallampati_image_prep import prepare_test_data
 
 
 def load_model_and_predict():
+    num_classes = 4
+
     # Load the pre-trained model
     model = models.resnet152()
-    num_ftrs = model.fc.in_features
-    model.fc = nn.Linear(num_ftrs, 4)  # Adjust for 4 class output
-    model.load_state_dict(torch.load('mallampati_models/best_model_ResNet152_93%.pth'))
+    num_features = model.fc.in_features
+    print(f"Number of features: {num_features}")
+    model.fc = nn.Linear(num_features, num_classes)
+    model.load_state_dict(torch.load('mallampati_models/best_model_new.pth'))
 
     # Move the model to GPU if available
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -22,7 +25,6 @@ def load_model_and_predict():
     test_loader = prepare_test_data()
 
     # Initialize the confusion matrix
-    num_classes = 4
     confusion_matrix = torch.zeros(num_classes, num_classes)
 
     # Initialize a list to hold the total number of images for each class
@@ -39,6 +41,10 @@ def load_model_and_predict():
             inputs, labels = inputs.to(device), labels.to(device)
             outputs = model(inputs)
             _, predicted = torch.max(outputs.data, 1)
+
+            # Print the model's prediction and the actual class for each image
+            for i in range(len(labels)):
+                print(f'Image {i + 1}: Actual class: {labels[i].item()}, Predicted class: {predicted[i].item()}')
 
             # Update the confusion matrix
             for t, p in zip(labels.view(-1), predicted.view(-1)):
