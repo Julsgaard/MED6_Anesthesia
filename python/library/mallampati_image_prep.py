@@ -58,7 +58,8 @@ def prepare_augmented_image_data():  # TODO: Try this
 
     # Augmented transformations for training
     train_transform_augmented = transforms.Compose([
-        transforms.RandomResizedCrop(224),
+        transforms.Resize(256),
+        transforms.CenterCrop(224),
         transforms.RandomHorizontalFlip(),
         transforms.RandomRotation(10),
         transforms.ToTensor(),
@@ -92,6 +93,18 @@ def prepare_augmented_image_data():  # TODO: Try this
     print(f"Number of training samples (augmented): {len(train_dataset)}")
     print(f"Number of testing samples: {len(test_dataset)}")
 
+    # # Display a few images from the training dataset
+    # for i, (inputs, labels) in enumerate(train_loader_augmented):
+    #     if i == 5:  # Display first 5 images
+    #         break
+    #     imshow_cv(inputs[0])  # Display the first image from the batch
+    #
+    # # Display a few images from the testing dataset
+    # for i, (inputs, labels) in enumerate(test_loader):
+    #     if i == 5:  # Display first 5 images
+    #         break
+    #     imshow_cv(inputs[0])  # Display the first image from the batch
+
     return train_loader_augmented, test_loader
 
 
@@ -119,4 +132,5 @@ def prepare_test_data():
 
 
 if __name__ == "__main__":
-    prepare_image_data()
+    # prepare_image_data()
+    prepare_augmented_image_data()

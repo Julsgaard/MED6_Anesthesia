@@ -28,14 +28,11 @@ def run_mallampati_model():
     # Move the model to GPU if available
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     model.to(device)
-    print(f"Device: {device}")  # TODO: Get CUDA to work
+    print(f"Device: {device}")
 
     # Loss function and optimizer
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.fc.parameters(), lr=1e-3)  # Only train the classifier parameters
-
-    # Learning rate scheduler - decay the learning rate by a factor of 0.1 every 7 epochs
-    scheduler = StepLR(optimizer, step_size=7, gamma=0.1)
 
     # Model checkpointing
     best_model_wts = copy.deepcopy(model.state_dict())
@@ -66,6 +63,7 @@ def run_mallampati_model():
 
         model.train()
         running_loss = 0.0
+        total_train_loss = 0.0  # Initialize total training loss for this epoch
         for inputs, labels in train_loader:
             inputs, labels = inputs.to(device), labels.to(device)
 
@@ -76,20 +74,22 @@ def run_mallampati_model():
             optimizer.step()  # Optimize
 
             running_loss += loss.item()
-        print(f"Epoch {epoch + 1}, Loss: {running_loss / len(train_loader)}")
-
-        # Append loss for this epoch
-        losses.append(running_loss / len(train_loader))
+            total_train_loss += loss.item()  # Add the batch loss to the total training loss
+        print(f"Epoch {epoch + 1}, Training Loss: {total_train_loss / len(train_loader)}")  # Print average training loss
 
         # Evaluate the model
         model.eval()  # Set the model to evaluation mode
         correct = 0
         total = 0
         epoch_acc = 0
+        total_val_loss = 0.0  # Initialize total validation loss for this epoch
         with torch.no_grad():
             for inputs, labels in test_loader:
                 inputs, labels = inputs.to(device), labels.to(device)
                 outputs = model(inputs)
+                loss = criterion(outputs, labels)
+                total_val_loss += loss.item()  # Add the batch loss to the total validation loss
+
                 _, predicted = torch.max(outputs.data, 1)
                 total += labels.size(0)
                 correct += (predicted == labels).sum().item()
@@ -98,8 +98,11 @@ def run_mallampati_model():
                 for t, p in zip(labels.view(-1), predicted.view(-1)):
                     confusion_matrix[t.long(), p.long()] += 1
 
+            print(f"Epoch {epoch + 1}, Validation Loss: {total_val_loss / len(test_loader)}")  # Print average validation loss
+
             epoch_acc = correct / total
             print(f'Accuracy on the test set: {100 * epoch_acc} %')
+            print("==============================================")
 
             # deep copy the model
             if epoch_acc > best_acc:
@@ -108,17 +111,15 @@ def run_mallampati_model():
                 best_model_wts = copy.deepcopy(model.state_dict())
                 best_epoch_confusion_matrix = confusion_matrix.clone()
 
+        # Append loss for this epoch
+        losses.append((running_loss / len(train_loader), total_val_loss / len(test_loader)))
+
         # Append accuracy for this epoch
         accuracies.append(epoch_acc)
-
-        # Step the scheduler
-        scheduler.step()
-        print(f"Learning rate: {scheduler.get_last_lr()}")
 
     # load best model weights
     model.load_state_dict(best_model_wts)
 
-    print("======================================")
     # Print the best epoch and the number of correct predictions for each class in that epoch
     print(f'Best epoch: {best_epoch}')
     print(f'Test set accuracy in best epoch: {best_acc * 100}%')
@@ -139,14 +140,15 @@ def plot_training(losses, accuracies):
     plt.figure(figsize=(12, 4))
 
     plt.subplot(1, 2, 1)
-    plt.plot(epochs, losses, 'bo', label='Training loss')
-    plt.title('Training loss')
+    plt.plot(epochs, [loss[0] for loss in losses], 'bo-', label='Training loss')  # Add line for training loss
+    plt.plot(epochs, [loss[1] for loss in losses], 'ro-', label='Validation loss')  # Add line for validation loss
+    plt.title('Training and Validation loss')
     plt.xlabel('Epochs')
     plt.ylabel('Loss')
     plt.legend()
 
     plt.subplot(1, 2, 2)
-    plt.plot(epochs, accuracies, 'bo', label='Training accuracy')
+    plt.plot(epochs, accuracies, 'bo-', label='Training accuracy')  # Add line for training accuracy
     plt.title('Training accuracy')
     plt.xlabel('Epochs')
     plt.ylabel('Accuracy')
