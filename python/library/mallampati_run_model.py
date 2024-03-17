@@ -5,14 +5,14 @@ from library.mallampati_image_prep import prepare_test_data
 
 
 def load_model_and_predict():
-    num_classes = 4
+    num_classes = 2
 
     # Load the pre-trained model
-    model = models.resnet152()
+    model = models.resnet34()
     num_features = model.fc.in_features
     print(f"Number of features: {num_features}")
     model.fc = nn.Linear(num_features, num_classes)
-    model.load_state_dict(torch.load('mallampati_models/best_model_new.pth'))
+    model.load_state_dict(torch.load('mallampati_models/best_model_ResNet34_98%_25_epochs_2_classes.pth'))
 
     # Move the model to GPU if available
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -44,7 +44,7 @@ def load_model_and_predict():
 
             # Print the model's prediction and the actual class for each image
             for i in range(len(labels)):
-                print(f'Image {i + 1}: Actual class: {labels[i].item()}, Predicted class: {predicted[i].item()}')
+                print(f'Image: Actual class: {labels[i].item()}, Predicted class: {predicted[i].item()}')
 
             # Update the confusion matrix
             for t, p in zip(labels.view(-1), predicted.view(-1)):

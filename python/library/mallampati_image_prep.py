@@ -7,7 +7,7 @@ from library.functions import imshow_cv
 
 def prepare_image_data():
     # Define your dataset path
-    dataset_path = 'mallampati_dataset'
+    dataset_path = 'mallampati_datasets/Second dataset (2 classes)'
 
     # # Define transformations
     # transform = transforms.Compose([
@@ -40,13 +40,13 @@ def prepare_image_data():
 
     # # Display a few images from the training dataset
     # for i, (inputs, labels) in enumerate(train_loader):
-    #     if i == 5:  # Display first 5 images
+    #     if i == 10:  # Display first 5 images
     #         break
     #     imshow_cv(inputs[0])  # Display the first image from the batch
     #
     # # Display a few images from the testing dataset
     # for i, (inputs, labels) in enumerate(test_loader):
-    #     if i == 5:  # Display first 5 images
+    #     if i == 10:  # Display first 5 images
     #         break
     #     imshow_cv(inputs[0])  # Display the first image from the batch
 
@@ -54,7 +54,7 @@ def prepare_image_data():
 
 
 def prepare_augmented_image_data():  # TODO: Try this
-    dataset_path = 'mallampati_dataset'
+    dataset_path = 'mallampati_datasets/Second dataset (2 classes)'
 
     # Augmented transformations for training
     train_transform_augmented = transforms.Compose([
@@ -110,7 +110,7 @@ def prepare_augmented_image_data():  # TODO: Try this
 
 def prepare_test_data():
     # Define your test dataset path
-    dataset_path = 'mallampati_testset'
+    dataset_path = 'mallampati_testset/Second testset'
 
     # Define transformations
     transform = transforms.Compose([
@@ -132,5 +132,5 @@ def prepare_test_data():
 
 
 if __name__ == "__main__":
-    # prepare_image_data()
-    prepare_augmented_image_data()
+    prepare_image_data()
+    # prepare_augmented_image_data()
