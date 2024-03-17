@@ -2,8 +2,8 @@ import cv2
 import mediapipe as mp
 
 
-# inner_lip_indices = [78, 191, 80, 81, 82, 13, 312, 311, 310, 415, 308, 324, 318, 402, 317, 14, 87, 178, 88, 95]
-# lip_and_mouth_indices = [33,263,61,291]
+inner_lip_indices = [78, 191, 80, 81, 82, 13, 312, 311, 310, 415, 308, 324, 318, 402, 317, 14, 87, 178, 88, 95]
+#lip_and_mouth_indices = [33,263,61,291]
 
 
 def detect_faces_and_landmarks(source, face_mesh, is_image=False):
@@ -36,12 +36,14 @@ def detect_faces_and_landmarks(source, face_mesh, is_image=False):
         print("No faces detected.")
         return frame, None
 
-    # Draw face landmarks.
+    # Draw face landmarks for specific indices.
+    desired_indices = [33, 263, 61, 291]
     for face_landmarks in results.multi_face_landmarks:
-        for landmark in face_landmarks.landmark:
-            x = int(landmark.x * frame.shape[1])
-            y = int(landmark.y * frame.shape[0])
-            cv2.circle(frame, (x, y), 1, (0, 255, 0), -1)  # Draw circle for each landmark
+        for idx, landmark in enumerate(face_landmarks.landmark):
+            if idx in inner_lip_indices:
+                x = int(landmark.x * frame.shape[1])
+                y = int(landmark.y * frame.shape[0])
+                cv2.circle(frame, (x, y), 1, (0, 255, 0), -1)  # Draw circle for each specified landmark
 
         return frame, results.multi_face_landmarks[0].landmark
 
@@ -50,7 +52,7 @@ def initialize_mediapipe_face_mesh():
     """Initializes the MediaPipe Face Mesh and returns it."""
     # Initialize MediaPipe Face Mesh.
     mp_face_mesh = mp.solutions.face_mesh
-    face_mesh = mp_face_mesh.FaceMesh(min_detection_confidence=0.5, min_tracking_confidence=0.5)
+    face_mesh = mp_face_mesh.FaceMesh(min_detection_confidence=0.5, min_tracking_confidence=0.5,refine_landmarks=True)
 
     return face_mesh
 

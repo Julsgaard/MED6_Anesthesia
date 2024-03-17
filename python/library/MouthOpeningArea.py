@@ -1,20 +1,33 @@
 from scipy.spatial import distance as dist
 
 
+def calculate_mouth_opening_area(face_landmarks):
+    """Calculates the mouth opening ratio (MOR) based on specified MediaPipe facial landmarks."""
+    # Updated indices for MediaPipe
+    indices = [78, 191, 80, 81, 82, 13, 312, 311, 310, 415, 308, 324, 318, 402, 317, 14, 87, 178, 88, 95]
 
-#Takes the list of facial landmarks and calculates the mouth opening area
-def calculate_mouth_opening_area(points): #MOR/MAR is from https://www.researchgate.net/profile/Zaheed-Shaikh/publication/325228756_Driver_Fatigue_Detection_and_Alert_System_using_Non-Intrusive_Eye_and_Yawn_Detection/links/631f9b890a70852150eb4ae7/Driver-Fatigue-Detection-and-Alert-System-using-Non-Intrusive-Eye-and-Yawn-Detection.pdf
-    lip_points = [(points.part(n).x, points.part(n).y) for n in range(60, 68)] #Extracts the lip points
-    A = dist.euclidean(lip_points[1], lip_points[5])
-    B = dist.euclidean(lip_points[2], lip_points[4])
-    C = dist.euclidean(lip_points[0], lip_points[3])
+    # Extracts the lip points from the updated indices, assuming face_landmarks is a flat list of landmarks
+    lip_points = [(face_landmarks[i].x, face_landmarks[i].y) for i in indices]
+
+    # We need to define which points A, B, and C refer to in your new landmark scheme
+    # Assuming they represent three key points such as the top-middle, lower-middle of the mouth, and a point on the outer edge.
+    # Update these based on the actual points used for mouth opening calculation
+    A = dist.euclidean(lip_points[0], lip_points[6])  # Update indices based on your measurement points
+    B = dist.euclidean(lip_points[3], lip_points[9])  # Same here
+    C = dist.euclidean(lip_points[12], lip_points[16])  # And here
+
     mor = (A + B) / (2.0 * C)
-
     return mor
 
 
-def calculate_polygon_area(points): #USES SHOELACE FORMULA https://en.wikipedia.org/wiki/Shoelace_formula
-    lip_points = [(points.part(n).x, points.part(n).y) for n in range(60, 68)] #Extracts the lip points
+def calculate_polygon_area(face_landmarks):
+    """Calculates the area of the mouth polygon based on specified MediaPipe facial landmarks using the Shoelace formula."""
+    # Updated indices for MediaPipe
+    indices = [78, 191, 80, 81, 82, 13, 312, 311, 310, 415, 308, 324, 318, 402, 317, 14, 87, 178, 88, 95]
+
+    # Extracts the lip points from the updated indices
+    lip_points = [(face_landmarks[i].x, face_landmarks[i].y) for i in indices]
+
     n = len(lip_points)  # Number of points
     area = 0.0
     for i in range(n):

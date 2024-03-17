@@ -1,4 +1,4 @@
-from library import server, functions, MediapipeFaceDetection, HeadAngle
+from library import server, functions, MediapipeFaceDetection, HeadAngle, MouthOpeningArea, MouthCrop
 import threading
 import queue
 
@@ -36,15 +36,21 @@ while True:
 
 
 
+
     # display_image_queue.put(image_path)
 
     # Detect faces and landmarks
     frame, face_landmarks = MediapipeFaceDetection.detect_faces_and_landmarks(image_path, face_mesh_model, is_image=True)
 
-    #if face_landmarks:
-    #    HeadAngle.store_head_angle_information(tilt_queue.get(), face_landmarks)
+    if face_landmarks:
+        HeadAngle.store_head_angle_information(tilt_queue.get(), face_landmarks,image_path)
+        mouth_region = MouthCrop.crop_mouth_region(frame, face_landmarks)
+        #print(f"Face landmarks: {face_landmarks}")
+        #MOR = MouthOpeningArea.calculate_polygon_area(face_landmarks)
+        #print(f"Mouth opening area: {MOR}")
 
-    display_image_queue.put(frame)
+
+    display_image_queue.put(mouth_region)
 
 
 
