@@ -1,4 +1,4 @@
-from library import server, functions, MediapipeFaceDetection, HeadAngle, MouthOpeningArea, MouthCrop
+from library import server, functions, MediapipeFaceDetection, MouthCrop, NeckAngle_PhoneSensor
 import threading
 import queue
 
@@ -31,29 +31,18 @@ if __name__ == '__main__':
 while True:
     # Get the image path from the server_image_queue
     image_path = server_image_queue.get()
-    #print(f"Queue tilt angle {tilt_queue.get()}")
-    #print(f"Processing image: {image_path}")
 
-
-
-
-    # display_image_queue.put(image_path)
+    # Neck angle using only the phone sensor (Needs 20 entries to calculate, which is like 8-10 seconds? (Maybe i should make it time based instead))
+    absolute_neck_angle, default_tilt_angle = NeckAngle_PhoneSensor.store_and_calculate_absolute_tilt_angle(tilt_queue.get())
 
     # Detect faces and landmarks
     frame, face_landmarks = MediapipeFaceDetection.detect_faces_and_landmarks(image_path, face_mesh_model, is_image=True)
 
     if face_landmarks:
-        HeadAngle.store_head_angle_information(tilt_queue.get(), face_landmarks,image_path)
         mouth_region = MouthCrop.crop_mouth_region(frame, face_landmarks)
-        #print(f"Face landmarks: {face_landmarks}")
-        #MOR = MouthOpeningArea.calculate_polygon_area(face_landmarks)
-        #print(f"Mouth opening area: {MOR}")
+        display_image_queue.put(mouth_region)
+    else:
+        display_image_queue.put(frame)
 
 
-    display_image_queue.put(mouth_region)
-
-
-
-    # print(f"Display image queue size: {display_image_queue.qsize()}")
-    # print(f"Server image queue size: {server_image_queue.qsize()}")
 

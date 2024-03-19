@@ -2,7 +2,7 @@ import cv2
 import dlib
 import os
 from library.MouthOpeningArea import calculate_mouth_opening_area
-from library.HeadAngle import calculate_face_ratio
+from library.HeadAngle_ImageProcessing import calculate_face_ratio
 
 
 #TODO Måske ændre sådan at funktionerne virker på en række af billeder (måske 10) i stedet for en stream af billeder? Alternativt kunne man måske også bare lave en anden funktion til det HMMM
