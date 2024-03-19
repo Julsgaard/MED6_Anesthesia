@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'camera_services.dart';
 import 'package:sensors/sensors.dart';
 import 'dart:math' as math;
+import 'package:dart/intro_page.dart';
 
 List<CameraDescription>? cameras;
 class GlobalVariables {
@@ -12,6 +13,7 @@ class GlobalVariables {
   // Static variable to hold the tilt angle
   static double tiltAngle = 0.0;
 }
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,14 +36,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: MyHomePage(
-        title: 'Flutter Demo Home Page',
-        camera: camera,
+      home: intro_page(
       ),
     );
   }
