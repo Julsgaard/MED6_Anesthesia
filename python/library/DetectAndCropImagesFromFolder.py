@@ -9,7 +9,7 @@ def crop_mouth_region(frame, landmarks):
     """
     Crops the mouth region from the image and ensures the cropped region is square.
     """
-    # Ensure landmarks are provided for indices around the mouth
+    # Ensure landmarks are provided for indices 0, 18, 57, and 287
     if len(landmarks) < 288:
         print("Insufficient landmarks provided.")
         return None
@@ -23,32 +23,41 @@ def crop_mouth_region(frame, landmarks):
     x_min, x_max = min(x_coords), max(x_coords)
     y_min, y_max = min(y_coords), max(y_coords)
 
-    # Calculate the center of the mouth region
+    # Calculate the size of the bounding box
+    width = x_max - x_min
+    height = y_max - y_min
+
+    # Determine the size of the square
+    side_length = max(width, height)
+
+    # Center the square around the original center of the mouth region
     center_x = (x_min + x_max) // 2
     center_y = (y_min + y_max) // 2
 
-    # Ensure the region is square by expanding the shorter dimension
-    width = x_max - x_min
-    height = y_max - y_min
-    if width > height:
-        difference = width - height
-        y_min = max(0, y_min - difference // 2)  # Decrease y_min but ensure it is not less than 0
-        y_max = min(frame.shape[0], y_max + difference // 2)  # Increase y_max but ensure it does not exceed frame height
-    else:
-        difference = height - width
-        x_min = max(0, x_min - difference // 2)  # Decrease x_min but ensure it is not less than 0
-        x_max = min(frame.shape[1], x_max + difference // 2)  # Increase x_max but ensure it does not exceed frame width
+    # Calculate new min and max x and y coordinates to ensure the crop is a square
+    x_min = max(0, center_x - side_length // 2)
+    x_max = min(frame.shape[1], center_x + side_length // 2)
+    y_min = max(0, center_y - side_length // 2)
+    y_max = min(frame.shape[0], center_y + side_length // 2)
 
-    # Recalculate the differences if the box was out of frame bounds
-    if (x_max - x_min) != (y_max - y_min):
-        max_side = max(x_max - x_min, y_max - y_min)
-        x_min, x_max = center_x - max_side // 2, center_x + max_side // 2
-        y_min, y_max = center_y - max_side // 2, center_y + max_side // 2
-        # Clamp values to ensure they remain within the frame's dimensions
-        x_min, y_min = max(0, x_min), max(0, y_min)
-        x_max, y_max = min(frame.shape[1], x_max), min(frame.shape[0], y_max)
+    # Ensure the square doesn't exceed the original image boundaries
+    if x_max - x_min < side_length:
+        # Adjust x_min if possible
+        if x_min > 0:
+            x_min = max(0, x_max - side_length)
+        # Otherwise, adjust x_max
+        elif x_max < frame.shape[1]:
+            x_max = min(frame.shape[1], x_min + side_length)
 
-    # Crop the image to the square mouth region
+    if y_max - y_min < side_length:
+        # Adjust y_min if possible
+        if y_min > 0:
+            y_min = max(0, y_max - side_length)
+        # Otherwise, adjust y_max
+        elif y_max < frame.shape[0]:
+            y_max = min(frame.shape[0], y_min + side_length)
+
+    # Crop the image to the new square region
     cropped_image = frame[y_min:y_max, x_min:x_max]
 
     return cropped_image
