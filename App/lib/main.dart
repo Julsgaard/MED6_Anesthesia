@@ -43,9 +43,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: CameraRecording(
-        title: 'Camera Recording',
-        camera: camera,
+      home: intro_page(
       ),
     );
   }

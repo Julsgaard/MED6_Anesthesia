@@ -11,10 +11,12 @@ class intro_page extends StatelessWidget {
     double circleHeight = (mHeight/5)*2;
     double textWidth = ((mWidth/8)*6);
     double textHeight = (mHeight/5)*3;
+    double buttonWidth = (mWidth/3);
+    double buttonHeight = (mHeight/8);
     return Material(
       child: Container(
         clipBehavior: Clip.antiAlias,
-        decoration: BoxDecoration(color: Color(0xFFEBEEF3)),
+        decoration: const BoxDecoration(color: Color(0xFFEBEEF3)),
         child: Stack(
           children: [
             Positioned(
@@ -23,7 +25,7 @@ class intro_page extends StatelessWidget {
               child: Container(
                 width: mWidth + mWidth/10,
                 height: circleHeight,
-                decoration: ShapeDecoration(
+                decoration: const ShapeDecoration(
                   gradient: LinearGradient(
                     begin: Alignment(0.00, -1.00),
                     end: Alignment(0, 1),
@@ -39,7 +41,7 @@ class intro_page extends StatelessWidget {
               child: SizedBox(
                 width: textWidth,
                 height: textHeight,
-                child: AutoSizeText(
+                child: const AutoSizeText(
                   overflow: TextOverflow.fade,
                   softWrap: true,
                   minFontSize: 20,
@@ -55,26 +57,13 @@ class intro_page extends StatelessWidget {
               ),
             ),
             Positioned(
-              left: 60,
-              top: 627,
-              child: Container(
-                width: 233,
-                height: 75,
-                decoration: ShapeDecoration(
-                  color: Color(0xFF153867),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(51),
-                  ),
+              left: buttonWidth,
+              top: mHeight- buttonHeight,
+              child: TextButton(
+                style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all<Color>(const Color(0xFF153867))
                 ),
-              ),
-            ),
-            Positioned(
-              left: 69,
-              top: 627,
-              child: SizedBox(
-                width: 215,
-                height: 75,
-                child: Text(
+                child: const Text(
                   'I understand\nproceed',
                   textAlign: TextAlign.center,
                   style: TextStyle(
@@ -85,6 +74,7 @@ class intro_page extends StatelessWidget {
                     height: 0,
                   ),
                 ),
+                onPressed: (){},
               ),
             ),
           ],
