@@ -27,7 +27,7 @@ class CameraRecording extends StatefulWidget {
 class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingObserver {
   late CameraController _controller;
   late Future<void> _initializeControllerFuture;
-
+  late StreamSubscription<AccelerometerEvent> accelerometerSubscription;
   // Variable to hold the tilt angle
 
   @override
@@ -35,7 +35,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
     super.initState();
 
     // Listener for accelerometer events
-    accelerometerEvents.listen((AccelerometerEvent event) {
+    accelerometerSubscription = accelerometerEvents.listen((AccelerometerEvent event) {
       // Assuming the phone is mostly upright, you can calculate the tilt
       // angle around the x-axis using the arctan of the y/z acceleration values.
       // This is a simplification and might need adjustment for your use case.
@@ -67,6 +67,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
     WidgetsBinding.instance.removeObserver(this);
     CameraServices.isStreaming = false; // Ensure the stream is turned off when the widget is disposed
     _controller.dispose();
+    accelerometerSubscription.cancel();
     super.dispose();
   }
 

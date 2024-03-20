@@ -1,8 +1,15 @@
+import 'package:camera/camera.dart';
 import "package:flutter/material.dart";
 import 'package:auto_size_text/auto_size_text.dart';
+import 'camera_recording.dart';
 
 class intro_page extends StatelessWidget {
-  const intro_page({super.key});
+  final CameraDescription camera;
+  const intro_page({
+    super.key,
+    required this.camera,
+  });
+
 
   @override
   Widget build(BuildContext context) {
@@ -74,7 +81,13 @@ class intro_page extends StatelessWidget {
                     height: 0,
                   ),
                 ),
-                onPressed: (){},
+                onPressed: (){
+                  Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => CameraRecording(title: 'Flutter Demo Home Page',
+                          camera: camera))
+                  );
+                },
               ),
             ),
           ],
