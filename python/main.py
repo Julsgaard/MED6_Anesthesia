@@ -50,7 +50,7 @@ while True:
         #print(f"Mouth opening area: {MOR}")
 
 
-    display_image_queue.put(mouth_region)
+    display_image_queue.put(frame)
 
 
 
