@@ -5,20 +5,23 @@ class intro_page extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double mWidth= MediaQuery.of(context).size.width;
+    double mHeight= MediaQuery.of(context).size.height;
+    double circleHeight = (mHeight/5)*2;
+    double textWidth = ((mWidth/8)*6);
+    double textHeight = (mHeight/5)*3;
     return Center(
       child: Container(
-        width: 360,
-        height: 800,
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(color: Color(0xFFEBEEF3)),
         child: Stack(
           children: [
             Positioned(
-              left: -73,
-              top: -190,
+              left: -mWidth/20,
+              top: -circleHeight/2,
               child: Container(
-                width: 506,
-                height: 392,
+                width: mWidth + mWidth/10,
+                height: circleHeight,
                 decoration: ShapeDecoration(
                   gradient: LinearGradient(
                     begin: Alignment(0.00, -1.00),
@@ -30,11 +33,11 @@ class intro_page extends StatelessWidget {
               ),
             ),
             Positioned(
-              left: 39,
-              top: 220,
+              left: (mWidth/8),
+              top: circleHeight/2,
               child: SizedBox(
-                width: 282,
-                height: 247,
+                width: textWidth,
+                height: textHeight,
                 child: Text(
                   'Hello, to access if you can undergo a standard anesthesia procedure the doctor has ordered a review of your mouth and neck. Therefore we ask you to go through this online video consultation, where you will record yourself as guided by the video. This video recording will then be accessed by an AI, to determine if you can undergo standard procedure, or you need to see a real doctor',
                   style: TextStyle(
