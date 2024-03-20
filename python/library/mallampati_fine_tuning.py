@@ -22,12 +22,12 @@ def run_mallampati_model():
     # Gather and prepare the data
     train_loader, test_loader = prepare_image_data()
 
-    # Load a pre-trained ResNet model and modify it
+    # Load a pre-trained ResNet model
     model = models.resnet34(weights='ResNet34_Weights.DEFAULT')
     for param in model.parameters():
         param.requires_grad = False  # Freeze parameters to avoid backpropagating through them
     num_ftrs = model.fc.in_features
-    model.fc = nn.Linear(num_ftrs, num_classes)  # Adjust for 4 class output
+    model.fc = nn.Linear(num_ftrs, num_classes)
 
     # Move the model to GPU if available
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -45,7 +45,7 @@ def run_mallampati_model():
     best_epoch_confusion_matrix = None
 
     # Initialize the confusion matrix
-    confusion_matrix = torch.zeros(num_classes, num_classes)
+    # confusion_matrix = torch.zeros(num_classes, num_classes)
 
     # Initialize lists to store losses and accuracies
     losses = []
@@ -84,7 +84,6 @@ def run_mallampati_model():
         model.eval()  # Set the model to evaluation mode
         correct = 0
         total = 0
-        epoch_acc = 0
         total_val_loss = 0.0  # Initialize total validation loss for this epoch
         with torch.no_grad():
             for inputs, labels in test_loader:

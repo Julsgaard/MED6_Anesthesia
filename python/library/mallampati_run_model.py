@@ -7,16 +7,19 @@ from library.mallampati_image_prep import prepare_test_data
 def load_model_and_predict():
     num_classes = 2
 
+    # Set the device to GPU if available
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    print(f"Device: {device}")
+
     # Load the pre-trained model
     model = models.resnet34()
     num_features = model.fc.in_features
     print(f"Number of features: {num_features}")
     model.fc = nn.Linear(num_features, num_classes)
-    model.load_state_dict(torch.load('mallampati_models/best_model_ResNet34_98%_25_epochs_2_classes.pth'))
+    model.load_state_dict(torch.load('mallampati_models/best_model_ResNet34_98%_25_epochs_2_classes.pth',
+                                     map_location=device))
 
-    # Move the model to GPU if available
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    model.to(device)
+    # model.to(device)
 
     # Set the model to evaluation mode
     model.eval()

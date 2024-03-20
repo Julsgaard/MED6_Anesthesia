@@ -5,7 +5,7 @@ from torch.utils.data import DataLoader
 from library.functions import imshow_cv
 
 
-def prepare_image_data():
+def prepare_image_data(DisplayImages=False):
     # Define your dataset path
     dataset_path = 'mallampati_datasets/Second dataset (2 classes)'
 
@@ -38,17 +38,18 @@ def prepare_image_data():
     print(f"Number of training samples: {len(train_dataset)}")
     print(f"Number of testing samples: {len(test_dataset)}")
 
-    # # Display a few images from the training dataset
-    # for i, (inputs, labels) in enumerate(train_loader):
-    #     if i == 10:  # Display first 5 images
-    #         break
-    #     imshow_cv(inputs[0])  # Display the first image from the batch
-    #
-    # # Display a few images from the testing dataset
-    # for i, (inputs, labels) in enumerate(test_loader):
-    #     if i == 10:  # Display first 5 images
-    #         break
-    #     imshow_cv(inputs[0])  # Display the first image from the batch
+    if DisplayImages:
+        # Display a few images from the training dataset
+        for i, (inputs, labels) in enumerate(train_loader):
+            if i == 10:  # Display first 5 images
+                break
+            imshow_cv(inputs[0])  # Display the first image from the batch
+
+        # Display a few images from the testing dataset
+        for i, (inputs, labels) in enumerate(test_loader):
+            if i == 10:  # Display first 5 images
+                break
+            imshow_cv(inputs[0])  # Display the first image from the batch
 
     return train_loader, test_loader
 
@@ -110,7 +111,7 @@ def prepare_augmented_image_data():  # TODO: Try this
 
 def prepare_test_data():
     # Define your test dataset path
-    dataset_path = 'mallampati_testset/Second testset'
+    dataset_path = 'mallampati_testset/Dataset'
 
     # Define transformations
     transform = transforms.Compose([
