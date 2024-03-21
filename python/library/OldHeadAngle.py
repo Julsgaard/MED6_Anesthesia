@@ -1,4 +1,5 @@
 from scipy.spatial import distance as dist
+import cv2
 
 #This script is used to calculate the head angle of the user, approach is taken from: https://onlinelibrary.wiley.com/doi/full/10.1002/tee.22778?casa_token=T35tTv7eXwEAAAAA%3AVhGzW-bADbqZ22Y9fNclHeLL1Xm44YLfpjImIzjVJexRZ0oJCSEuyi7IIZwETKTpPMVsPbo9fk2H0w
 
@@ -54,6 +55,7 @@ def calculate_neck_angle(phone_angles, face_angles):
 
     neck_angle = total_sum / n
     return neck_angle
+
 
 
 def store_head_angle_information(phone_angle, face_landmarks):

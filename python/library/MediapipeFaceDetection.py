@@ -37,10 +37,10 @@ def detect_faces_and_landmarks(source, face_mesh, is_image=False):
         return frame, None
 
     # Draw face landmarks for specific indices.
-    desired_indices = [33, 263, 61, 291]
+    #desired_indices = [4,152]
     for face_landmarks in results.multi_face_landmarks:
         for idx, landmark in enumerate(face_landmarks.landmark):
-            if idx in inner_lip_indices:
+            if idx in inner_lip_indices :
                 x = int(landmark.x * frame.shape[1])
                 y = int(landmark.y * frame.shape[0])
                 cv2.circle(frame, (x, y), 1, (0, 255, 0), -1)  # Draw circle for each specified landmark
