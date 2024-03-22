@@ -1,57 +1,72 @@
+import asyncio
+import cv2
+import numpy as np
 import os
-from flask import Flask, request, jsonify
-from werkzeug.utils import secure_filename
-from library import functions
-
-app = Flask(__name__)
-
-image_queue = None
-tilt_queue = None
+import time
 
 
-def start_server(host_ip, server_port, temp_image_queue, temp_tilt_queue):
-    global image_queue
-    global tilt_queue
-    image_queue = temp_image_queue
-    tilt_queue = temp_tilt_queue
-    app.run(debug=False, host=host_ip, port=server_port, threaded=True)
+# Ensure the directory for saving images exists
+images_dir = "received_images"
+os.makedirs(images_dir, exist_ok=True)
 
 
-@app.route('/upload', methods=['POST'])
-def upload_file():
-    if 'picture' in request.files:
-        file = request.files['picture']
-        filename = file.filename
-        filename = secure_filename(filename)
+async def handle_client(reader, writer):
+    image_counter = 0
+    prev_time = time.time()  # Initialize prev_time
+    frame_counter = 0  # Initialize frame counter
 
-        image_path = os.path.join(functions.session_path, filename)
-        file.save(image_path)
+    try:
+        while True:
+            size_data = await reader.readexactly(4)
+            size = int.from_bytes(size_data, 'big')
 
-        # Default to 0.0 if 'tiltAngle' is not provided
-        tilt_angle = request.form.get('tiltAngle', '0.0')
+            if size:
+                image_data = await reader.readexactly(size)
+                print(f"Received data of size: {size}")
+
+                width, height = 640, 480
+                if size == width * height:
+                    image = np.frombuffer(image_data, dtype=np.uint8).reshape((height, width))
+
+                    image_filename = f"{images_dir}/received_image_{image_counter}.jpg"
+                    cv2.imwrite(image_filename, image)
+                    image_counter += 1
+
+                    cv2.imshow('Received Image', image)
+                    if cv2.waitKey(1) & 0xFF == ord('q'):
+                        break
+                else:
+                    print("Mismatched data size, cannot form an image.")
+
+                # Increment frame counter
+                frame_counter += 1
+
+                # Calculate FPS every 1 second
+                curr_time = time.time()
+                if curr_time - prev_time >= 1:
+                    fps = frame_counter / (curr_time - prev_time)
+                    print(f"FPS: {fps}")
+
+                    # Reset frame counter and prev_time
+                    frame_counter = 0
+                    prev_time = curr_time
+            else:
+                print("No more data from client.")
+                break
+    except asyncio.IncompleteReadError:
+        print("Client disconnected.")
+    finally:
+        writer.close()
+        await writer.wait_closed()
 
 
-        # Here, convert tilt_angle from string to float, and handle potential conversion errors
-        try:
-            tilt_angle = float(tilt_angle)
-            tilt_queue.put(tilt_angle)
-        except ValueError:
-            # If there is an error, set a default value or handle it as needed
-            tilt_angle = 0.0
+async def main():
+    server = await asyncio.start_server(handle_client, '0.0.0.0', 5000)
+    addr = server.sockets[0].getsockname()
+    print(f"Serving on {addr}")
 
-        #print(f"Raw tilt angle: {tilt_angle}")
-
-        if image_path:
-            # Now you can use the tilt_angle along with the image
-            # For example, put both in the queue if needed
-            image_queue.put(image_path)
-
-            return jsonify(message="Image received and updated successfully!")
-        else:
-            return jsonify(message="Image path is None"), 400
-    else:
-        return jsonify(message="No image received"), 400
+    async with server:
+        await server.serve_forever()
 
 
-
-
+asyncio.run(main())
