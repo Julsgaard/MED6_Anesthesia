@@ -4,7 +4,6 @@ import numpy as np
 import os
 import time
 
-
 # Ensure the directory for saving images exists
 images_dir = "received_images"
 os.makedirs(images_dir, exist_ok=True)
@@ -17,21 +16,28 @@ async def handle_client(reader, writer):
 
     try:
         while True:
+            # Read the resolution data first
+            resolution_data = await reader.readexactly(8)
+            width = int.from_bytes(resolution_data[:4], 'big')
+            height = int.from_bytes(resolution_data[4:], 'big')
+
+            # Then read the size of the image data
             size_data = await reader.readexactly(4)
             size = int.from_bytes(size_data, 'big')
 
             if size:
                 image_data = await reader.readexactly(size)
-                print(f"Received data of size: {size}")
+                # print(f"Received data of size: {size} for resolution: {width}x{height}")
 
-                width, height = 640, 480
-                if size == width * height:
+                if size == width * height:  # Check if data size matches the resolution
                     image = np.frombuffer(image_data, dtype=np.uint8).reshape((height, width))
 
                     image_filename = f"{images_dir}/received_image_{image_counter}.jpg"
                     cv2.imwrite(image_filename, image)
+                    # print(f"Image saved to {image_filename}")
                     image_counter += 1
 
+                    # Display the image
                     cv2.imshow('Received Image', image)
                     if cv2.waitKey(1) & 0xFF == ord('q'):
                         break
@@ -41,18 +47,21 @@ async def handle_client(reader, writer):
                 # Increment frame counter
                 frame_counter += 1
 
-                # Calculate FPS every 1 second
+                # Calculate FPS every second
                 curr_time = time.time()
                 if curr_time - prev_time >= 1:
                     fps = frame_counter / (curr_time - prev_time)
                     print(f"FPS: {fps}")
-
-                    # Reset frame counter and prev_time
                     frame_counter = 0
                     prev_time = curr_time
+
+                    print(f"Received data of size: {size} for resolution: {width}x{height}")
+
+
             else:
                 print("No more data from client.")
                 break
+
     except asyncio.IncompleteReadError:
         print("Client disconnected.")
     finally:

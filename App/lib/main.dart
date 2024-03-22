@@ -48,7 +48,7 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
     _controller = CameraController(
       widget.frontCamera,
-      ResolutionPreset.medium,
+      ResolutionPreset.max,
     );
     _controller.initialize().then((_) {
       if (!mounted) {
@@ -63,26 +63,36 @@ class _MyHomePageState extends State<MyHomePage> {
       _isStreaming = true;
     });
     socket = await Socket.connect('192.168.50.141', 5000);
+
     _controller.startImageStream((CameraImage image) async {
       if (_isStreaming) {
-        // Simplified: Just send the first plane's data for now
+        // Include resolution data
+        final int width = image.width;
+        final int height = image.height;
+
+        final ByteData resolutionData = ByteData(8); // 4 bytes for width and 4 for height
+        resolutionData.setUint32(0, width, Endian.big);
+        resolutionData.setUint32(4, height, Endian.big);
+        final Uint8List resolutionHeader = resolutionData.buffer.asUint8List();
+
+        // Assuming we're still sending just the first plane's data for simplicity
         final Uint8List? imageData = image.planes.first.bytes;
+        final int imageSize = imageData?.length ?? 0;
 
-        // Use null-aware operators to handle potential nulls
-        final int imageSize = imageData?.length ?? 0;  // Provide a fallback value of 0
+        final ByteData byteData = ByteData(4);
+        byteData.setUint32(0, imageSize, Endian.big);
+        final Uint8List sizeHeader = byteData.buffer.asUint8List();
 
-        if (imageData != null && imageSize > 0) {  // Check that imageData is not null and has size
-          // Mock size sending (assuming the size can fit in 4 bytes)
-          final ByteData byteData = ByteData(4);
-          byteData.setUint32(0, imageSize, Endian.big);
-          final Uint8List sizeHeader = byteData.buffer.asUint8List();
-
+        // Send resolution header, size header, then image data
+        if (imageData != null && imageSize > 0) {
+          socket.add(resolutionHeader);
           socket.add(sizeHeader);
-          socket.add(imageData);  // imageData is guaranteed not to be null here
+          socket.add(imageData);
         }
       }
     });
   }
+
 
 
 
