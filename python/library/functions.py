@@ -46,7 +46,7 @@ def display_images(display_image_queue):
     while True:
         # Get the current image from the queue
         current_image = display_image_queue.get()
-        print(f"Displaying image: {current_image}")
+        #print(f"Displaying image: {current_image}")
 
         # Check if current_image is a string (indicating it's a path)
         if isinstance(current_image, str):

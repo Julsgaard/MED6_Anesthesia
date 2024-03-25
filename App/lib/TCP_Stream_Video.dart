@@ -1,8 +1,11 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
+import 'dart:developer' as developer; // Import for logging
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:path_provider/path_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -41,6 +44,8 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   late CameraController _controller;
   late Socket socket;
+  int _imagesCaptured = 0;
+  int _lastLogTimestamp = DateTime.now().millisecondsSinceEpoch;
   bool _isStreaming = false;
 
   @override
@@ -58,43 +63,57 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  void startStreaming() async {
+  void startStreaming({int frameIntervalMs = 50}) async { // 50 svarer til cirka 15 billeder i sekundet, i kan teste andre værdier og kigge i loggen
     setState(() {
       _isStreaming = true;
     });
-    socket = await Socket.connect('192.168.8.150', 5000);
+    socket = await Socket.connect('192.168.86.69', 5000);
+
+    int lastTimestamp = DateTime.now().millisecondsSinceEpoch;
 
     _controller.startImageStream((CameraImage image) async {
       if (_isStreaming) {
-        // Include resolution data
-        final int width = image.width;
-        final int height = image.height;
+        int currentTimestamp = DateTime.now().millisecondsSinceEpoch;
+        if (currentTimestamp - lastTimestamp >= frameIntervalMs) {
+          lastTimestamp = currentTimestamp;
 
-        final ByteData resolutionData = ByteData(8); // 4 bytes for width and 4 for height
-        resolutionData.setUint32(0, width, Endian.big);
-        resolutionData.setUint32(4, height, Endian.big);
-        final Uint8List resolutionHeader = resolutionData.buffer.asUint8List();
+          // Increment the counter since an image has been captured
+          _imagesCaptured++;
 
-        // Assuming we're still sending just the first plane's data for simplicity
-        final Uint8List? imageData = image.planes.first.bytes;
-        final int imageSize = imageData?.length ?? 0;
+          final int width = image.width;
+          final int height = image.height;
 
-        final ByteData byteData = ByteData(4);
-        byteData.setUint32(0, imageSize, Endian.big);
-        final Uint8List sizeHeader = byteData.buffer.asUint8List();
+          final ByteData resolutionData = ByteData(8);
+          resolutionData.setUint32(0, width, Endian.big);
+          resolutionData.setUint32(4, height, Endian.big);
+          final Uint8List resolutionHeader = resolutionData.buffer.asUint8List();
 
-        // Send resolution header, size header, then image data
-        if (imageData != null && imageSize > 0) {
-          socket.add(resolutionHeader);
-          socket.add(sizeHeader);
-          socket.add(imageData);
+          final Uint8List? imageData = image.planes.first.bytes;
+          final int imageSize = imageData?.length ?? 0;
+
+          final ByteData byteData = ByteData(4);
+          byteData.setUint32(0, imageSize, Endian.big);
+          final Uint8List sizeHeader = byteData.buffer.asUint8List();
+
+          if (imageData != null && imageSize > 0) {
+            socket.add(resolutionHeader);
+            socket.add(sizeHeader);
+            socket.add(imageData);
+
+            // Check if a second has passed since the last log
+            if (currentTimestamp - _lastLogTimestamp >= 1000) {
+              // Log the number of images captured in the last second
+              developer.log('Images captured in last second: $_imagesCaptured', name: 'camera.capture');
+
+              // Reset the counter and update the timestamp for the next log
+              _imagesCaptured = 0;
+              _lastLogTimestamp = currentTimestamp;
+            }
+          }
         }
       }
     });
   }
-
-
-
 
   void stopStreaming() {
     setState(() {
@@ -123,6 +142,32 @@ class _MyHomePageState extends State<MyHomePage> {
         ],
       ),
     );
+  }
+
+  //TODO Det her resize/compression code bliver ikk brugt endnu men man kan måske give det et forsøg hvis vi har lyst
+  static Future<XFile> resizeImage(XFile file) async {
+    // Temporary file path for the compressed file
+    final tempDir = await getTemporaryDirectory();
+    final targetPath = '${tempDir.path}/${DateTime
+        .now()
+        .millisecondsSinceEpoch}.jpg';
+
+    // Resize the image to 300x300 and reduce the quality
+    final compressedFile = await FlutterImageCompress.compressAndGetFile(
+      file.path,
+      targetPath,
+      quality: 50,
+      minWidth: 500,
+      minHeight: 500,
+    );
+
+    if (compressedFile == null) {
+      // If the compression is not successful, return the original file
+      return file;
+    } else {
+      // Return the compressed file as XFile
+      return XFile(compressedFile.path);
+    }
   }
 
   @override
