@@ -8,7 +8,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:dart/main.dart';
+import 'package:dart/TCP_Stream_Video.dart';
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {

@@ -48,7 +48,7 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
     _controller = CameraController(
       widget.frontCamera,
-      ResolutionPreset.max,
+      ResolutionPreset.medium,
     );
     _controller.initialize().then((_) {
       if (!mounted) {
@@ -62,7 +62,7 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       _isStreaming = true;
     });
-    socket = await Socket.connect('192.168.50.141', 5000);
+    socket = await Socket.connect('192.168.8.150', 5000);
 
     _controller.startImageStream((CameraImage image) async {
       if (_isStreaming) {

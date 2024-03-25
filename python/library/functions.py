@@ -46,6 +46,7 @@ def display_images(display_image_queue):
     while True:
         # Get the current image from the queue
         current_image = display_image_queue.get()
+        print(f"Displaying image: {current_image}")
 
         # Check if current_image is a string (indicating it's a path)
         if isinstance(current_image, str):
@@ -62,7 +63,7 @@ def display_images(display_image_queue):
         cv.imshow('Live Image', image)
 
         # Break the loop if 'q' is pressed
-        if cv.waitKey(100) & 0xFF == ord('q'):
+        if cv.waitKey(1) & 0xFF == ord('q'):
             break
 
     # Close the OpenCV window
