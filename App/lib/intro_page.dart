@@ -2,6 +2,7 @@ import 'package:camera/camera.dart';
 import "package:flutter/material.dart";
 import 'package:auto_size_text/auto_size_text.dart';
 import 'camera_recording.dart';
+import '../assets/circle.dart';
 
 class intro_page extends StatelessWidget {
   final CameraDescription camera;
@@ -26,22 +27,7 @@ class intro_page extends StatelessWidget {
         decoration: const BoxDecoration(color: Color(0xFFEBEEF3)),
         child: Stack(
           children: [
-            Positioned(
-              left: -mWidth/20,
-              top: -circleHeight/2,
-              child: Container(
-                width: mWidth + mWidth/10,
-                height: circleHeight,
-                decoration: const ShapeDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment(0.00, -1.00),
-                    end: Alignment(0, 1),
-                    colors: [Color(0xFF153867), Color(0xFF38577F), Color(0xFF748EA8)],
-                  ),
-                  shape: OvalBorder(),
-                ),
-              ),
-            ),
+            Circle(mWidth: mWidth, circleHeight: circleHeight,),
             Positioned(
               left: (mWidth/8),
               top: circleHeight/2 + 20,

@@ -5,7 +5,7 @@ import 'camera_services.dart';
 import 'package:sensors/sensors.dart';
 import 'dart:math' as math;
 import 'package:dart/intro_page.dart';
-
+import 'package:dart/Assets/circle.dart';
 import 'main.dart';
 
 
@@ -86,63 +86,57 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Tilt Angle: ${GlobalVariables.tiltAngle} degrees'),
-      ),
-      body: FutureBuilder<void>(
-        future: _initializeControllerFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            return Stack(
-              children: <Widget>[
-                Positioned.fill(
-                  child: AspectRatio(
-                    aspectRatio: _controller.value.aspectRatio,
-                    child: CameraPreview(_controller),
-                  ),
-                ),
-                Positioned.fill( //THIS WHERE THE MOUTH IMAGE IS PLACED
-                  child: Transform.translate(
-                    offset: Offset(0, 30), // Adjust the 100 to move it further down or less
-                    child: Transform.scale(
-                      scale: 0.4, // Adjust the scale factor to make it bigger (greater than 1) or smaller (less than 1)
-                      child: Image.asset(
-                        'assets/mouth_overlay.png',
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                  ),
-                ),
-                Positioned(
-                  bottom: 20,
-                  left: 0,
-                  right: 0,
-                  child: Center(
-                    child: FloatingActionButton(
-                      onPressed: () {
-                        setState(() {
-                          if (CameraServices.isStreaming) {
-                            CameraServices.isStreaming = false; // Stops the stream
-                          } else {
-                            CameraServices.streamCameraFootage(_controller); // Starts the stream
-                            CameraServices.isStreaming = true;
-                          }
-                        });
-                      },
-                      child: Icon(
-                        CameraServices.isStreaming ? Icons.stop : Icons.videocam,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            );
-          } else {
-            return Center(child: CircularProgressIndicator());
-          }
-        },
-      ),
+    double mWidth= MediaQuery.of(context).size.width;
+    double mHeight= MediaQuery.of(context).size.height;
+    double circleHeight = (mHeight/5)*2;
+    double cameraWidth = mWidth;
+    double cameraHeight = (mHeight/5)*3;
+    return Material(
+
+      child: Stack(
+        children: [
+          Circle(mWidth: mWidth, circleHeight: circleHeight,),
+          Positioned(
+            left: 0,
+            top: circleHeight/2 + 10,
+            child: SizedBox(
+              height: cameraHeight,
+              width: cameraWidth,
+              child: FutureBuilder<void>(
+                future: _initializeControllerFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    return Stack(
+                      children: <Widget>[
+                        Positioned.fill(
+                          child: AspectRatio(
+                            aspectRatio: _controller.value.aspectRatio,
+                            child: CameraPreview(_controller),
+                          ),
+                        ),
+                        Positioned.fill( //THIS WHERE THE MOUTH IMAGE IS PLACED
+                          child: Transform.translate(
+                            offset: Offset(0, 30), // Adjust the 100 to move it further down or less
+                            child: Transform.scale(
+                              scale: 0.4, // Adjust the scale factor to make it bigger (greater than 1) or smaller (less than 1)
+                              child: Image.asset(
+                                'assets/mouth_overlay.png',
+                                fit: BoxFit.contain,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  } else {
+                    return Center(child: CircularProgressIndicator());
+                  }
+                },
+              ),
+            ),
+          )
+        ]
+      )
     );
   }
 }
