@@ -5,8 +5,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
-
-import 'TCP_Stream_Video.dart';
+import 'main.dart';
 
 
 class CameraServices {
