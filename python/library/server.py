@@ -1,16 +1,11 @@
 import asyncio
-import queue
 import cv2
 import numpy as np
-import os
 import time
+from library import functions
 
 host = '0.0.0.0'
 port = 5000
-
-# Ensure the directory for saving images exists
-images_dir = "received_images"
-os.makedirs(images_dir, exist_ok=True)
 
 
 async def handle_client(reader, writer, image_queue, tilt_queue):
@@ -37,10 +32,11 @@ async def handle_client(reader, writer, image_queue, tilt_queue):
                 if size == width * height:  # Check if data size matches the resolution
                     image = np.frombuffer(image_data, dtype=np.uint8).reshape((height, width))
 
-                    image_filename = f"{images_dir}/received_image_{image_counter}.jpg"
+                    image_filename = f"{functions.session_path}/received_image_{image_counter}.jpg"
 
+                    # TODO: Maybe don't save it during runtime - Depends on how we use the images in the code
                     # Save the image to a file
-                    cv2.imwrite(image_filename, image) #TODO: Maybe don't save it during runtime - Depends on how we use the images in the code
+                    cv2.imwrite(image_filename, image)
 
                     # Put the image filename in the server_image_queue
                     image_queue.put(image_filename)
@@ -48,10 +44,6 @@ async def handle_client(reader, writer, image_queue, tilt_queue):
                     # print(f"Image saved to {image_filename}")
                     image_counter += 1
 
-                    # Display the image
-                    # cv2.imshow('Received Image', image)
-                    # if cv2.waitKey(1) & 0xFF == ord('q'):
-                    #     break
                 else:
                     print("Mismatched data size, cannot form an image.")
 
@@ -92,7 +84,3 @@ async def async_server(image_queue, tilt_queue):
 
 def start_server(image_queue, tilt_queue):
     asyncio.run(async_server(image_queue, tilt_queue))
-
-
-if __name__ == '__main__':
-    start_server(image_queue=queue.Queue, tilt_queue=None)
