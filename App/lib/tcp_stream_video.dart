@@ -6,6 +6,8 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:image/image.dart' as imglib;
+import 'image_utils.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -63,11 +65,11 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  void startStreaming({int frameIntervalMs = 50}) async { // 50 svarer til cirka 15 billeder i sekundet, i kan teste andre værdier og kigge i loggen
+  void startStreaming({int frameIntervalMs = 75}) async { // 50 svarer til cirka 15 billeder i sekundet, i kan teste andre værdier og kigge i loggen
     setState(() {
       _isStreaming = true;
     });
-    socket = await Socket.connect('192.168.86.69', 5000);
+    socket = await Socket.connect('192.168.8.150', 5000);
 
     int lastTimestamp = DateTime.now().millisecondsSinceEpoch;
 
@@ -80,25 +82,50 @@ class _MyHomePageState extends State<MyHomePage> {
           // Increment the counter since an image has been captured
           _imagesCaptured++;
 
-          final int width = image.width;
-          final int height = image.height;
+          // final int width = image.width;
+          // final int height = image.height;
 
-          final ByteData resolutionData = ByteData(8);
-          resolutionData.setUint32(0, width, Endian.big);
-          resolutionData.setUint32(4, height, Endian.big);
-          final Uint8List resolutionHeader = resolutionData.buffer.asUint8List();
+          // final ByteData resolutionData = ByteData(8);
+          // resolutionData.setUint32(0, width, Endian.big);
+          // resolutionData.setUint32(4, height, Endian.big);
+          // final Uint8List resolutionHeader = resolutionData.buffer.asUint8List();
 
-          final Uint8List? imageData = image.planes.first.bytes;
-          final int imageSize = imageData?.length ?? 0;
 
+          // Convert the CameraImage to an RGB image
+          final imglib.Image rgbImage = ImageUtils.convertCameraImage(image);
+
+          // Convert the image to a byte format (e.g., PNG) before sending
+          List<int> imageBytes = imglib.encodePng(rgbImage);
+          final int imageSize = imageBytes.length;
+
+          // Convert imageSize to bytes and send it
           final ByteData byteData = ByteData(4);
           byteData.setUint32(0, imageSize, Endian.big);
           final Uint8List sizeHeader = byteData.buffer.asUint8List();
 
-          if (imageData != null && imageSize > 0) {
-            socket.add(resolutionHeader);
+
+          // final Uint8List? imageData = image.planes.first.bytes;
+          // final int imageSize = imageData?.length ?? 0;
+          //
+          // final ByteData byteData = ByteData(4);
+          // byteData.setUint32(0, imageSize, Endian.big);
+          // final Uint8List sizeHeader = byteData.buffer.asUint8List();
+
+          if (imageSize > 0) {
             socket.add(sizeHeader);
-            socket.add(imageData);
+
+
+            // Now send the image bytes
+            socket.add(Uint8List.fromList(imageBytes));
+
+            //socket.add(sizeHeader);
+
+            // Send the image bytes over TCP
+            //socket.add(Uint8List.fromList(imageBytes));
+
+            // socket.add(resolutionHeader);
+            // socket.add(sizeHeader);
+            // socket.add(imageData);
 
             // Check if a second has passed since the last log
             if (currentTimestamp - _lastLogTimestamp >= 1000) {
@@ -114,6 +141,24 @@ class _MyHomePageState extends State<MyHomePage> {
       }
     });
   }
+
+  // Future<void> startStreaming() async {
+  //   socket = await Socket.connect('192.168.8.150', 5000); // Use your server IP and port
+  //   _isStreaming = true;
+  //   _controller.startImageStream((CameraImage cameraImage) async {
+  //     if (_isStreaming) {
+  //       // Convert the CameraImage to an RGB image
+  //       final imglib.Image rgbImage = ImageUtils.convertCameraImage(cameraImage);
+  //
+  //       // Convert the image to a byte format (e.g., PNG) before sending
+  //       List<int> imageBytes = imglib.encodePng(rgbImage);
+  //
+  //
+  //       // Send the image bytes over TCP
+  //       socket.add(Uint8List.fromList(imageBytes));
+  //     }
+  //   });
+  // }
 
   void stopStreaming() {
     setState(() {
