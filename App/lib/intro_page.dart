@@ -19,8 +19,8 @@ class intro_page extends StatelessWidget {
     double circleHeight = (mHeight/5)*2;
     double textWidth = ((mWidth/8)*6);
     double textHeight = (mHeight/5)*3;
-    double buttonWidth = (mWidth/3);
-    double buttonHeight = (mHeight/8);
+    double buttonPosW = (mWidth/3);
+    double buttonPosH = (mHeight/8);
     return Material(
       child: Container(
         clipBehavior: Clip.antiAlias,
@@ -50,8 +50,8 @@ class intro_page extends StatelessWidget {
               ),
             ),
             Positioned(
-              left: buttonWidth,
-              top: mHeight- buttonHeight,
+              left: buttonPosW,
+              top: mHeight- buttonPosH,
               child: TextButton(
                 style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.all<Color>(const Color(0xFF153867))

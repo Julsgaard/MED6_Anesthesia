@@ -89,19 +89,38 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
     double mWidth= MediaQuery.of(context).size.width;
     double mHeight= MediaQuery.of(context).size.height;
     double circleHeight = (mHeight/5)*2;
-    double cameraWidth = mWidth;
-    double cameraHeight = (mHeight/5)*3;
+    double cameraWidth = (mWidth/7)*6;
+    double cameraHeight = (mHeight/8)*5;
+    double buttonPosW = (mWidth/7);
+    double buttonPosH = (mHeight/8);
     return Material(
 
       child: Stack(
         children: [
           Circle(mWidth: mWidth, circleHeight: circleHeight,),
           Positioned(
-            left: 0,
+            left: (mWidth - cameraWidth)/2,
             top: circleHeight/2 + 10,
-            child: SizedBox(
+            child: Container(
               height: cameraHeight,
               width: cameraWidth,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(10),
+                    topRight: Radius.circular(10),
+                    bottomLeft: Radius.circular(10),
+                    bottomRight: Radius.circular(10)
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 5,
+                    blurRadius: 7,
+                    offset: Offset(0, 3), // changes position of shadow
+                  ),
+                ],
+              ),
               child: FutureBuilder<void>(
                 future: _initializeControllerFuture,
                 builder: (context, snapshot) {
@@ -114,18 +133,18 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
                             child: CameraPreview(_controller),
                           ),
                         ),
-                        Positioned.fill( //THIS WHERE THE MOUTH IMAGE IS PLACED
-                          child: Transform.translate(
-                            offset: Offset(0, 30), // Adjust the 100 to move it further down or less
-                            child: Transform.scale(
-                              scale: 0.4, // Adjust the scale factor to make it bigger (greater than 1) or smaller (less than 1)
-                              child: Image.asset(
-                                'assets/mouth_overlay.png',
-                                fit: BoxFit.contain,
-                              ),
-                            ),
-                          ),
-                        ),
+                        // Positioned.fill( //THIS WHERE THE MOUTH IMAGE IS PLACED
+                        //   child: Transform.translate(
+                        //     offset: Offset(0, 30), // Adjust the 100 to move it further down or less
+                        //     child: Transform.scale(
+                        //       scale: 0.4, // Adjust the scale factor to make it bigger (greater than 1) or smaller (less than 1)
+                        //       child: Image.asset(
+                        //         'assets/mouth_overlay.png',
+                        //         fit: BoxFit.contain,
+                        //       ),
+                        //     ),
+                        //   ),
+                        // ),
                       ],
                     );
                   } else {
@@ -134,7 +153,76 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
                 },
               ),
             ),
-          )
+          ),
+          Positioned(
+            right: buttonPosW,
+            top: mHeight- buttonPosH,
+            child: TextButton(
+              style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all<Color>(const Color(0xFF153867))
+              ),
+              child: const Text(
+                'I understand\nproceed',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w400,
+                  height: 0,
+                ),
+              ),
+              onPressed: (){
+
+              },
+            ),
+          ),
+          Positioned(
+            left: buttonPosW,
+            top: mHeight- buttonPosH,
+            child: TextButton(
+              style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all<Color>(const Color(0xFF153867))
+              ),
+              child: const Text(
+                'I understand\nproceed',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w400,
+                  height: 0,
+                ),
+              ),
+              onPressed: (){
+
+              },
+            ),
+          ),
+          Positioned(
+            right: buttonPosW,
+            top: mHeight- buttonPosH,
+            child: TextButton(
+              style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all<Color>(const Color(0xFF153867))
+              ),
+              child: const Text(
+                'I understand\nproceed',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w400,
+                  height: 0,
+                ),
+              ),
+              onPressed: (){
+
+              },
+            ),
+          ),
         ]
       )
     );
