@@ -55,7 +55,7 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
     _controller = CameraController(
       widget.frontCamera,
-      ResolutionPreset.medium,
+      ResolutionPreset.low,
     );
     _controller.initialize().then((_) {
       if (!mounted) {
@@ -65,7 +65,7 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  void startStreaming({int frameIntervalMs = 75}) async { // 50 svarer til cirka 15 billeder i sekundet, i kan teste andre værdier og kigge i loggen
+  void startStreaming({int frameIntervalMs = 50}) async { // 50 svarer til cirka 15 billeder i sekundet, i kan teste andre værdier og kigge i loggen
     setState(() {
       _isStreaming = true;
     });
@@ -95,7 +95,12 @@ class _MyHomePageState extends State<MyHomePage> {
           final imglib.Image rgbImage = ImageUtils.convertCameraImage(image);
 
           // Convert the image to a byte format (e.g., PNG) before sending
-          List<int> imageBytes = imglib.encodePng(rgbImage);
+          // List<int> imageBytes = imglib.encodePng(rgbImage);
+          // final int imageSize = imageBytes.length;
+
+          // Convert the image to a byte format (e.g., JPEG) before sending with a desired quality
+          const int quality = 50; // Adjust the quality as needed, 0-100
+          List<int> imageBytes = imglib.encodeJpg(rgbImage, quality: quality);
           final int imageSize = imageBytes.length;
 
           // Convert imageSize to bytes and send it

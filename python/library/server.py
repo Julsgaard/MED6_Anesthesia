@@ -32,7 +32,7 @@ async def handle_client(reader, writer, image_queue, tilt_queue):
                 # if size == width * height:  # Check if data size matches the resolution
                 #     image = np.frombuffer(image_data, dtype=np.uint8).reshape((height, width))
 
-                image_filename = f"{functions.session_path}/received_image_{image_counter}.jpg"
+                image_filename = f"{functions.session_path}/received_image_{image_counter}.JPEG"
 
                 with open(image_filename, 'wb') as img_file:
                     img_file.write(image_data)
@@ -60,6 +60,7 @@ async def handle_client(reader, writer, image_queue, tilt_queue):
                 if curr_time - prev_time >= 1:
                     fps = frame_counter / (curr_time - prev_time)
                     print(f"FPS: {fps}")
+                    print(f"Image ByteSize: {size}")
                     frame_counter = 0
                     prev_time = curr_time
 
