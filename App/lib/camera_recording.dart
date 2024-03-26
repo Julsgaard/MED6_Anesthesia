@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'camera_services.dart';
 import 'package:sensors/sensors.dart';
 import 'dart:math' as math;
-import 'package:dart/intro_page.dart';
+import 'package:dart/info_page.dart';
 import 'package:dart/Assets/circle.dart';
 import 'main.dart';
 
@@ -90,9 +90,11 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
     double mHeight= MediaQuery.of(context).size.height;
     double circleHeight = (mHeight/5)*2;
     double cameraWidth = (mWidth/7)*6;
-    double cameraHeight = (mHeight/8)*5;
+    double cameraHeight = (mHeight/12)*8;
     double buttonPosW = (mWidth/7);
-    double buttonPosH = (mHeight/8);
+    double buttonPosH = (mHeight/10);
+    double buttonWidth = (mWidth/4);
+    double buttonHeight = (mHeight/18);
     return Material(
 
       child: Stack(
@@ -106,7 +108,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
               width: cameraWidth,
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.only(
+                borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(10),
                     topRight: Radius.circular(10),
                     bottomLeft: Radius.circular(10),
@@ -159,10 +161,11 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
             top: mHeight- buttonPosH,
             child: TextButton(
               style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all<Color>(const Color(0xFF153867))
+                backgroundColor: MaterialStateProperty.all<Color>(const Color(0xFF153867)),
+                minimumSize: MaterialStateProperty.all(Size(buttonWidth,buttonHeight,)),
               ),
               child: const Text(
-                'I understand\nproceed',
+                'Continue \n anyway',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.white,
@@ -182,10 +185,11 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
             top: mHeight- buttonPosH,
             child: TextButton(
               style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all<Color>(const Color(0xFF153867))
+                backgroundColor: MaterialStateProperty.all<Color>(const Color(0xFF153867)),
+                minimumSize: MaterialStateProperty.all(Size(buttonWidth,buttonHeight,)),
               ),
               child: const Text(
-                'I understand\nproceed',
+                'Repeat \ninstructions',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.white,
@@ -200,29 +204,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
               },
             ),
           ),
-          Positioned(
-            right: buttonPosW,
-            top: mHeight- buttonPosH,
-            child: TextButton(
-              style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all<Color>(const Color(0xFF153867))
-              ),
-              child: const Text(
-                'I understand\nproceed',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w400,
-                  height: 0,
-                ),
-              ),
-              onPressed: (){
 
-              },
-            ),
-          ),
         ]
       )
     );

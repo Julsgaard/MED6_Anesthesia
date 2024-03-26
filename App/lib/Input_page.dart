@@ -4,11 +4,12 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'camera_recording.dart';
 import '../assets/circle.dart';
 
-class intro_page extends StatelessWidget {
+class InputPage extends StatelessWidget {
   final CameraDescription camera;
-  const intro_page({
+  const InputPage({
     super.key,
     required this.camera,
+    re
   });
 
 
@@ -20,7 +21,7 @@ class intro_page extends StatelessWidget {
     double textWidth = ((mWidth/8)*6);
     double textHeight = (mHeight/5)*3;
     double buttonPosW = (mWidth/3);
-    double buttonPosH = (mHeight/8);
+    double buttonPosH = (mHeight/10);
     return Material(
       child: Container(
         clipBehavior: Clip.antiAlias,
@@ -38,7 +39,7 @@ class intro_page extends StatelessWidget {
                   overflow: TextOverflow.fade,
                   softWrap: true,
                   minFontSize: 20,
-                  'Hello, to access if you can undergo a standard anesthesia procedure the doctor has ordered a review of your mouth and neck. Therefore we ask you to go through this online video consultation, where you will record yourself as guided by the video. This video recording will then be accessed by an AI, to determine if you can undergo standard procedure, or you need to see a real doctor',
+                  'On this page you shall fill out some information about your medical state and history',
                   style: TextStyle(
                     color: Color(0xFF143868),
                     fontSize: 24,
@@ -57,7 +58,7 @@ class intro_page extends StatelessWidget {
                     backgroundColor: MaterialStateProperty.all<Color>(const Color(0xFF153867))
                 ),
                 child: const Text(
-                  'I understand\nproceed',
+                  'I have filled out \neverything proceed',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.white,
@@ -82,4 +83,3 @@ class intro_page extends StatelessWidget {
     );
   }
 }
-

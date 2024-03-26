@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'camera_services.dart';
 import 'package:sensors/sensors.dart';
 import 'dart:math' as math;
-import 'package:dart/intro_page.dart';
+import 'package:dart/info_page.dart';
 import 'package:dart/camera_recording.dart';
 
 List<CameraDescription>? cameras;
@@ -43,8 +43,9 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: intro_page(
+      home: InfoPage(
         camera: camera,
+        infoText: 'Hello, to access if you can undergo a standard anesthesia procedure the doctor has ordered a review of your mouth and neck. Therefore we ask you to go through this online video consultation, where you will record yourself as guided by the video. This video recording will then be accessed by an AI, to determine if you can undergo standard procedure, or you need to see a real doctor',
       ),
     );
   }
