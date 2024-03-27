@@ -7,59 +7,63 @@ from library import functions
 host = '0.0.0.0'
 port = 5000
 
-
 async def handle_client(reader, writer, image_queue, tilt_queue):
     image_counter = 0
     prev_time = time.time()  # Initialize prev_time
     frame_counter = 0  # Initialize frame counter
+    width, height = 640, 480  # Assuming a fixed resolution
 
     try:
         while True:
-            # TODO: Dynamic resolution in separate function?
-            # Read the resolution data first
-            resolution_data = await reader.readexactly(8)
-            width = int.from_bytes(resolution_data[:4], 'big')
-            height = int.from_bytes(resolution_data[4:], 'big')
-
-            # Then read the size of the image data
+            # Read the size of the image data
             size_data = await reader.readexactly(4)
             size = int.from_bytes(size_data, 'big')
 
             if size:
                 image_data = await reader.readexactly(size)
-                # print(f"Received data of size: {size} for resolution: {width}x{height}")
 
-                if size == width * height:  # Check if data size matches the resolution
-                    image = np.frombuffer(image_data, dtype=np.uint8).reshape((height, width))
+                # Reconstruct the NV21 image
+                # NV21 has the Y plane followed by the UV plane (which is half the size of Y)
+                y_plane_len = width * height
+                uv_plane_len = width * height // 2  # UV plane has half the number of pixels
+                y_plane = np.frombuffer(image_data[:y_plane_len], dtype=np.uint8).reshape((height, width))
 
-                    image_filename = f"{functions.session_path}/received_image_{image_counter}.jpg"
-
-                    # TODO: Maybe don't save it during runtime - Depends on how we use the images in the code
-                    # Save the image to a file
-                    cv2.imwrite(image_filename, image)
-
-                    # Put the image filename in the server_image_queue
-                    image_queue.put(image_filename)
-
-                    # print(f"Image saved to {image_filename}")
-                    image_counter += 1
-
+                # If there's a byte missing in the UV plane, add a neutral (zero) byte
+                if len(image_data[y_plane_len:]) == uv_plane_len - 1:
+                    uv_data = image_data[y_plane_len:] + b'\x00'  # Append a single neutral byte
                 else:
-                    print("Mismatched data size, cannot form an image.")
+                    uv_data = image_data[y_plane_len:y_plane_len + uv_plane_len]
+
+                uv_plane = np.frombuffer(uv_data, dtype=np.uint8).reshape((height // 2, width // 2, 2))
+
+                # Convert NV21 to BGR format for OpenCV
+                yuv_image = cv2.cvtColorTwoPlane(y_plane, uv_plane, cv2.COLOR_YUV2BGR_NV12)
+
+                # Rotate the image counter-clockwise 90 degrees to correct the orientation
+                # Since your image was rotated 90 degrees clockwise, we'll rotate it back 270 degrees
+                # which is equivalent to 90 degrees counter-clockwise
+                corrected_image = cv2.rotate(yuv_image, cv2.ROTATE_90_COUNTERCLOCKWISE)
+
+                # Save the corrected image to a file
+                image_filename = f"{functions.session_path}/received_image_{image_counter}.jpeg"
+                cv2.imwrite(image_filename, corrected_image)
+
+                # Put the image filename in the server_image_queue
+                image_queue.put(image_filename)
+
+                image_counter += 1
 
                 # Increment frame counter
                 frame_counter += 1
 
-                # TODO: Calculate FPS in separate function
                 # Calculate FPS every second
                 curr_time = time.time()
                 if curr_time - prev_time >= 1:
                     fps = frame_counter / (curr_time - prev_time)
                     print(f"FPS: {fps}")
+                    print(f"Image ByteSize: {size}")
                     frame_counter = 0
                     prev_time = curr_time
-
-                    print(f"Received data of size: {size} for resolution: {width}x{height}")
 
             else:
                 print("No more data from client.")
@@ -67,12 +71,9 @@ async def handle_client(reader, writer, image_queue, tilt_queue):
 
     except asyncio.IncompleteReadError:
         print("Client disconnected.")
-
-    # TODO: Maybe the server can connect to the client again after the client disconnects?
     finally:
         writer.close()
         await writer.wait_closed()
-
 
 async def async_server(image_queue, tilt_queue):
     server = await asyncio.start_server(lambda r, w: handle_client(r, w, image_queue, tilt_queue), host, port)

@@ -6,9 +6,11 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:camera_android_camerax/camera_android_camerax.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   final cameras = await availableCameras();
   final frontCamera = cameras.firstWhere(
         (camera) => camera.lensDirection == CameraLensDirection.front,
@@ -54,6 +56,8 @@ class _MyHomePageState extends State<MyHomePage> {
     _controller = CameraController(
       widget.frontCamera,
       ResolutionPreset.medium,
+      enableAudio: false,
+      imageFormatGroup: ImageFormatGroup.nv21
     );
     _controller.initialize().then((_) {
       if (!mounted) {
@@ -63,7 +67,8 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  void startStreaming({int frameIntervalMs = 50}) async { // 50 svarer til cirka 15 billeder i sekundet, i kan teste andre værdier og kigge i loggen
+  void startStreaming({int frameIntervalMs = 50}) async {
+    // 50 corresponds to approximately 20 frames per second, test other values as needed
     setState(() {
       _isStreaming = true;
     });
@@ -71,41 +76,43 @@ class _MyHomePageState extends State<MyHomePage> {
 
     int lastTimestamp = DateTime.now().millisecondsSinceEpoch;
 
+    // Here we assume that your CameraController has been properly initialized.
+    String imageFormat = _controller.imageFormatGroup.toString();
+    developer.log('Camera image format: $imageFormat', name: 'camera.info');
+
     _controller.startImageStream((CameraImage image) async {
       if (_isStreaming) {
         int currentTimestamp = DateTime.now().millisecondsSinceEpoch;
         if (currentTimestamp - lastTimestamp >= frameIntervalMs) {
           lastTimestamp = currentTimestamp;
 
-          // Increment the counter since an image has been captured
-          _imagesCaptured++;
+          // Assuming the image is in NV21 format or similar, consisting of Y plane followed by UV plane
+          final Uint8List yPlane = image.planes[0].bytes; // Y plane
+          final Uint8List uvPlane = image.planes[1].bytes; // UV plane (assuming NV21 format or similar)
+          final int ySize = yPlane.length;
+          final int uvSize = uvPlane.length;
+          final int totalSize = ySize + uvSize;
 
+          // Log the image format, size, and resolution
           final int width = image.width;
           final int height = image.height;
+          developer.log('Image format: $imageFormat, Size: $totalSize bytes, Resolution: ${width}x${height}', name: 'camera.info');
 
-          final ByteData resolutionData = ByteData(8);
-          resolutionData.setUint32(0, width, Endian.big);
-          resolutionData.setUint32(4, height, Endian.big);
-          final Uint8List resolutionHeader = resolutionData.buffer.asUint8List();
+          if (totalSize > 0) {
+            // Prepare and send the total size of the concatenated image data
+            final ByteData byteData = ByteData(4);
+            byteData.setUint32(0, totalSize, Endian.big);
+            final Uint8List sizeHeader = byteData.buffer.asUint8List();
 
-          final Uint8List? imageData = image.planes.first.bytes;
-          final int imageSize = imageData?.length ?? 0;
+            socket.add(sizeHeader); // Send the total size of the concatenated image data
 
-          final ByteData byteData = ByteData(4);
-          byteData.setUint32(0, imageSize, Endian.big);
-          final Uint8List sizeHeader = byteData.buffer.asUint8List();
+            // Concatenate Y and UV data for NV21 format and send
+            final Uint8List nv21Data = Uint8List.fromList(yPlane + uvPlane);
+            socket.add(nv21Data); // Send the actual concatenated image bytes
 
-          if (imageData != null && imageSize > 0) {
-            socket.add(resolutionHeader);
-            socket.add(sizeHeader);
-            socket.add(imageData);
-
-            // Check if a second has passed since the last log
+            // Logging the number of images captured every second
             if (currentTimestamp - _lastLogTimestamp >= 1000) {
-              // Log the number of images captured in the last second
               developer.log('Images captured in last second: $_imagesCaptured', name: 'camera.capture');
-
-              // Reset the counter and update the timestamp for the next log
               _imagesCaptured = 0;
               _lastLogTimestamp = currentTimestamp;
             }
@@ -114,6 +121,27 @@ class _MyHomePageState extends State<MyHomePage> {
       }
     });
   }
+
+
+
+
+  // Future<void> startStreaming() async {
+  //   socket = await Socket.connect('192.168.8.150', 5000); // Use your server IP and port
+  //   _isStreaming = true;
+  //   _controller.startImageStream((CameraImage cameraImage) async {
+  //     if (_isStreaming) {
+  //       // Convert the CameraImage to an RGB image
+  //       final imglib.Image rgbImage = ImageUtils.convertCameraImage(cameraImage);
+  //
+  //       // Convert the image to a byte format (e.g., PNG) before sending
+  //       List<int> imageBytes = imglib.encodePng(rgbImage);
+  //
+  //
+  //       // Send the image bytes over TCP
+  //       socket.add(Uint8List.fromList(imageBytes));
+  //     }
+  //   });
+  // }
 
   void stopStreaming() {
     setState(() {
