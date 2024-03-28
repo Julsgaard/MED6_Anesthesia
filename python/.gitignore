@@ -152,3 +152,10 @@ cython_debug/
 #.idea/
 
 /logs/phone_images
+/dataset
+/library/mallampati_dataset
+/library/mallampati_testset
+/library/mallampati_datasets
+/library/Cropped_images
+/library/received_images
+/received_images

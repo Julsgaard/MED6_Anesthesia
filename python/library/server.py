@@ -74,14 +74,6 @@ async def handle_client(reader, writer, image_queue, tilt_queue):
 def fps_counter(frame_counter, prev_time):
     """
     Calculates and print the FPS every second
-
-    Parameters:
-        frame_counter (int): Number of frames processed in the current second.
-        prev_time (float): Timestamp (in seconds) of the start of the current second.
-
-    Returns:
-        frame_counter (int): Updated frame counter.
-        prev_time (float): Updated timestamp.
     """
     # Increment frame counter
     frame_counter += 1
@@ -99,13 +91,6 @@ def fps_counter(frame_counter, prev_time):
 async def async_server(image_queue, tilt_queue):
     """
     Starts the server and listens for incoming connections
-
-    Parameters:
-        image_queue (queue.Queue): Queue to store image paths
-        tilt_queue (queue.Queue): Queue to store tilt angles
-
-    Returns:
-        None
     """
     server = await asyncio.start_server(lambda r, w: handle_client(r, w, image_queue, tilt_queue), host, port)
     sock_name = server.sockets[0].getsockname()
