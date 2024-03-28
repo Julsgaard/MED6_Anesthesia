@@ -72,7 +72,7 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       _isStreaming = true;
     });
-    socket = await Socket.connect('192.168.86.69', 5000);
+    socket = await Socket.connect('192.168.8.150', 5000);
 
     int lastTimestamp = DateTime.now().millisecondsSinceEpoch;
 
@@ -103,8 +103,14 @@ class _MyHomePageState extends State<MyHomePage> {
             final ByteData byteData = ByteData(4);
             byteData.setUint32(0, totalSize, Endian.big);
             final Uint8List sizeHeader = byteData.buffer.asUint8List();
-
             socket.add(sizeHeader); // Send the total size of the concatenated image data
+
+            // Prepare and send the resolution of the image
+            final ByteData resolutionData = ByteData(8);
+            resolutionData.setUint32(0, image.width, Endian.big);
+            resolutionData.setUint32(4, image.height, Endian.big);
+            final Uint8List resolutionHeader = resolutionData.buffer.asUint8List();
+            socket.add(resolutionHeader); // Send the resolution of the image (width and height)
 
             // Concatenate Y and UV data for NV21 format and send
             final Uint8List nv21Data = Uint8List.fromList(yPlane + uvPlane);
