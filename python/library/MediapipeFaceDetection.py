@@ -52,7 +52,10 @@ def initialize_mediapipe_face_mesh():
     """Initializes the MediaPipe Face Mesh and returns it."""
     # Initialize MediaPipe Face Mesh.
     mp_face_mesh = mp.solutions.face_mesh
-    face_mesh = mp_face_mesh.FaceMesh(min_detection_confidence=0.5, min_tracking_confidence=0.5,refine_landmarks=True)
+    face_mesh = mp_face_mesh.FaceMesh(
+        min_detection_confidence=0.5,
+        min_tracking_confidence=0.3,
+        refine_landmarks=True)
 
     return face_mesh
 
