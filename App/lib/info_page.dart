@@ -22,8 +22,10 @@ class InfoPage extends StatelessWidget {
     double circleHeight = (mHeight/5)*2;
     double textWidth = ((mWidth/8)*6);
     double textHeight = (mHeight/5)*3;
-    double buttonPosW = (mWidth/3);
+    double buttonPosW = (mWidth/4);
     double buttonPosH = (mHeight/10);
+    double buttonWidth = (mWidth/2);
+    double buttonHeight = (mHeight/15);
     return Material(
       child: Container(
         clipBehavior: Clip.antiAlias,
@@ -57,7 +59,9 @@ class InfoPage extends StatelessWidget {
               top: mHeight- buttonPosH,
               child: TextButton(
                 style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all<Color>(const Color(0xFF153867))
+                    backgroundColor: MaterialStateProperty.all<Color>(const Color(0xFF153867)),
+                    minimumSize: MaterialStateProperty.all(Size(buttonWidth,buttonHeight,)),
+                    maximumSize: MaterialStateProperty.all(Size(buttonWidth,buttonHeight,)),
                 ),
                 child: const Text(
                   'I understand\nproceed',

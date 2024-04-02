@@ -94,7 +94,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
     double buttonPosW = (mWidth/7);
     double buttonPosH = (mHeight/10);
     double buttonWidth = (mWidth/4);
-    double buttonHeight = (mHeight/18);
+    double buttonHeight = (mHeight/16);
     return Material(
 
       child: Stack(
@@ -163,6 +163,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
               style: ButtonStyle(
                 backgroundColor: MaterialStateProperty.all<Color>(const Color(0xFF153867)),
                 minimumSize: MaterialStateProperty.all(Size(buttonWidth,buttonHeight,)),
+                maximumSize: MaterialStateProperty.all(Size(buttonWidth,buttonHeight,)),
               ),
               child: const Text(
                 'Continue \n anyway',
@@ -187,6 +188,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
               style: ButtonStyle(
                 backgroundColor: MaterialStateProperty.all<Color>(const Color(0xFF153867)),
                 minimumSize: MaterialStateProperty.all(Size(buttonWidth,buttonHeight,)),
+                maximumSize: MaterialStateProperty.all(Size(buttonWidth,buttonHeight,)),
               ),
               child: const Text(
                 'Repeat \ninstructions',
