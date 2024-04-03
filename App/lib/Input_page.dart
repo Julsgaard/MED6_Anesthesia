@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'package:camera/camera.dart';
 import "package:flutter/material.dart";
 import 'package:flutter/services.dart';
@@ -122,12 +123,22 @@ class _InputPageState extends State<InputPage> {
                   ),
                 ),
                 onPressed: () {
-                  // Check if variables have been assigned
                   if (weight.isNotEmpty && difficultyOfIntubation.isNotEmpty) {
-                    String dataToSend = 'Weight: $weight, Difficulty: $difficultyOfIntubation';
 
-                    // Use NetworkClient to send the data
-                    NetworkClient().sendData(dataToSend);
+                    // Convert weight to an integer
+                    int weightInt = int.parse(weight);
+
+                    // Use ByteData for the conversion to bytes
+                    ByteData byteDataWeight = ByteData(4);
+                    byteDataWeight.setInt32(0, weightInt, Endian.big);
+                    List<int> weightBytes = byteDataWeight.buffer.asUint8List();
+
+                    // Map difficultyOfIntubation to an integer, and then directly to a byte
+                    int difficultyInt = (difficultyOfIntubation == "Definite difficulty") ? 1 : 0;
+                    List<int> difficultyBytes = [difficultyInt];
+
+                    // Combine the two lists into one Uint8List and send
+                    NetworkClient().sendBinaryData(Uint8List.fromList(weightBytes + difficultyBytes));
 
                     // Navigate to the CameraRecording page
                     Navigator.pushReplacement(
