@@ -1,57 +1,48 @@
 import torch
 from torchvision import transforms
 from torchvision.datasets import ImageFolder
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, random_split
 from library.functions import imshow_cv
 
 
 def prepare_image_data(DisplayImages=False):
-    # Define your dataset path
     dataset_path = 'mallampati_datasets/Second dataset (2 classes)'
 
-    # # Define transformations
-    # transform = transforms.Compose([
-    #     transforms.Resize((224, 224)),  # Resize the image
-    #     transforms.ToTensor(),  # Convert the image to a PyTorch tensor
-    #     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])  # Normalize
-    # ])
-
     transform = transforms.Compose([
-        transforms.Resize(224),  # Resize the shorter side to 224
-        transforms.CenterCrop(224),  # Crop the longer side to 224
-        transforms.ToTensor(),  # Convert the image to a PyTorch tensor
-        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])  # Normalize
+        transforms.Resize(224),
+        transforms.CenterCrop(224),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
     ])
 
     # Load the dataset and apply the transformations
     dataset = ImageFolder(root=dataset_path, transform=transform)
 
-    # Splitting the dataset into train and test sets
-    train_size = int(0.8 * len(dataset))
-    test_size = len(dataset) - train_size
-    train_dataset, test_dataset = torch.utils.data.random_split(dataset, [train_size, test_size])
+    # Splitting the dataset into train, validation, and test sets
+    train_size = int(0.7 * len(dataset))  # 70% for training
+    validation_size = int(0.15 * len(dataset))  # 15% for validation
+    test_size = len(dataset) - (train_size + validation_size)  # Remaining ~15% for testing
 
-    # Creating data loaders for training and testing
+    # Vi får den til at splitte det randomly lige nu, men kan godt være vi selv skal gøre det og gemme det? Eller får den til det
+    train_dataset, validation_dataset, test_dataset = random_split(dataset, [train_size, validation_size, test_size])
+
+    # Creating data loaders for training, validation, and testing
     train_loader = DataLoader(train_dataset, batch_size=4, shuffle=True)
+    validation_loader = DataLoader(validation_dataset, batch_size=4, shuffle=False)
     test_loader = DataLoader(test_dataset, batch_size=4, shuffle=False)
 
     print(f"Number of training samples: {len(train_dataset)}")
+    print(f"Number of validation samples: {len(validation_dataset)}")
     print(f"Number of testing samples: {len(test_dataset)}")
 
     if DisplayImages:
-        # Display a few images from the training dataset
+        # Example code to display images from each dataset
         for i, (inputs, labels) in enumerate(train_loader):
-            if i == 10:  # Display first 5 images
+            if i == 10:  # Display first 10 images
                 break
             imshow_cv(inputs[0])  # Display the first image from the batch
 
-        # Display a few images from the testing dataset
-        for i, (inputs, labels) in enumerate(test_loader):
-            if i == 10:  # Display first 5 images
-                break
-            imshow_cv(inputs[0])  # Display the first image from the batch
-
-    return train_loader, test_loader
+    return train_loader, validation_loader, test_loader
 
 
 def prepare_augmented_image_data():  # TODO: Try this

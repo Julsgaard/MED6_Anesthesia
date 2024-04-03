@@ -89,6 +89,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.3.2+4"
+  camerax:
+    dependency: "direct main"
+    description:
+      name: camerax
+      sha256: "87e71053445c290e100f53deb33ad1acde24ac8f6e40dbd2f7c2fcdd7a6cb1d4"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.2"
   characters:
     dependency: transitive
     description:
