@@ -1,4 +1,6 @@
 import copy
+import os
+
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -20,34 +22,28 @@ num_epochs = 25  # The number of epochs to train the model
 
 
 def run_mallampati_model():
-    # Gather and prepare the data
-    train_loader, validation_loader, _ = prepare_image_data()  # Adjusted to include validation data
+    train_loader, validation_loader, _ = prepare_image_data()
 
-    # Load a pre-trained ResNet model
     model = models.resnet34(pretrained=True)
     for param in model.parameters():
-        param.requires_grad = False  # Freeze parameters to avoid backpropagating through them
+        param.requires_grad = False
     num_ftrs = model.fc.in_features
     model.fc = nn.Sequential(
-        nn.Linear(num_ftrs, 512),  # Adding a new layer
+        nn.Linear(num_ftrs, 512),
         nn.ReLU(),
         nn.Dropout(0.5),
-        nn.Linear(512, num_classes)  # Final layer with 'num_classes' outputs
+        nn.Linear(512, num_classes)
     )
 
-    # Move the model to GPU if available
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     model.to(device)
 
-    # Loss function and optimizer
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.fc.parameters(), lr=learning_rate)  # Only train the classifier parameters
+    optimizer = optim.Adam(model.fc.parameters(), lr=learning_rate)
 
-    # Model checkpointing
     best_model_wts = copy.deepcopy(model.state_dict())
     best_acc = 0.0
 
-    # Initialize lists to store losses and accuracies
     training_losses = []
     validation_losses = []
     accuracies = []
@@ -97,19 +93,28 @@ def run_mallampati_model():
             best_acc = epoch_acc
             best_model_wts = copy.deepcopy(model.state_dict())
 
-    # load best model weights
     model.load_state_dict(best_model_wts)
-    print(f"Best Validation Acc: {best_acc:.4f}")
+    folder_name = f'mallampati_models/{best_acc * 100:.2f}%_{num_epochs}_epochs'
+    os.makedirs(folder_name, exist_ok=True)
 
     # Save the model
-    torch.save(model.state_dict(), f'mallampati_models/best_model_{best_acc * 100:.2f}%_{num_epochs}_epochs.pth')
+    torch.save(model.state_dict(), os.path.join(folder_name, 'model.pth'))
 
-    # Plot the training and validation loss
-    plot_training(training_losses, validation_losses, accuracies)
+    # Save hyperparameters
+    with open(os.path.join(folder_name, 'hyperparameters.txt'), 'w') as f:
+        f.write(f'Num Classes: {num_classes}\n')
+        f.write(f'Learning Rate: {learning_rate}\n')
+        f.write(f'Num Epochs: {num_epochs}\n')
+
+    # Save the plot
+    plot_file_path = os.path.join(folder_name, 'training_validation_plot.png')
+    plot_training(training_losses, validation_losses, accuracies, plot_file_path)
+
+    print(f"Model and training details saved in folder: {folder_name}")
 
 
-def plot_training(training_losses, validation_losses, accuracies):
-    epochs = range(1, num_epochs + 1)
+def plot_training(training_losses, validation_losses, accuracies, plot_file_path):
+    epochs = range(1, len(training_losses) + 1)
     plt.figure(figsize=(12, 6))
 
     plt.subplot(1, 2, 1)
@@ -128,8 +133,8 @@ def plot_training(training_losses, validation_losses, accuracies):
     plt.legend()
 
     plt.tight_layout()
-    plt.show()
-
+    plt.savefig(plot_file_path)
+    plt.close()
 
 if __name__ == "__main__":
     run_mallampati_model()
