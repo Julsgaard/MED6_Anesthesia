@@ -4,14 +4,26 @@ import 'package:flutter/services.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'camera_recording.dart';
 import '../assets/circle.dart';
+import 'network_client.dart';
 
-class InputPage extends StatelessWidget {
+// Convert InputPage to StatefulWidget
+class InputPage extends StatefulWidget {
   final CameraDescription camera;
+
   const InputPage({
-    super.key,
+    Key? key,
     required this.camera,
-    re
-  });
+  }) : super(key: key);
+
+  @override
+  _InputPageState createState() => _InputPageState();
+}
+
+class _InputPageState extends State<InputPage> {
+  // Initialize as empty strings; they're now mutable and can be updated
+  String weight = '';
+  String difficultyOfIntubation = '';
+
 
 
   @override
@@ -27,8 +39,6 @@ class InputPage extends StatelessWidget {
     double buttonWidth = (mWidth/2);
     double buttonHeight = (mHeight/15);
     double gab = 20;
-    String weight;
-    String difficultyOfIntubation;
 
     return Material(
       child: Container(
@@ -111,13 +121,23 @@ class InputPage extends StatelessWidget {
                     height: 0,
                   ),
                 ),
-                onPressed: (){
-                  //TODO: Send weight and difficulty of intibation to the server
-                  Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => CameraRecording(title: 'Flutter Demo Home Page',
-                          camera: camera))
-                  );
+                onPressed: () {
+                  // Check if variables have been assigned
+                  if (weight.isNotEmpty && difficultyOfIntubation.isNotEmpty) {
+                    String dataToSend = 'Weight: $weight, Difficulty: $difficultyOfIntubation';
+
+                    // Use NetworkClient to send the data
+                    NetworkClient().sendData(dataToSend);
+
+                    // Navigate to the CameraRecording page
+                    Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => CameraRecording(title: 'Flutter Demo Home Page', camera: widget.camera))
+                    );
+                  } else {
+                    // Handle the case where weight or difficultyOfIntubation is not entered
+                    print("Please fill in all the fields.");
+                  }
                 },
               ),
             ),

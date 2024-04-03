@@ -6,11 +6,13 @@ import 'package:sensors/sensors.dart';
 import 'dart:math' as math;
 import 'package:dart/info_page.dart';
 import 'package:dart/camera_recording.dart';
+import 'network_client.dart';
 
 List<CameraDescription>? cameras;
 class GlobalVariables {
   // Static variable to hold the IP address
-  static var ipAddress = "http://192.168.86.69:5000/upload";
+  static var ipAddress = "192.168.50.141";
+  static var port = 5000;
   // Static variable to hold the tilt angle
   static double tiltAngle = 0.0;
 }
@@ -22,7 +24,15 @@ void main() async {
   final frontCamera = cameras!.firstWhere(
         (camera) => camera.lensDirection == CameraLensDirection.front,
   );
+
   runApp(MyApp(camera: frontCamera));
+
+  initNetworkClient();
+}
+
+// Initialize network client
+Future<void> initNetworkClient() async {
+  await NetworkClient().initConnection();
 }
 
 

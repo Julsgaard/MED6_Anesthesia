@@ -16,6 +16,9 @@ async def handle_client(reader, writer, image_queue, tilt_queue):
     prev_time = time.time()  # Initialize prev_time
     frame_counter = 0  # Initialize frame counter
 
+    client_addr = writer.get_extra_info('peername')
+    print(f"Client connected: {client_addr}")
+
     try:
         while True:
             # Read the size of the image data
@@ -56,7 +59,7 @@ async def handle_client(reader, writer, image_queue, tilt_queue):
                 break
 
     except asyncio.IncompleteReadError:
-        print("Client disconnected.")
+        print(f"Client disconnected: {client_addr}")
     finally:
         writer.close()
         await writer.wait_closed()
