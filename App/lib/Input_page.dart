@@ -1,17 +1,30 @@
+import 'dart:typed_data';
 import 'package:camera/camera.dart';
 import "package:flutter/material.dart";
 import 'package:flutter/services.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'camera_recording.dart';
 import '../assets/circle.dart';
+import 'network_client.dart';
 
-class InputPage extends StatelessWidget {
+// Convert InputPage to StatefulWidget
+class InputPage extends StatefulWidget {
   final CameraDescription camera;
+
   const InputPage({
-    super.key,
+    Key? key,
     required this.camera,
-    re
-  });
+  }) : super(key: key);
+
+  @override
+  _InputPageState createState() => _InputPageState();
+}
+
+class _InputPageState extends State<InputPage> {
+  // Initialize as empty strings; they're now mutable and can be updated
+  String weight = '';
+  String difficultyOfIntubation = '';
+
 
 
   @override
@@ -27,8 +40,6 @@ class InputPage extends StatelessWidget {
     double buttonWidth = (mWidth/2);
     double buttonHeight = (mHeight/15);
     double gab = 20;
-    String weight;
-    String difficultyOfIntubation;
 
     return Material(
       child: Container(
@@ -111,13 +122,33 @@ class InputPage extends StatelessWidget {
                     height: 0,
                   ),
                 ),
-                onPressed: (){
-                  //TODO: Send weight and difficulty of intibation to the server
-                  Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => CameraRecording(title: 'Flutter Demo Home Page',
-                          camera: camera))
-                  );
+                onPressed: () {
+                  if (weight.isNotEmpty && difficultyOfIntubation.isNotEmpty) {
+
+                    // Convert weight to an integer
+                    int weightInt = int.parse(weight);
+
+                    // Use ByteData for the conversion to bytes
+                    ByteData byteDataWeight = ByteData(4);
+                    byteDataWeight.setInt32(0, weightInt, Endian.big);
+                    List<int> weightBytes = byteDataWeight.buffer.asUint8List();
+
+                    // Map difficultyOfIntubation to an integer, and then directly to a byte
+                    int difficultyInt = (difficultyOfIntubation == "Definite difficulty") ? 1 : 0;
+                    List<int> difficultyBytes = [difficultyInt];
+
+                    // Combine the two lists into one Uint8List and send
+                    NetworkClient().sendBinaryData(Uint8List.fromList(weightBytes + difficultyBytes));
+
+                    // Navigate to the CameraRecording page
+                    Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => CameraRecording(title: 'Flutter Demo Home Page', camera: widget.camera))
+                    );
+                  } else {
+                    // Handle the case where weight or difficultyOfIntubation is not entered
+                    print("Please fill in all the fields.");
+                  }
                 },
               ),
             ),

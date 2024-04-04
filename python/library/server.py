@@ -16,7 +16,22 @@ async def handle_client(reader, writer, image_queue, tilt_queue):
     prev_time = time.time()  # Initialize prev_time
     frame_counter = 0  # Initialize frame counter
 
+    client_addr = writer.get_extra_info('peername')
+    print(f"Client connected: {client_addr}")
+
     try:
+        # Read the weight (4 bytes)
+        weight_data = await reader.readexactly(4)
+        weight = int.from_bytes(weight_data, 'big')
+
+        # Read the difficulty of intubation (1 byte)
+        difficulty_data = await reader.readexactly(1)
+        difficultyOfIntubation = int.from_bytes(difficulty_data, 'big')
+
+        # Weight in kg
+        # Difficulty of Intubation: 0 = No, 1 = Yes
+        print(f"Received - Weight: {weight}, Difficulty of Intubation: {difficultyOfIntubation}")
+
         while True:
             # Read the size of the image data
             size_data = await reader.readexactly(4)
@@ -56,7 +71,7 @@ async def handle_client(reader, writer, image_queue, tilt_queue):
                 break
 
     except asyncio.IncompleteReadError:
-        print("Client disconnected.")
+        print(f"Client disconnected: {client_addr}")
     finally:
         writer.close()
         await writer.wait_closed()
