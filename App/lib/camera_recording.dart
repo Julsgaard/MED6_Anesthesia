@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'camera_services.dart';
+import 'camera_services_TCP.dart';
 import 'package:sensors/sensors.dart';
 import 'dart:math' as math;
 import 'package:dart/info_page.dart';
@@ -47,7 +47,9 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
     WidgetsBinding.instance.addObserver(this);
     _controller = CameraController(
       widget.camera,
-      ResolutionPreset.max,
+      ResolutionPreset.medium,
+      enableAudio: false,
+        imageFormatGroup: ImageFormatGroup.nv21
     );
     _initializeControllerFuture = _controller.initialize().then((_) {
       if (!mounted) {

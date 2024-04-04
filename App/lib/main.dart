@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'camera_services.dart';
 import 'package:sensors/sensors.dart';
 import 'dart:math' as math;
 import 'package:dart/info_page.dart';

@@ -72,7 +72,8 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       _isStreaming = true;
     });
-    socket = await Socket.connect('192.168.50.141', 5000);
+
+    socket = await Socket.connect('192.168.86.69', 5000);
 
     int lastTimestamp = DateTime.now().millisecondsSinceEpoch;
 
