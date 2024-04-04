@@ -1,11 +1,10 @@
 import 'dart:io';
 import 'dart:convert';
-import 'dart:typed_data'; // For sending binary data (camera footage)
+import 'dart:typed_data';
+import 'package:dart/main.dart';
 
 class NetworkClient {
   Socket? _socket;
-  final String serverIP = '192.168.50.141';
-  final int serverPort = 5000;
 
   // Singleton pattern to ensure only one instance is created
   static final NetworkClient _instance = NetworkClient._internal();
@@ -14,7 +13,7 @@ class NetworkClient {
 
   Future<void> initConnection() async {
     try {
-      _socket = await Socket.connect(serverIP, serverPort, timeout: Duration(seconds: 5));
+      _socket = await Socket.connect(GlobalVariables.ipAddress, GlobalVariables.port, timeout: Duration(seconds: 5));
       _socket?.listen(_onDataReceived,
           onError: _onError,
           onDone: _onDone,
