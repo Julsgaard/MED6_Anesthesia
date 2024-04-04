@@ -1,4 +1,3 @@
-// camera_services_HTTP.dart
 import 'dart:async';
 import 'dart:convert';
 import 'package:camera/camera.dart';

@@ -4,13 +4,14 @@ import 'dart:typed_data';
 import 'package:dart/main.dart';
 
 class NetworkClient {
-  Socket? _socket;
+  Socket? _socket; // Socket for the connection
 
   // Singleton pattern to ensure only one instance is created
   static final NetworkClient _instance = NetworkClient._internal();
   factory NetworkClient() => _instance;
   NetworkClient._internal();
 
+  // Initialize the connection to the server
   Future<void> initConnection() async {
     try {
       _socket = await Socket.connect(GlobalVariables.ipAddress, GlobalVariables.port, timeout: Duration(seconds: 5));
@@ -20,6 +21,7 @@ class NetworkClient {
           cancelOnError: false);
     } catch (e) {
       print('Could not connect to the server: $e');
+
       // Implement reconnection logic or error handling as needed
     }
   }
@@ -36,17 +38,14 @@ class NetworkClient {
   }
 
   void _onDataReceived(data) {
-    // Handle data received from the server if needed
   }
 
   void _onError(error, StackTrace trace) {
     print('Error: $error');
-    // Handle any error here
   }
 
   void _onDone() {
     print('Disconnected from the server.');
-    // Handle disconnection here, possibly attempt to reconnect
   }
 
   void closeConnection() {

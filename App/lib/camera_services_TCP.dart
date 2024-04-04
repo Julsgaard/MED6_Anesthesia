@@ -1,10 +1,11 @@
-// camera_services_HTTP.dart
 import 'dart:async';
 import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:camera_android_camerax/camera_android_camerax.dart';
 import 'dart:developer' as developer; // Import for logging
 import 'dart:typed_data';
+import 'network_client.dart';
+
 
 
 
@@ -16,8 +17,10 @@ class CameraServices {
 
   static Future<void> streamCameraFootage(CameraController _controller,{int frameIntervalMs = 50}) async {
     // 50 corresponds to approximately 20 frames per second, test other values as needed
+
+    NetworkClient networkClient = NetworkClient();
+
     isStreaming = true;
-    Socket socket = await Socket.connect('192.168.86.69', 5000);
 
     int lastTimestamp = DateTime.now().millisecondsSinceEpoch;
 
@@ -48,18 +51,20 @@ class CameraServices {
             final ByteData byteData = ByteData(4);
             byteData.setUint32(0, totalSize, Endian.big);
             final Uint8List sizeHeader = byteData.buffer.asUint8List();
-            socket.add(sizeHeader); // Send the total size of the concatenated image data
+            networkClient.sendBinaryData(sizeHeader);  // Send the total size of the concatenated image data
 
             // Prepare and send the resolution of the image
             final ByteData resolutionData = ByteData(8);
             resolutionData.setUint32(0, image.width, Endian.big);
             resolutionData.setUint32(4, image.height, Endian.big);
             final Uint8List resolutionHeader = resolutionData.buffer.asUint8List();
-            socket.add(resolutionHeader); // Send the resolution of the image (width and height)
+            networkClient.sendBinaryData(resolutionHeader);  // Send the resolution of the image (width and height)
+
 
             // Concatenate Y and UV data for NV21 format and send
             final Uint8List nv21Data = Uint8List.fromList(yPlane + uvPlane);
-            socket.add(nv21Data); // Send the actual concatenated image bytes
+            networkClient.sendBinaryData(nv21Data);  // Send the actual concatenated image bytes
+
 
             // Logging the number of images captured every second
             if (currentTimestamp - _lastLogTimestamp >= 1000) {
