@@ -1,4 +1,4 @@
-// camera_services.dart
+// camera_services_HTTP.dart
 import 'dart:async';
 import 'dart:convert';
 import 'package:camera/camera.dart';
@@ -6,7 +6,11 @@ import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'main.dart';
-
+import 'package:camera_android_camerax/camera_android_camerax.dart';
+import 'dart:async';
+import 'dart:io';
+import 'dart:typed_data';
+import 'dart:developer' as developer; // Import for logging
 
 class CameraServices {
 
