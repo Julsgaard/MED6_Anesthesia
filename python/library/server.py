@@ -12,6 +12,8 @@ async def handle_client(reader, writer, image_queue, tilt_queue):
     """Handles the client connection reads the image data and saves it to a file. The image filename is then put in
     the server_image_queue."""
 
+    session_path = functions.create_session_folder()  # Create a new session folder when a client connects
+
     image_counter = 0
     prev_time = time.time()  # Initialize prev_time
     frame_counter = 0  # Initialize frame counter
@@ -52,7 +54,7 @@ async def handle_client(reader, writer, image_queue, tilt_queue):
                 corrected_image = cv2.rotate(yuv_image, cv2.ROTATE_90_COUNTERCLOCKWISE)
 
                 # Create a filename for the image
-                image_filename = f"{functions.session_path}/received_image_{image_counter}.jpeg"
+                image_filename = f"{session_path}/received_image_{image_counter}.jpeg"
 
                 # Save the corrected image to a file
                 cv2.imwrite(image_filename, corrected_image)

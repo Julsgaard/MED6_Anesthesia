@@ -11,14 +11,11 @@ nose_tracker = None
 chin_tracker = None
 
 if __name__ == '__main__':
-    functions.check_for_logs_folder()
-    functions.delete_empty_folders_in_logs()
-    functions.create_session_folder()
+    functions.check_for_logs_folder()  # Check if the logs folder exists, if not create it
+    functions.delete_empty_folders_in_logs()  # Delete empty folders in the logs folder to prevent clutter
 
     # Initialize face and landmark data
     face_mesh_model = MediapipeFaceDetection.initialize_mediapipe_face_mesh()
-
-    # print("Server starting...")
 
     # Starts the server in a new thread
     server_thread = threading.Thread(target=server.start_server, args=(image_queue, tilt_queue))
