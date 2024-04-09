@@ -10,11 +10,10 @@ def calculate_mouth_opening_area(face_landmarks):
     lip_points = [(face_landmarks[i].x, face_landmarks[i].y) for i in indices]
 
     # We need to define which points A, B, and C refer to in your new landmark scheme
-    # Assuming they represent three key points such as the top-middle, lower-middle of the mouth, and a point on the outer edge.
     # Update these based on the actual points used for mouth opening calculation
-    A = dist.euclidean(lip_points[0], lip_points[6])  # Update indices based on your measurement points
-    B = dist.euclidean(lip_points[3], lip_points[9])  # Same here
-    C = dist.euclidean(lip_points[12], lip_points[16])  # And here
+    A = dist.euclidean(lip_points[3], lip_points[17])  # Update indices based on your measurement points
+    B = dist.euclidean(lip_points[7], lip_points[14])  # Same here
+    C = dist.euclidean(lip_points[0], lip_points[10])  # And here
 
     mor = (A + B) / (2.0 * C)
     return mor

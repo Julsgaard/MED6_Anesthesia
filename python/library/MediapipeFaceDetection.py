@@ -1,5 +1,6 @@
 import cv2
 import mediapipe as mp
+import MouthOpeningArea
 
 
 inner_lip_indices = [78, 191, 80, 81, 82, 13, 312, 311, 310, 415, 308, 324, 318, 402, 317, 14, 87, 178, 88, 95]
@@ -35,18 +36,16 @@ def detect_faces_and_landmarks(source, face_mesh, is_image=False):
         # No faces found, return the original frame and None for the landmarks
         print("No faces detected.")
         return frame, None
-
-    # Draw face landmarks for specific indices.
-    #desired_indices = [4,152]
     for face_landmarks in results.multi_face_landmarks:
         for idx, landmark in enumerate(face_landmarks.landmark):
-            if idx in inner_lip_indices :
+            if idx in inner_lip_indices:
                 x = int(landmark.x * frame.shape[1])
                 y = int(landmark.y * frame.shape[0])
                 cv2.circle(frame, (x, y), 1, (0, 255, 0), -1)  # Draw circle for each specified landmark
+                # Draw the index number near each landmark point
+                #cv2.putText(frame, str(idx), (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (255, 255, 255), 1)
 
-        return frame, results.multi_face_landmarks[0].landmark
-
+    return frame, results.multi_face_landmarks[0].landmark
 
 def initialize_mediapipe_face_mesh():
     """Initializes the MediaPipe Face Mesh and returns it."""
@@ -67,6 +66,10 @@ if __name__ == "__main__":
     while True:
         # Exit loop on 'q' keypress
         frame, face_landmarks = detect_faces_and_landmarks(cap, face_mesh)
+
+        area = MouthOpeningArea.calculate_mouth_opening_area(face_landmarks)
+
+        print(f"Area: {area}")
 
         # Display the resulting frame
         cv2.imshow('Facial Landmarks', frame)
