@@ -53,12 +53,18 @@ async def handle_client(reader, writer, image_queue, tilt_queue):
             # print(f"Current State: {current_state}")
 
             if current_state == 0:  # Mouth Opening state
-                image_counter = await video_stream(reader, image_queue, session_path, 'Mouth Opening', image_counter)
+                current_state = 'Mouth Opening'
+
+                image_counter = await video_stream(reader, image_queue, session_path, current_state, image_counter)
 
             elif current_state == 1:  # Mallampati state
+                current_state = 'Mallampati'
+
                 image_counter = await video_stream(reader, image_queue, session_path, 'Mallampati', image_counter)
 
             elif current_state == 2:  # Neck Movement state
+                current_state = 'Neck Movement'
+
                 image_counter = await video_stream(reader, image_queue, session_path, 'Neck Movement', image_counter)
 
             else:
@@ -75,7 +81,7 @@ async def handle_client(reader, writer, image_queue, tilt_queue):
         await writer.wait_closed()
 
 
-async def video_stream(reader, image_queue, session_path, state_name, image_counter):
+async def video_stream(reader, image_queue, session_path, current_state, image_counter):
     # Read the size of the image data
     size_data = await reader.readexactly(4)
     size = int.from_bytes(size_data, 'big')
@@ -95,7 +101,7 @@ async def video_stream(reader, image_queue, session_path, state_name, image_coun
         corrected_image = cv2.rotate(yuv_image, cv2.ROTATE_90_COUNTERCLOCKWISE)
 
         # Create a directory for the state if it doesn't exist
-        state_dir = f"{session_path}/{state_name}"
+        state_dir = f"{session_path}/{current_state}"
         os.makedirs(state_dir, exist_ok=True)
 
         # Create the image filename
