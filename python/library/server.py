@@ -31,6 +31,12 @@ async def handle_client(reader, writer, image_queue, tilt_queue):
         difficulty_data = await reader.readexactly(1)
         difficulty_of_intubation = int.from_bytes(difficulty_data, 'big')
 
+        # Convert the difficulty of intubation to a string
+        if difficulty_of_intubation == 0:
+            difficulty_of_intubation = "No difficulty"
+        if difficulty_of_intubation == 1:
+            difficulty_of_intubation = "Definite difficulty"
+
         # Save the weight and difficulty of intubation to the session folder
         with open(f"{session_path}/weight and difficulty.txt", 'w') as f:
             f.write(f"Weight: {weight}\n")
