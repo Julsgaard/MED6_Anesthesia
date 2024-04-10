@@ -5,8 +5,7 @@ import 'package:camera_android_camerax/camera_android_camerax.dart';
 import 'dart:developer' as developer; // Import for logging
 import 'dart:typed_data';
 import 'network_client.dart';
-
-
+import 'state_manager.dart';
 
 
 class CameraServices {
@@ -15,7 +14,7 @@ class CameraServices {
   static int _imagesCaptured = 0;
   static int _lastLogTimestamp = DateTime.now().millisecondsSinceEpoch;
 
-  static Future<void> streamCameraFootage(CameraController _controller,{int frameIntervalMs = 50}) async {
+  static Future<void> streamCameraFootage(CameraController _controller, StateManager stateManager, {int frameIntervalMs = 50}) async {
     // 50 corresponds to approximately 20 frames per second, test other values as needed
 
     NetworkClient networkClient = NetworkClient();
@@ -28,11 +27,22 @@ class CameraServices {
     String imageFormat = _controller.imageFormatGroup.toString();
     developer.log('Camera image format: $imageFormat', name: 'camera.info');
 
-    _controller.startImageStream((CameraImage image) async {
+    _controller.startImageStream((CameraImage image) async { //TODO: Make ByteData to a function in network_client.dart
       if (isStreaming) {
+
         int currentTimestamp = DateTime.now().millisecondsSinceEpoch;
         if (currentTimestamp - lastTimestamp >= frameIntervalMs) {
           lastTimestamp = currentTimestamp;
+
+          // Get the current state as an integer
+          int stateInt = stateManager.currentState.index;
+          //developer.log('Current state: ${stateInt.toString()}');
+
+          // Use ByteData for the conversion to bytes
+          ByteData byteDataState = ByteData(4);
+          byteDataState.setInt32(0, stateInt, Endian.big);
+          final Uint8List stateHeader = byteDataState.buffer.asUint8List();
+          networkClient.sendBinaryData(stateHeader);
 
           // Assuming the image is in NV21 format or similar, consisting of Y plane followed by UV plane
           final Uint8List yPlane = image.planes[0].bytes; // Y plane
@@ -44,7 +54,7 @@ class CameraServices {
           // Log the image format, size, and resolution
           final int width = image.width;
           final int height = image.height;
-          developer.log('Image format: $imageFormat, Size: $totalSize bytes, Resolution: ${width}x${height}', name: 'camera.info');
+          //developer.log('Image format: $imageFormat, Size: $totalSize bytes, Resolution: ${width}x${height}', name: 'camera.info');
 
           if (totalSize > 0) {
             // Prepare and send the total size of the concatenated image data

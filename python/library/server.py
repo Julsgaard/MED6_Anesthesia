@@ -1,4 +1,5 @@
 import asyncio
+import os
 import cv2
 import numpy as np
 import time
@@ -28,55 +29,97 @@ async def handle_client(reader, writer, image_queue, tilt_queue):
 
         # Read the difficulty of intubation (1 byte)
         difficulty_data = await reader.readexactly(1)
-        difficultyOfIntubation = int.from_bytes(difficulty_data, 'big')
+        difficulty_of_intubation = int.from_bytes(difficulty_data, 'big')
+
+        # Convert the difficulty of intubation to a string
+        if difficulty_of_intubation == 0:
+            difficulty_of_intubation = "No difficulty"
+        if difficulty_of_intubation == 1:
+            difficulty_of_intubation = "Definite difficulty"
+
+        # Save the weight and difficulty of intubation to the session folder
+        with open(f"{session_path}/weight and difficulty.txt", 'w') as f:
+            f.write(f"Weight: {weight}\n")
+            f.write(f"Difficulty of Intubation: {difficulty_of_intubation}\n")
 
         # Weight in kg
         # Difficulty of Intubation: 0 = No, 1 = Yes
-        print(f"Received - Weight: {weight}, Difficulty of Intubation: {difficultyOfIntubation}")
+        print(f"Received - Weight: {weight}, Difficulty of Intubation: {difficulty_of_intubation}")
 
         while True:
-            # Read the size of the image data
-            size_data = await reader.readexactly(4)
-            size = int.from_bytes(size_data, 'big')
 
-            # Read the resolution of the image
-            resolution_data = await reader.readexactly(8)
-            width = int.from_bytes(resolution_data[:4], 'big')
-            height = int.from_bytes(resolution_data[4:], 'big')
+            current_state_data = await reader.readexactly(4)
+            current_state = int.from_bytes(current_state_data, 'big')
+            # print(f"Current State: {current_state}")
 
-            if size:
-                # Read the image data
-                image_data = await reader.readexactly(size)
+            if current_state == 0:  # Mouth Opening state
+                current_state = 'Mouth Opening'
 
-                yuv_image = convert_nv12_to_bgr(height, image_data, width)
+                image_counter = await video_stream(reader, image_queue, session_path, current_state, image_counter)
 
-                # Rotate the image counter-clockwise 90 degrees to correct the orientation
-                corrected_image = cv2.rotate(yuv_image, cv2.ROTATE_90_COUNTERCLOCKWISE)
+            elif current_state == 1:  # Mallampati state
+                current_state = 'Mallampati'
 
-                # Create a filename for the image
-                image_filename = f"{session_path}/received_image_{image_counter}.jpeg"
+                image_counter = await video_stream(reader, image_queue, session_path, 'Mallampati', image_counter)
 
-                # Save the corrected image to a file
-                cv2.imwrite(image_filename, corrected_image)
+            elif current_state == 2:  # Neck Movement state
+                current_state = 'Neck Movement'
 
-                # Put the image filename in the server_image_queue
-                image_queue.put(image_filename)
-
-                # Increment the image counter
-                image_counter += 1
-
-                # Prints the FPS
-                frame_counter, prev_time = fps_counter(frame_counter, prev_time)
+                image_counter = await video_stream(reader, image_queue, session_path, 'Neck Movement', image_counter)
 
             else:
-                print("No more data from client.")
+                print("Unknown state closing connection")
                 break
+
+            # Prints the FPS and current state every second
+            frame_counter, prev_time = print_every_second(frame_counter, prev_time, current_state)
 
     except asyncio.IncompleteReadError:
         print(f"Client disconnected: {client_addr}")
     finally:
         writer.close()
         await writer.wait_closed()
+
+
+async def video_stream(reader, image_queue, session_path, current_state, image_counter):
+    # Read the size of the image data
+    size_data = await reader.readexactly(4)
+    size = int.from_bytes(size_data, 'big')
+
+    # Read the resolution of the image
+    resolution_data = await reader.readexactly(8)
+    width = int.from_bytes(resolution_data[:4], 'big')
+    height = int.from_bytes(resolution_data[4:], 'big')
+
+    if size:
+        # Read the image data
+        image_data = await reader.readexactly(size)
+
+        yuv_image = convert_nv12_to_bgr(height, image_data, width)
+
+        # Rotate the image counter-clockwise 90 degrees to correct the orientation
+        corrected_image = cv2.rotate(yuv_image, cv2.ROTATE_90_COUNTERCLOCKWISE)
+
+        # Create a directory for the state if it doesn't exist
+        state_dir = f"{session_path}/{current_state}"
+        os.makedirs(state_dir, exist_ok=True)
+
+        # Create the image filename
+        image_filename = f"{state_dir}/received_image_{image_counter}.jpeg"
+
+        # Save the corrected image to a file
+        cv2.imwrite(image_filename, corrected_image)
+
+        # Put the image filename in the server_image_queue
+        image_queue.put(image_filename)
+
+        # Increment the image counter
+        image_counter += 1
+
+        return image_counter
+
+    else:
+        print("No more data from client.")
 
 
 def convert_nv12_to_bgr(height, image_data, width):
@@ -100,8 +143,8 @@ def convert_nv12_to_bgr(height, image_data, width):
     return yuv_image
 
 
-def fps_counter(frame_counter, prev_time):
-    """Calculates and print the FPS every second"""
+def print_every_second(frame_counter, prev_time, current_state):
+    """Prints the FPS every second and the current state"""
 
     # Increment frame counter
     frame_counter += 1
@@ -110,6 +153,7 @@ def fps_counter(frame_counter, prev_time):
     if curr_time - prev_time >= 1:
         fps = frame_counter / (curr_time - prev_time)
         print(f"FPS: {fps}")
+        print(f"Current State: {current_state}")
         # print(f"Image ByteSize: {size}")
         frame_counter = 0
         prev_time = curr_time
