@@ -159,3 +159,4 @@ cython_debug/
 /library/Cropped_images
 /library/received_images
 /received_images
+/logs
