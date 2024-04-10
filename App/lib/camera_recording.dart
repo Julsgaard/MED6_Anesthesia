@@ -72,10 +72,11 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
 
   @override
   void dispose() {
-    stateManager.removeListener(_onStateChanged); // Remove state change listener
-    accelerometerSubscription.cancel(); // Existing disposal of subscriptions
-    _controller.dispose();
-    WidgetsBinding.instance.removeObserver(this);
+    //CameraServices.isStreaming = false; // Ensure the stream is turned off when the widget is disposed
+    stateManager.removeListener(_onStateChanged); // Remove the listener
+    accelerometerSubscription.cancel(); // Cancel the accelerometer subscription
+    _controller.dispose(); // Dispose the controller
+    WidgetsBinding.instance.removeObserver(this); // Remove the observer
     super.dispose();
   }
 
