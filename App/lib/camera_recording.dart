@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 import 'camera_services_TCP.dart';
 import 'package:sensors/sensors.dart';
 import 'dart:math' as math;
+import 'dart:developer' as developer; // Import for logging
 import 'package:dart/info_page.dart';
 import 'package:dart/Assets/circle.dart';
 import 'main.dart';
+import 'state_manager.dart';
 
 
 
@@ -28,11 +30,15 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
   late CameraController _controller;
   late Future<void> _initializeControllerFuture;
   late StreamSubscription<AccelerometerEvent> accelerometerSubscription;
+  final StateManager stateManager = StateManager();
+
   // Variable to hold the tilt angle
 
   @override
   void initState() {
     super.initState();
+
+    stateManager.addListener(_onStateChanged); // Listen to state changes
 
     // Listener for accelerometer events
     accelerometerSubscription = accelerometerEvents.listen((AccelerometerEvent event) {
@@ -58,7 +64,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
       setState(() {});
       // Start streaming only if it is not already streaming
       if (!CameraServices.isStreaming) {
-        CameraServices.streamCameraFootage(_controller);
+        CameraServices.streamCameraFootage(_controller, stateManager);
       }
     });
 
@@ -66,20 +72,46 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    CameraServices.isStreaming = false; // Ensure the stream is turned off when the widget is disposed
+    stateManager.removeListener(_onStateChanged); // Remove state change listener
+    accelerometerSubscription.cancel(); // Existing disposal of subscriptions
     _controller.dispose();
-    accelerometerSubscription.cancel();
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
+  // For handling state changes (mouth opening, mallampati, neck movement)
+  void _onStateChanged() {
+    setState(() {
+
+      //TODO: Start avatar animation for each state
+
+      //TODO: Start countdown after avatar animation or button press
+
+      if (stateManager.currentState == States.mouthOpening) { //TODO: CONTINUE ANYWAY SHOULD CHANGE STATE
+        developer.log('Mouth opening state');
+
+      } else if (stateManager.currentState == States.mallampati) {
+        developer.log('Mallampati state');
+
+      } else if (stateManager.currentState == States.neckMovement) {
+        developer.log('Neck movement state');
+
+      }
+      else {
+        developer.log('Unknown state');
+      }
+
+    });
+  }
+
+  // For the app to pause and resume streaming when it is in the background or foreground
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
     if (state == AppLifecycleState.resumed) {
       // Only restart streaming if it was previously active
       if (CameraServices.isStreaming) {
-        CameraServices.streamCameraFootage(_controller);
+        CameraServices.streamCameraFootage(_controller, stateManager);
       }
     } else if (state == AppLifecycleState.paused) {
       CameraServices.isStreaming = false; // Stop streaming when the app is paused
@@ -179,6 +211,23 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
                 ),
               ),
               onPressed: (){
+
+                // Get the current state as an integer
+                int currentStateInt = stateManager.currentState.index;
+
+                // +1 to the current state
+                currentStateInt++;
+
+                // If the incremented state exceeds the maximum, reset it to the first state to prevent an error
+                if (currentStateInt >= States.values.length) {
+                  currentStateInt = 0;
+                }
+
+                // Convert the incremented integer back to a state
+                States nextState = States.values[currentStateInt];
+
+                // Change to the next state
+                stateManager.changeState(nextState);
 
               },
             ),
