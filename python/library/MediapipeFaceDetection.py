@@ -1,6 +1,6 @@
 import cv2
 import mediapipe as mp
-import MouthOpeningArea
+from library import MouthOpeningArea
 
 
 inner_lip_indices = [78, 191, 80, 81, 82, 13, 312, 311, 310, 415, 308, 324, 318, 402, 317, 14, 87, 178, 88, 95]
