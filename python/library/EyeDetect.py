@@ -15,6 +15,8 @@ LOWER_Y_THRESHOLD = 0.55  # Lower y-coordinate threshold (as a fraction of the f
 left_eye_avg_y = None  # Initialize outside the loop
 right_eye_avg_y = None
 
+
+
 # Initialize Mediapipe solutions
 
 def detect_faces_and_landmarks(source, face_mesh, is_image=False):
@@ -64,15 +66,34 @@ def detect_faces_and_landmarks(source, face_mesh, is_image=False):
 
         eye_landmarks_combined= (right_eye_avg_y + left_eye_avg_y)/2
         eye_avg_y = sum([eye_landmarks_combined]) / len([eye_landmarks_combined])
+
+        rect_top_left = (int(frame.shape[1] * 0.35), int(frame.shape[0] / 9))
+        rect_bottom_right = (int(frame.shape[1] * 0.65), int(frame.shape[0] * 0.25))
+        text_y = int(frame.shape[0] / 5)
+        overlay = frame.copy()
+        alpha = 0.4  # Opacity of the rectangle
         if MIN_Y_THRESHOLD * frame.shape[0] < eye_avg_y < MAX_Y_THRESHOLD * frame.shape[0]:
             if eye_avg_y < UPPER_Y_THRESHOLD * frame.shape[0]:
-                cv2.putText(frame, "Eyes Too High", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1)
+                cv2.rectangle(overlay, rect_top_left, rect_bottom_right, (0, 0, 0), cv2.FILLED)
+                cv2.addWeighted(overlay, alpha, frame, 1 - alpha, 0, frame)
+                cv2.rectangle(frame, rect_top_left, rect_bottom_right, (220, 220, 220), 2, cv2.LINE_AA)
+                text_width = cv2.getTextSize("Eyes Too High", cv2.FONT_HERSHEY_SIMPLEX, 0.6, 1)[0][0]
+                text_x = int((frame.shape[1] - text_width) / 2)
+                cv2.putText(frame, "Eyes Too High", (text_x, text_y),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1, cv2.LINE_AA)
             elif eye_avg_y > LOWER_Y_THRESHOLD * frame.shape[0]:
-                cv2.putText(frame, "Eyes Too Low", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1)
+                cv2.rectangle(overlay, rect_top_left, rect_bottom_right, (0, 0, 0), cv2.FILLED)
+                cv2.addWeighted(overlay, alpha, frame, 1 - alpha, 0, frame)
+                cv2.rectangle(frame, rect_top_left, rect_bottom_right, (220, 220, 220), 2, cv2.LINE_AA)
+                text_width = cv2.getTextSize("Eyes Too Low", cv2.FONT_HERSHEY_SIMPLEX, 0.6, 1)[0][0]
+                text_x = int((frame.shape[1] - text_width) / 2)
+                cv2.putText(frame, "Eyes Too Low", (text_x, text_y),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1, cv2.LINE_AA)
             else:
                 print("Eyes Position:", eye_avg_y)
 
     return frame, results.multi_face_landmarks[0].landmark
+
 
 
 def initialize_mediapipe_eye_placement():
