@@ -1,6 +1,6 @@
 import cv2
 import mediapipe as mp
-from library import MouthOpeningArea
+from library import MouthOpeningArea, Tracker
 #import Tracker #Udkommenter den her linje hvis du vil teste scriptet direkte
 
 
