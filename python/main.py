@@ -28,6 +28,11 @@ while True:
     # Get the image path from the server_image_queue
     image_path = image_queue.get()
     display_image_queue.put(image_path)
+
+    state = functions.find_state_for_image_path(image_path)
+
+    print(f"State: {state}")
+
     # print(f"Received image: {image_path}")
     # Neck angle using only the phone sensor (Needs 20 entries to calculate, which is like 8-10 seconds? (Maybe i should make it time based instead))
     # absolute_neck_angle, default_tilt_angle = NeckAngle_PhoneSensor.store_and_calculate_absolute_tilt_angle(tilt_queue.get())

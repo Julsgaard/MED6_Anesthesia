@@ -90,3 +90,19 @@ def imshow_cv(inp, title=None):
     cv.imshow(title if title else 'Image', inp)
     cv.waitKey(0)  # Wait for a key press to proceed
     cv.destroyAllWindows()  # Close the window after key press
+
+
+def find_state_for_image_path(image_path):
+    # Extract the base directory or folder name from the image path
+    base_directory = os.path.basename(os.path.dirname(image_path))
+
+    # Define actions based on directory names
+    if base_directory.lower() == 'mallampati':
+        return "Mallampati"
+    elif base_directory.lower() == 'mouth opening':
+        return "Mouth Opening"
+    elif base_directory.lower() == 'neck movement':
+        return "Neck Movement"
+    else:
+        return "Unknown category"
+
