@@ -41,6 +41,13 @@ while True:
 
     elif state == 'Neck Movement':
         print("State is Neck Movement")
+        frame, face_landmarks = MediapipeFaceDetection.detect_faces_and_landmarks(image_path, face_mesh_model, is_image=True)
+        if face_landmarks is not None:
+            nose_tracker, chin_tracker, frame, chin_nose_distance = Tracker.add_chin_and_nose_tracker(frame, face_landmarks, nose_tracker,
+                                                                                  chin_tracker)
+            if chin_nose_distance is not None:
+                print(f"Distance between chin and nose is: {chin_nose_distance}")
+
 
     else:
         print("Invalid state")

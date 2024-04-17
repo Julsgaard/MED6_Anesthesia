@@ -1,11 +1,13 @@
 import cv2
 import mediapipe as mp
 from library import MouthOpeningArea
+#import Tracker #Udkommenter den her linje hvis du vil teste scriptet direkte
 
 
 inner_lip_indices = [78, 191, 80, 81, 82, 13, 312, 311, 310, 415, 308, 324, 318, 402, 317, 14, 87, 178, 88, 95]
 #lip_and_mouth_indices = [33,263,61,291]
-
+chin_tracker = None
+nose_tracker = None
 
 def detect_faces_and_landmarks(source, face_mesh, is_image=False):
     """Returns the facial landmarks and the frame with the landmarks drawn on it, needs either a video capture or an
@@ -41,7 +43,7 @@ def detect_faces_and_landmarks(source, face_mesh, is_image=False):
             if idx in inner_lip_indices:
                 x = int(landmark.x * frame.shape[1])
                 y = int(landmark.y * frame.shape[0])
-                cv2.circle(frame, (x, y), 1, (0, 255, 0), -1)  # Draw circle for each specified landmark
+                #cv2.circle(frame, (x, y), 1, (0, 255, 0), -1)  # Draw circle for each specified landmark
                 # Draw the index number near each landmark point
                 #cv2.putText(frame, str(idx), (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (255, 255, 255), 1)
 
@@ -67,9 +69,16 @@ if __name__ == "__main__":
         # Exit loop on 'q' keypress
         frame, face_landmarks = detect_faces_and_landmarks(cap, face_mesh)
 
-        area = MouthOpeningArea.calculate_mouth_opening_area(face_landmarks)
+        #area = MouthOpeningArea.calculate_mouth_opening_area(face_landmarks)
+        #print(f"Area: {area}")
 
-        print(f"Area: {area}")
+        if face_landmarks is not None:
+            nose_tracker, chin_tracker, frame, chin_nose_distance = Tracker.add_chin_and_nose_tracker(frame, face_landmarks, nose_tracker,chin_tracker)
+            if chin_nose_distance is not None:
+                print(f"Distance between chin and nose is: {chin_nose_distance}")
+
+
+
 
         # Display the resulting frame
         cv2.imshow('Facial Landmarks', frame)
@@ -81,3 +90,4 @@ if __name__ == "__main__":
     cap.release()
     cv2.destroyAllWindows()
     face_mesh.close()
+
