@@ -32,7 +32,6 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
   late StreamSubscription<AccelerometerEvent> accelerometerSubscription;
   final StateManager stateManager = StateManager();
 
-  // Variable to hold the tilt angle
 
   @override
   void initState() {
@@ -88,7 +87,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
 
       //TODO: Start countdown after avatar animation or button press
 
-      if (stateManager.currentState == States.mouthOpening) { //TODO: CONTINUE ANYWAY SHOULD CHANGE STATE
+      if (stateManager.currentState == States.mouthOpening) {
         developer.log('Mouth opening state');
 
       } else if (stateManager.currentState == States.mallampati) {

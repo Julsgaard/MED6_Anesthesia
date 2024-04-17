@@ -8,10 +8,13 @@
 
 #include <file_selector_windows/file_selector_windows.h>
 #include <flutter_webrtc/flutter_web_r_t_c_plugin.h>
+#include <screen_brightness_windows/screen_brightness_windows_plugin.h>
 
 void RegisterPlugins(flutter::PluginRegistry* registry) {
   FileSelectorWindowsRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("FileSelectorWindows"));
   FlutterWebRTCPluginRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("FlutterWebRTCPlugin"));
+  ScreenBrightnessWindowsPluginRegisterWithRegistrar(
+      registry->GetRegistrarForPlugin("ScreenBrightnessWindowsPlugin"));
 }
