@@ -29,9 +29,21 @@ while True:
     image_path = image_queue.get()
     display_image_queue.put(image_path)
 
+    # Find the state for the image path
     state = functions.find_state_for_image_path(image_path)
 
-    print(f"State: {state}")
+    # Do something based on the state
+    if state == 'Mouth Opening':
+        print("State is Mouth Opening")
+
+    elif state == 'Mallampati':
+        print("State is Mallampati")
+
+    elif state == 'Neck Movement':
+        print("State is Neck Movement")
+
+    else:
+        print("Invalid state")
 
     # print(f"Received image: {image_path}")
     # Neck angle using only the phone sensor (Needs 20 entries to calculate, which is like 8-10 seconds? (Maybe i should make it time based instead))
