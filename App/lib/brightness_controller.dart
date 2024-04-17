@@ -11,7 +11,7 @@ class BrightnessController {
     _adjustScreenBrightness(brightness);
   }
 
-  double _calculateBrightness(CameraImage image) {
+  double _calculateBrightness(CameraImage image) { //TODO: Maybe calculate the brightness and use it for the avatar instead of adjusting the screen brightness
     int sumLuminance = 0;
     final int pixelCount = image.width * image.height;
     developer.log('Calculating brightness', name: 'BrightnessController');
@@ -23,7 +23,7 @@ class BrightnessController {
     return avgLuminance / 255;  // Normalize the luminance
   }
 
-  void _adjustScreenBrightness(double brightness) {
+  void _adjustScreenBrightness(double brightness) { //TODO: Maybe the brightness should always be on max
     double screenBrightness = brightness.clamp(0.0, 1.0);  // Ensure within range
 
     // Make the brightness darker the brighter the image
