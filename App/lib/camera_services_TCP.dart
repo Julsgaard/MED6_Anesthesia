@@ -28,6 +28,11 @@ class CameraServices {
     // Initialize the brightness controller
     _brightnessController = BrightnessController();
 
+    // Set the brightness to maximum
+    _brightnessController?.setBrightnessToMax();
+
+    _brightnessController?.startListening();
+
     // Initialize the network client
     NetworkClient networkClient = NetworkClient();
 
@@ -46,11 +51,11 @@ class CameraServices {
         if (currentTimestamp - lastTimestamp >= frameIntervalMs) {
           lastTimestamp = currentTimestamp;
 
-          //TODO: once per second might be better
-          _brightnessController?.processImage(image);  // Process the image for brightness
+          // Get the latest lux value
+          int? luxValue = _brightnessController?.getLatestLuxValue();
+          developer.log('Lux value: $luxValue', name: 'camera.info');
 
           sendImageOverTCP(image, networkClient, stateManager, currentTimestamp);  // Send the image over TCP
-
         }
       }
     });
