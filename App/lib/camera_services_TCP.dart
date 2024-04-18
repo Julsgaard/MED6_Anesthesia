@@ -25,16 +25,12 @@ class CameraServices {
       return; // Already streaming, avoid reinitialization
     }
 
-    // Initialize the brightness controller
-    _brightnessController = BrightnessController();
+    _brightnessController = BrightnessController(); // Initialize the brightness controller
+    _brightnessController?.setBrightnessToMax(); // Set the brightness to maximum
+    _brightnessController?.startListening(); // Start listening with the light sensor
 
-    // Set the brightness to maximum
-    _brightnessController?.setBrightnessToMax();
+    NetworkClient networkClient = NetworkClient(); // Initialize the network client
 
-    _brightnessController?.startListening();
-
-    // Initialize the network client
-    NetworkClient networkClient = NetworkClient();
 
     isStreaming = true;
 
@@ -55,6 +51,7 @@ class CameraServices {
           int? luxValue = _brightnessController?.getLatestLuxValue();
           developer.log('Lux value: $luxValue', name: 'camera.info');
 
+          // Send the image over TCP
           sendImageOverTCP(image, networkClient, stateManager, currentTimestamp);  // Send the image over TCP
         }
       }
