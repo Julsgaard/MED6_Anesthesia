@@ -69,8 +69,8 @@ def add_chin_and_nose_tracker(frame, face_landmarks, nose_tracker, chin_tracker)
         initial_nose_position = ensure_bbox_within_frame(initial_nose_position, frame_width, frame_height)
         initial_chin_position = ensure_bbox_within_frame(initial_chin_position, frame_width, frame_height)
 
-        print(f"Reinitializing Nose Tracker Position: {initial_nose_position}")
-        print(f"Reinitializing Chin Tracker Position: {initial_chin_position}")
+        #print(f"Reinitializing Nose Tracker Position: {initial_nose_position}")
+        #print(f"Reinitializing Chin Tracker Position: {initial_chin_position}")
 
         nose_tracker = initialize_tracker(frame, initial_nose_position)
         chin_tracker = initialize_tracker(frame, initial_chin_position)

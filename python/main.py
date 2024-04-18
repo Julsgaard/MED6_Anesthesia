@@ -30,7 +30,6 @@ if __name__ == '__main__':
 while True:
     # Get the image path from the server_image_queue
     image_path = image_queue.get()
-    display_image_queue.put(image_path)
 
     # Find the state for the image path
     state = functions.find_state_for_image_path(image_path)
@@ -47,15 +46,16 @@ while True:
     elif state == 'Neck Movement':
         print("State is Neck Movement")
         frame, face_landmarks = MediapipeFaceDetection.detect_faces_and_landmarks(image_path, face_mesh_model, is_image=True)
-        if face_landmarks is not None:
-            nose_tracker, chin_tracker, frame, chin_nose_distance = Tracker.add_chin_and_nose_tracker(frame, face_landmarks, nose_tracker,
+        nose_tracker, chin_tracker, frame, chin_nose_distance = Tracker.add_chin_and_nose_tracker(frame, face_landmarks, nose_tracker,
                                                                                   chin_tracker)
-            if chin_nose_distance is not None:
-                print(f"Distance between chin and nose is: {chin_nose_distance}")
+        if chin_nose_distance is not None:
+             print(f"Distance between chin and nose is: {chin_nose_distance}")
 
 
     else:
         print("Invalid state")
+
+    display_image_queue.put(frame)
 
     # print(f"Received image: {image_path}")
     # Neck angle using only the phone sensor (Needs 20 entries to calculate, which is like 8-10 seconds? (Maybe i should make it time based instead))
