@@ -72,10 +72,9 @@ if __name__ == "__main__":
         #area = MouthOpeningArea.calculate_mouth_opening_area(face_landmarks)
         #print(f"Area: {area}")
 
-        if face_landmarks is not None:
-            nose_tracker, chin_tracker, frame, chin_nose_distance = Tracker.add_chin_and_nose_tracker(frame, face_landmarks, nose_tracker,chin_tracker)
-            if chin_nose_distance is not None:
-                print(f"Distance between chin and nose is: {chin_nose_distance}")
+        nose_tracker, chin_tracker, frame, chin_nose_distance = Tracker.add_chin_and_nose_tracker(frame, face_landmarks, nose_tracker,chin_tracker)
+        if chin_nose_distance is not None:
+            print(f"Distance between chin and nose is: {chin_nose_distance}")
 
 
 
