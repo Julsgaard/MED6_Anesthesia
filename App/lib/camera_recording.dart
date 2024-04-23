@@ -6,6 +6,7 @@ import 'package:sensors/sensors.dart';
 import 'dart:math' as math;
 import 'package:dart/info_page.dart';
 import 'package:dart/Assets/circle.dart';
+import 'countdown.dart';
 import 'main.dart';
 
 
@@ -203,7 +204,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
                   height: 0,
                 ),
               ),
-              onPressed: (){
+              onPressed: (){MaterialPageRoute(builder: (context) => CountdownWidget());
 
               },
             ),
