@@ -22,9 +22,44 @@ class CameraRecording extends StatefulWidget {
     required this.camera,
   }) : super(key: key);
 
+
+
   @override
   _CameraRecordingState createState() => _CameraRecordingState();
 }
+
+int _secondsRemaining = 0;
+
+
+class ShowCountdown {
+  void showOverlay(BuildContext context) {
+    developer.log('IM CALLED, IM CALLED, IM CALLED');
+    OverlayState overlayState = Overlay.of(context);
+    OverlayEntry overlayEntry = OverlayEntry(builder: (context) {
+      return Positioned(
+        child: SizedBox(
+          width: 400,
+          height: 300,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('$_secondsRemaining',
+                style: TextStyle(
+                fontSize: 225,
+                fontWeight: FontWeight.bold,),
+              )
+            ],
+          ),
+        ),
+      );
+    });
+    overlayState.insert(overlayEntry);
+    Timer(Duration(seconds: _secondsRemaining), () {
+      overlayEntry.remove(); // Remove overlay after 3 seconds
+    });
+  }
+}
+
 
 class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingObserver {
   late CameraController _controller;
@@ -78,6 +113,25 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
     WidgetsBinding.instance.removeObserver(this); // Remove the observer
     super.dispose();
   }
+
+  void startTimer(int duration) {
+    late Timer _timer;
+    const oneSecond = Duration(seconds: 1);
+    _secondsRemaining = duration;
+    _timer = Timer.periodic(oneSecond, (timer) {
+      ShowCountdown();
+      setState(() {
+        if (_secondsRemaining <= 0) {
+          timer.cancel();
+        } else {
+          _secondsRemaining -= 1;
+        }
+      });
+    });
+  }
+
+
+
 
   // For handling state changes (mouth opening, mallampati, neck movement)
   void _onStateChanged() {
@@ -211,6 +265,8 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
                 ),
               ),
               onPressed: (){
+                developer.log('SecondsRemaining:'+ _secondsRemaining.toString());
+                startTimer(10);
 
                 // Get the current state as an integer
                 int currentStateInt = stateManager.currentState.index;
