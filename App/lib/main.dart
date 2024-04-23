@@ -14,6 +14,7 @@ class GlobalVariables {
   static var port = 5000;
   // Static variable to hold the tilt angle
   static double tiltAngle = 0.0;
+  static int luxValue = 0;
 }
 
 

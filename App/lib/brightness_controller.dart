@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:html';
 import 'package:camera/camera.dart';
+import 'package:dart/main.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 import 'dart:developer' as developer; // Import for logging
 import 'package:light/light.dart';
@@ -14,6 +16,7 @@ class BrightnessController {
     _lightSubscription = _light.lightSensorStream.listen((luxValue) {
       // Do something with the lux value
       //developer.log('Lux value: $luxValue', name: 'camera.info');
+      GlobalVariables.luxValue = luxValue;
       _latestLuxValue = luxValue;
     });
   }
