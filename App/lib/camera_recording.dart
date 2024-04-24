@@ -10,8 +10,6 @@ import 'package:dart/Assets/circle.dart';
 import 'main.dart';
 import 'state_manager.dart';
 
-
-
 class CameraRecording extends StatefulWidget {
   final CameraDescription camera;
   final String title;
@@ -22,51 +20,18 @@ class CameraRecording extends StatefulWidget {
     required this.camera,
   }) : super(key: key);
 
-
-
   @override
   _CameraRecordingState createState() => _CameraRecordingState();
 }
-
-int _secondsRemaining = 0;
-
-
-class ShowCountdown {
-  void showOverlay(BuildContext context) {
-    developer.log('IM CALLED, IM CALLED, IM CALLED');
-    OverlayState overlayState = Overlay.of(context);
-    OverlayEntry overlayEntry = OverlayEntry(builder: (context) {
-      return Positioned(
-        child: SizedBox(
-          width: 400,
-          height: 300,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text('$_secondsRemaining',
-                style: TextStyle(
-                fontSize: 225,
-                fontWeight: FontWeight.bold,),
-              )
-            ],
-          ),
-        ),
-      );
-    });
-    overlayState.insert(overlayEntry);
-    Timer(Duration(seconds: _secondsRemaining), () {
-      overlayEntry.remove(); // Remove overlay after 3 seconds
-    });
-  }
-}
-
 
 class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingObserver {
   late CameraController _controller;
   late Future<void> _initializeControllerFuture;
   late StreamSubscription<AccelerometerEvent> accelerometerSubscription;
+  late Timer _timer;
+  int _secondsRemaining = 10; // Initial value
+  OverlayEntry? overlayEntry;
   final StateManager stateManager = StateManager();
-
 
   @override
   void initState() {
@@ -101,8 +66,8 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
         CameraServices.streamCameraFootage(_controller, stateManager);
       }
     });
-
   }
+
 
   @override
   void dispose() {
@@ -110,28 +75,29 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
     stateManager.removeListener(_onStateChanged); // Remove the listener
     accelerometerSubscription.cancel(); // Cancel the accelerometer subscription
     _controller.dispose(); // Dispose the controller
-    WidgetsBinding.instance.removeObserver(this); // Remove the observer
+    WidgetsBinding.instance.removeObserver(this);
+    _timer.cancel();// Remove the observer
     super.dispose();
   }
 
   void startTimer(int duration) {
-    late Timer _timer;
     const oneSecond = Duration(seconds: 1);
     _secondsRemaining = duration;
     _timer = Timer.periodic(oneSecond, (timer) {
-      ShowCountdown();
-      setState(() {
-        if (_secondsRemaining <= 0) {
-          timer.cancel();
-        } else {
+      if (_secondsRemaining <= 0) {
+        timer.cancel();
+        overlayEntry?.remove();
+        overlayEntry = null;
+      } else {
+        setState(() {
           _secondsRemaining -= 1;
-        }
-      });
+          if (overlayEntry != null) {
+            overlayEntry!.markNeedsBuild(); // Trigger rebuild of OverlayEntry
+          }
+        });
+      }
     });
   }
-
-
-
 
   // For handling state changes (mouth opening, mallampati, neck movement)
   void _onStateChanged() {
@@ -142,12 +108,15 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
       //TODO: Start countdown after avatar animation or button press
 
       if (stateManager.currentState == States.mouthOpening) {
+        startTimer(10);
         developer.log('Mouth opening state');
 
       } else if (stateManager.currentState == States.mallampati) {
+        startTimer(5);
         developer.log('Mallampati state');
 
       } else if (stateManager.currentState == States.neckMovement) {
+        startTimer(20);
         developer.log('Neck movement state');
 
       }
@@ -265,9 +234,26 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
                 ),
               ),
               onPressed: (){
-                developer.log('SecondsRemaining:'+ _secondsRemaining.toString());
-                startTimer(10);
-
+                overlayEntry ??= OverlayEntry(builder: (context) {
+                    return Positioned(
+                      child: SizedBox(
+                        width: 400,
+                        height: 300,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            DefaultTextStyle(style: TextStyle(
+                              fontSize: 225,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black.withOpacity(0.5),),
+                                child: Text('$_secondsRemaining',)
+                            )
+                          ],
+                        ),
+                      ),
+                    );
+                  });
+                Overlay.of(context).insert(overlayEntry!);
                 // Get the current state as an integer
                 int currentStateInt = stateManager.currentState.index;
 
