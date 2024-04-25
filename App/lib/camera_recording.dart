@@ -152,6 +152,9 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
     double buttonPosH = (mHeight/10);
     double buttonWidth = (mWidth/4);
     double buttonHeight = (mHeight/16);
+
+    double mouthOverlayScale = 0.5; //Juster den her for at gøre mouthoverlay større/mindre, skal være mellem 0-1 (Tror enten den skal være 0.4 eller 0.5)
+
     return Material(
 
       child: Stack(
@@ -192,18 +195,18 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
                             child: CameraPreview(_controller),
                           ),
                         ),
-                        // Positioned.fill( //THIS WHERE THE MOUTH IMAGE IS PLACED
-                        //   child: Transform.translate(
-                        //     offset: Offset(0, 30), // Adjust the 100 to move it further down or less
-                        //     child: Transform.scale(
-                        //       scale: 0.4, // Adjust the scale factor to make it bigger (greater than 1) or smaller (less than 1)
-                        //       child: Image.asset(
-                        //         'assets/mouth_overlay.png',
-                        //         fit: BoxFit.contain,
-                        //       ),
-                        //     ),
-                        //   ),
-                        // ),
+                         Positioned.fill( //THIS WHERE THE MOUTH IMAGE IS PLACED
+                           child: Transform.translate(
+                             offset: Offset(0, 30), // Adjust the 100 to move it further down or less
+                             child: Transform.scale(
+                               scale: mouthOverlayScale,
+                               child: Image.asset(
+                                 'assets/mallampatti_1.png',
+                                 fit: BoxFit.contain,
+                               ),
+                             ),
+                           ),
+                         ),
                       ],
                     );
                   } else {
