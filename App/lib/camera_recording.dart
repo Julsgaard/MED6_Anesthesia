@@ -188,6 +188,8 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
                 future: _initializeControllerFuture,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.done) {
+
+                    //Sets the focus in the middle of the camera
                     double fullWidth = MediaQuery.of(context).size.width;
                     double cameraHeight = fullWidth * _controller.value.aspectRatio;
 
@@ -196,7 +198,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
 
                     Offset point = Offset(xp,yp);
                     _controller.setFocusPoint(point);
-                    
+
                     return Stack(
                       children: <Widget>[
                         Positioned.fill(
