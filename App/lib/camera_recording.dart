@@ -64,6 +64,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
       setState(() {});
       // Start streaming only if it is not already streaming
       if (!CameraServices.isStreaming) {
+        CameraServices.saveImageLocally(_controller);
         CameraServices.streamCameraFootage(_controller, stateManager);
       }
     });
