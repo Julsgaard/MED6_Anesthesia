@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:js';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'camera_services_TCP.dart';
@@ -187,6 +188,15 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
                 future: _initializeControllerFuture,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.done) {
+                    double fullWidth = MediaQuery.of(context).size.width;
+                    double cameraHeight = fullWidth * _controller.value.aspectRatio;
+
+                    double xp = fullWidth/2 ;
+                    double yp = cameraHeight/2;
+
+                    Offset point = Offset(xp,yp);
+                    _controller.setFocusPoint(point);
+                    
                     return Stack(
                       children: <Widget>[
                         Positioned.fill(
