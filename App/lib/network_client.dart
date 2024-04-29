@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:dart/main.dart';
+import 'dart:developer' as developer;
 
 class NetworkClient {
   Socket? _socket; // Socket for the connection
@@ -20,9 +21,9 @@ class NetworkClient {
           onDone: _onDone,
           cancelOnError: false);
     } catch (e) {
-      print('Could not connect to the server: $e');
+      developer.log('Could not connect to the server: $e');
 
-      // Implement reconnection logic or error handling as needed
+      //TODO: Implement reconnection logic or error handling
     }
   }
 
@@ -38,14 +39,25 @@ class NetworkClient {
   }
 
   void _onDataReceived(data) {
+    // Decode the JSON string to a Map
+    Map<String, dynamic> variables = jsonDecode(utf8.decode(data));
+
+    // Access the variables
+    var eyeLevel = variables['eye_level'];
+    GlobalVariables.eyeLevel = eyeLevel;
+
+    developer.log('Received from server: $eyeLevel');
+
+    //String message = utf8.decode(data);
+    //developer.log('Received from server: $message');
   }
 
   void _onError(error, StackTrace trace) {
-    print('Error: $error');
+    developer.log('Error: $error');
   }
 
   void _onDone() {
-    print('Disconnected from the server.');
+    developer.log('Disconnected from the server.');
   }
 
   void closeConnection() {

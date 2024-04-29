@@ -1,4 +1,5 @@
 import asyncio
+import json
 import os
 import cv2
 import numpy as np
@@ -55,21 +56,33 @@ async def handle_client(reader, writer, image_queue, tilt_queue):
             if current_state == 0:  # Mouth Opening state
                 current_state = 'Mouth Opening'
 
-                image_counter, lux_value, tilt_angle = await video_stream(reader, image_queue, session_path, current_state, image_counter)
+                image_counter, lux_value, tilt_angle = await video_stream(reader, image_queue, session_path,
+                                                                          current_state, image_counter)
 
             elif current_state == 1:  # Mallampati state
                 current_state = 'Mallampati'
 
-                image_counter, lux_value, tilt_angle = await video_stream(reader, image_queue, session_path, current_state, image_counter)
+                image_counter, lux_value, tilt_angle = await video_stream(reader, image_queue, session_path,
+                                                                          current_state, image_counter)
 
             elif current_state == 2:  # Neck Movement state
                 current_state = 'Neck Movement'
 
-                image_counter, lux_value, tilt_angle = await video_stream(reader, image_queue, session_path, current_state, image_counter)
+                image_counter, lux_value, tilt_angle = await video_stream(reader, image_queue, session_path,
+                                                                          current_state, image_counter)
 
             else:
                 print("Unknown state closing connection")
                 break
+
+            # Send the eye level data to the client
+            send_data = {
+                "eye_level": image_counter,  # TODO: Change to eye level
+            }
+            message = json.dumps(send_data)
+
+            writer.write(message.encode())
+            await writer.drain()
 
             # Prints the FPS, current state, lux value, and tilt angle every second
             frame_counter, prev_time = print_every_x(
