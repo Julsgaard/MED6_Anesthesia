@@ -78,6 +78,7 @@ async def handle_client(reader, writer, image_queue, tilt_queue):
             # Send the eye level data to the client
             send_data = {
                 "eye_level": image_counter,  # TODO: Change to eye level
+                "test": "test",
             }
             message = json.dumps(send_data)
 

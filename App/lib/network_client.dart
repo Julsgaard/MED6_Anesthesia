@@ -39,17 +39,26 @@ class NetworkClient {
   }
 
   void _onDataReceived(data) {
-    // Decode the JSON string to a Map
-    Map<String, dynamic> variables = jsonDecode(utf8.decode(data));
+    // Convert the data to a string
+    String jsonString = utf8.decode(data);
 
-    // Access the variables
-    var eyeLevel = variables['eye_level'];
-    GlobalVariables.eyeLevel = eyeLevel;
+    // Split the string into separate JSON objects
+    List<String> jsonObjects = jsonString.split('\n');
 
-    developer.log('Received from server: $eyeLevel');
+    // Loop through the JSON objects
+    for (String jsonObject in jsonObjects) {
+      if (jsonObject.isNotEmpty) {
+        Map<String, dynamic> variables = jsonDecode(jsonObject);
 
-    //String message = utf8.decode(data);
-    //developer.log('Received from server: $message');
+        // Access the variables
+        var eyeLevel = variables['eye_level'];
+        GlobalVariables.eyeLevel = eyeLevel;
+        developer.log('Received from server: $eyeLevel');
+
+        var test = variables['test'];
+        developer.log('Received from server: $test');
+      }
+    }
   }
 
   void _onError(error, StackTrace trace) {
