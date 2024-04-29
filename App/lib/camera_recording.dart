@@ -190,26 +190,26 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
                   if (snapshot.connectionState == ConnectionState.done) {
 
                     //Sets the focus in the middle of the camera
-                    double fullWidth = MediaQuery.of(context).size.width;
-                    double cameraHeight = fullWidth * _controller.value.aspectRatio;
-
-                    double xp = fullWidth/2 ;
-                    double yp = cameraHeight/2;
-
-                    // Ensure the point coordinates are within the valid range
-                    Offset validPoint = Offset(
-                      max(0.0, min(1.0, xp)),
-                      max(0.0, min(1.0, yp)),
-                    );
-                    try {
-                      _controller.setFocusPoint(validPoint);
-                    } catch (e) {
-                      if (e is CameraException) {
-                        developer.log('Failed to set focus point');
-                      } else {
-                        rethrow;
-                      }
-                    }
+                    // double fullWidth = MediaQuery.of(context).size.width;
+                    // double cameraHeight = fullWidth * _controller.value.aspectRatio;
+                    //
+                    // double xp = fullWidth/2 ;
+                    // double yp = cameraHeight/2;
+                    //
+                    // // Ensure the point coordinates are within the valid range
+                    // Offset validPoint = Offset(
+                    //   max(0.0, min(1.0, xp)),
+                    //   max(0.0, min(1.0, yp)),
+                    // );
+                    // try {
+                    //   _controller.setFocusPoint(validPoint);
+                    // } catch (e) {
+                    //   if (e is CameraException) {
+                    //     developer.log('Failed to set focus point');
+                    //   } else {
+                    //     rethrow;
+                    //   }
+                    // }
 
                     return Stack(
                       children: <Widget>[
