@@ -1,4 +1,5 @@
 import 'package:camera/camera.dart';
+import 'package:dart/settings_page.dart';
 import "package:flutter/material.dart";
 import 'package:auto_size_text/auto_size_text.dart';
 import 'camera_recording.dart';
@@ -17,6 +18,7 @@ class InfoPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     double mWidth= MediaQuery.of(context).size.width;
     double mHeight= MediaQuery.of(context).size.height;
     double circleHeight = (mHeight/5)*2;
@@ -83,10 +85,22 @@ class InfoPage extends StatelessWidget {
                 },
               ),
             ),
+            Positioned(
+              right: 10,
+              top: 40,
+              child: IconButton(
+                icon: const Icon(Icons.settings),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => SettingsPage()),
+                  );
+                },
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 }
-

@@ -5,12 +5,13 @@ import 'package:sensors/sensors.dart';
 import 'dart:math' as math;
 import 'package:dart/info_page.dart';
 import 'package:dart/camera_recording.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'network_client.dart';
 
 List<CameraDescription>? cameras;
 class GlobalVariables {
   // Static variable to hold the IP address
-  static var ipAddress = "192.168.8.150";
+  static var ipAddress = "No IP address set";
   static var port = 5000;
   // Static variable to hold the tilt angle
   static double tiltAngle = 0.0;
@@ -25,6 +26,13 @@ void main() async {
   final frontCamera = cameras!.firstWhere(
         (camera) => camera.lensDirection == CameraLensDirection.front,
   );
+
+  // Load the IP address from the shared preferences
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String? ipAddress = prefs.getString('ipAddress');
+  if (ipAddress != null) {
+    GlobalVariables.ipAddress = ipAddress;
+  }
 
   runApp(MyApp(camera: frontCamera));
 
