@@ -60,12 +60,12 @@ async def handle_client(reader, writer, image_queue, tilt_queue):
             elif current_state == 1:  # Mallampati state
                 current_state = 'Mallampati'
 
-                image_counter = await video_stream(reader, image_queue, session_path, 'Mallampati', image_counter)
+                image_counter = await video_stream(reader, image_queue, session_path, current_state, image_counter)
 
             elif current_state == 2:  # Neck Movement state
                 current_state = 'Neck Movement'
 
-                image_counter = await video_stream(reader, image_queue, session_path, 'Neck Movement', image_counter)
+                image_counter = await video_stream(reader, image_queue, session_path, current_state, image_counter)
 
             else:
                 print("Unknown state closing connection")
