@@ -137,10 +137,7 @@ async def video_stream(reader, image_queue, session_path, current_state, image_c
         # print(f"Tilt Angle: {tilt_angle}")
 
         # Create the image filename
-        image_filename = f"{state_dir}/{image_counter}Image_{lux_value}Lux_{tilt_angle}Angle.jpeg"
-        # image_filename = f"{state_dir}/{image_counter}Image_{lux_value}Lux.jpeg"
-
-        # image_filename = f"{state_dir}/{image_counter}Image.jpeg"
+        image_filename = f"{state_dir}/{image_counter}image_{lux_value}lux_{tilt_angle}angle.jpeg"
 
         # Save the corrected image to a file
         cv2.imwrite(image_filename, corrected_image)
