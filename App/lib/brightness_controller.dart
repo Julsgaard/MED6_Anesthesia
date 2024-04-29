@@ -1,6 +1,4 @@
 import 'dart:async';
-//import 'dart:html';
-import 'package:camera/camera.dart';
 import 'package:dart/main.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 import 'dart:developer' as developer; // Import for logging

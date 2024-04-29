@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:camera_android_camerax/camera_android_camerax.dart';
+import 'package:dart/main.dart';
 import 'dart:developer' as developer; // Import for logging
 import 'dart:typed_data';
 import 'brightness_controller.dart';
@@ -53,9 +54,30 @@ class CameraServices {
 
           // Send the image over TCP
           sendImageOverTCP(image, networkClient, stateManager, currentTimestamp);  // Send the image over TCP
+          sendBrightnessOverTCP(GlobalVariables.luxValue, networkClient);
+          sendTiltAngleOverTCP(GlobalVariables.tiltAngle, networkClient);
         }
       }
     });
+    }
+
+    static void sendBrightnessOverTCP(int luxValue, NetworkClient networkClient) {
+      // Use ByteData for the conversion to bytes
+      ByteData byteData = ByteData(4);
+      byteData.setInt32(0, luxValue, Endian.big);
+      final Uint8List brightnessHeader = byteData.buffer.asUint8List();
+      networkClient.sendBinaryData(brightnessHeader);  // Send the brightness value over TCP
+    }
+
+    static void sendTiltAngleOverTCP(double tiltAngle, NetworkClient networkClient) {
+      // Convert to integer for sending over TCP
+      int tiltAngleInt = tiltAngle.toInt();
+
+      // Use ByteData for the conversion to bytes
+      ByteData byteData = ByteData(4);
+      byteData.setInt32(0, tiltAngleInt, Endian.big);
+      final Uint8List tiltAngleHeader = byteData.buffer.asUint8List();
+      networkClient.sendBinaryData(tiltAngleHeader);  // Send the tilt angle over TCP
     }
 
     //TODO: Make ByteData to a function in network_client.dart
@@ -112,5 +134,25 @@ class CameraServices {
         }
       }
     }
+
+    // Code for saving the image locally if no network connection is available
+    // static Future<void> saveImageLocally(CameraController controller) async {
+    //   if (isCapturing) return; // Exit if a capture is already in progress
+    //
+    //   isCapturing = true;
+    //   try {
+    //     final XFile file = await controller.takePicture();
+    //     final Directory? directory = await getExternalStorageDirectory();
+    //
+    //     final String filePath = '${directory?.path}/${DateTime.now().millisecondsSinceEpoch}.jpg';
+    //
+    //     await file.saveTo(filePath); // Saves the image captured by the camera to the specified path
+    //     developer.log('Image saved to $filePath', name: 'camera.save');
+    //   } catch (e) {
+    //     developer.log('Error saving image locally: $e', name: 'camera.error');
+    //   } finally {
+    //     isCapturing = false; // Reset the flag after operation completes
+    //   }
+    // }
   }
 

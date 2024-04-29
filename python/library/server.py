@@ -55,24 +55,31 @@ async def handle_client(reader, writer, image_queue, tilt_queue):
             if current_state == 0:  # Mouth Opening state
                 current_state = 'Mouth Opening'
 
-                image_counter = await video_stream(reader, image_queue, session_path, current_state, image_counter)
+                image_counter, lux_value, tilt_angle = await video_stream(reader, image_queue, session_path, current_state, image_counter)
 
             elif current_state == 1:  # Mallampati state
                 current_state = 'Mallampati'
 
-                image_counter = await video_stream(reader, image_queue, session_path, current_state, image_counter)
+                image_counter, lux_value, tilt_angle = await video_stream(reader, image_queue, session_path, current_state, image_counter)
 
             elif current_state == 2:  # Neck Movement state
                 current_state = 'Neck Movement'
 
-                image_counter = await video_stream(reader, image_queue, session_path, current_state, image_counter)
+                image_counter, lux_value, tilt_angle = await video_stream(reader, image_queue, session_path, current_state, image_counter)
 
             else:
                 print("Unknown state closing connection")
                 break
 
-            # Prints the FPS and current state every second
-            frame_counter, prev_time = print_every_second(frame_counter, prev_time, current_state)
+            # Prints the FPS, current state, lux value, and tilt angle every second
+            frame_counter, prev_time = print_every_x(
+                frame_counter,
+                prev_time,
+                current_state,
+                lux_value,
+                tilt_angle,
+                print_time=1  # Prints every second
+            )
 
     except asyncio.IncompleteReadError:
         print(f"Client disconnected: {client_addr}")
@@ -104,8 +111,21 @@ async def video_stream(reader, image_queue, session_path, current_state, image_c
         state_dir = f"{session_path}/{current_state}"
         os.makedirs(state_dir, exist_ok=True)
 
+        # Read the brightness value
+        lux_value = await reader.readexactly(4)
+        lux_value = int.from_bytes(lux_value, 'big')  # Convert the byte string to an integer
+        # print(f"Lux Value: {lux_value}")
+
+        # Read the tilt angle
+        tilt_angle = await reader.readexactly(4)
+        tilt_angle = int.from_bytes(tilt_angle, 'big')  # Convert the byte string to an integer
+        # print(f"Tilt Angle: {tilt_angle}")
+
         # Create the image filename
-        image_filename = f"{state_dir}/received_image_{image_counter}.jpeg"
+        image_filename = f"{state_dir}/{image_counter}Image_{lux_value}Lux_{tilt_angle}Angle.jpeg"
+        # image_filename = f"{state_dir}/{image_counter}Image_{lux_value}Lux.jpeg"
+
+        # image_filename = f"{state_dir}/{image_counter}Image.jpeg"
 
         # Save the corrected image to a file
         cv2.imwrite(image_filename, corrected_image)
@@ -116,7 +136,7 @@ async def video_stream(reader, image_queue, session_path, current_state, image_c
         # Increment the image counter
         image_counter += 1
 
-        return image_counter
+        return image_counter, lux_value, tilt_angle
 
     else:
         print("No more data from client.")
@@ -143,17 +163,20 @@ def convert_nv12_to_bgr(height, image_data, width):
     return yuv_image
 
 
-def print_every_second(frame_counter, prev_time, current_state):
-    """Prints the FPS every second and the current state"""
+def print_every_x(frame_counter, prev_time, current_state, lux_value, tilt_angle, print_time=1):
+    """Prints values every x"""
 
     # Increment frame counter
     frame_counter += 1
     # Calculate FPS every second
     curr_time = time.time()
-    if curr_time - prev_time >= 1:
+    if curr_time - prev_time >= print_time:
         fps = frame_counter / (curr_time - prev_time)
-        print(f"FPS: {fps}")
+        print("=================================")
         print(f"Current State: {current_state}")
+        print(f"FPS: {fps}")
+        print(f"Lux Value: {lux_value}")
+        print(f"Tilt Angle: {tilt_angle}")
         # print(f"Image ByteSize: {size}")
         frame_counter = 0
         prev_time = curr_time

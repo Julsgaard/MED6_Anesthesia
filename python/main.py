@@ -31,6 +31,9 @@ while True:
     # Get the image path from the server_image_queue
     image_path = image_queue.get()
 
+    # Display the image
+    display_image_queue.put(image_path)
+
     # Find the state for the image path
     state = functions.find_state_for_image_path(image_path)
 
@@ -54,8 +57,6 @@ while True:
 
     else:
         print("Invalid state")
-
-    display_image_queue.put(frame)
 
     # print(f"Received image: {image_path}")
     # Neck angle using only the phone sensor (Needs 20 entries to calculate, which is like 8-10 seconds? (Maybe i should make it time based instead))

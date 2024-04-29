@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:js';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'camera_services_TCP.dart';
