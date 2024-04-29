@@ -213,7 +213,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
 
                     return Stack(
                       children: <Widget>[
-                        Positioned.fill(
+                        Positioned.fill( // THIS IS WHERE THE CAMERA IS PLACED
                           child: AspectRatio(
                             aspectRatio: _controller.value.aspectRatio,
                             child: CameraPreview(_controller),

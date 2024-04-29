@@ -87,7 +87,7 @@ class InfoPage extends StatelessWidget {
             ),
             Positioned(
               right: 10,
-              top: 40,
+              top: 30,
               child: IconButton(
                 icon: const Icon(Icons.settings),
                 onPressed: () {

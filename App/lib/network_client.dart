@@ -3,9 +3,13 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:dart/main.dart';
 import 'dart:developer' as developer;
+import 'package:flutter/cupertino.dart';
 
 class NetworkClient {
   Socket? _socket; // Socket for the connection
+  bool _isConnected = false;
+  final ValueNotifier<bool> connectionStatus = ValueNotifier<bool>(false);
+
 
   // Singleton pattern to ensure only one instance is created
   static final NetworkClient _instance = NetworkClient._internal();
@@ -20,8 +24,10 @@ class NetworkClient {
           onError: _onError,
           onDone: _onDone,
           cancelOnError: false);
+      connectionStatus.value = true; // Update connection status
     } catch (e) {
       developer.log('Could not connect to the server: $e');
+      connectionStatus.value = false; // Update connection status
 
       //TODO: Implement reconnection logic or error handling
     }
@@ -78,9 +84,11 @@ class NetworkClient {
 
   void _onDone() {
     developer.log('Disconnected from the server.');
+    connectionStatus.value = false; // Update connection status
   }
 
   void closeConnection() {
     _socket?.close();
+    connectionStatus.value = false; // Update connection status
   }
 }
