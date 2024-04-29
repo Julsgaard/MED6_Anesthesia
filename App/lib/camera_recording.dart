@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'camera_services_TCP.dart';
@@ -195,8 +196,20 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
                     double xp = fullWidth/2 ;
                     double yp = cameraHeight/2;
 
-                    Offset point = Offset(xp,yp);
-                    _controller.setFocusPoint(point);
+                    // Ensure the point coordinates are within the valid range
+                    Offset validPoint = Offset(
+                      max(0.0, min(1.0, xp)),
+                      max(0.0, min(1.0, yp)),
+                    );
+                    try {
+                      _controller.setFocusPoint(validPoint);
+                    } catch (e) {
+                      if (e is CameraException) {
+                        developer.log('Failed to set focus point');
+                      } else {
+                        rethrow;
+                      }
+                    }
 
                     return Stack(
                       children: <Widget>[
