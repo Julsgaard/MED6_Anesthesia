@@ -43,20 +43,31 @@ class NetworkClient {
     String jsonString = utf8.decode(data);
 
     // Split the string into separate JSON objects
-    List<String> jsonObjects = jsonString.split('\n');
+    List<String> jsonObjects = jsonString.split('}{');
 
     // Loop through the JSON objects
     for (String jsonObject in jsonObjects) {
+      // Add back the missing closing bracket '}' if it's not the last JSON object
+      if (jsonObject != jsonObjects.last) {
+        jsonObject += '}';
+      }
       if (jsonObject.isNotEmpty) {
-        Map<String, dynamic> variables = jsonDecode(jsonObject);
+        try {
+          // Attempt to decode the JSON object
+          Map<String, dynamic> variables = jsonDecode(jsonObject);
 
-        // Access the variables
-        var eyeLevel = variables['eye_level'];
-        GlobalVariables.eyeLevel = eyeLevel;
-        developer.log('Received from server: $eyeLevel');
+          // Access the variables
+          var eyeLevel = variables['eye_level'];
+          GlobalVariables.eyeLevel = eyeLevel;
+          developer.log('Received from server: $eyeLevel');
 
-        var test = variables['test'];
-        developer.log('Received from server: $test');
+          var test = variables['test'];
+          developer.log('Received from server: $test');
+
+        } catch (e) {
+          // Log an error if JSON decoding fails
+          developer.log('Failed to decode JSON object: $e');
+        }
       }
     }
   }
