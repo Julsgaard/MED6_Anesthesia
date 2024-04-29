@@ -11,7 +11,7 @@ import 'network_client.dart';
 List<CameraDescription>? cameras;
 class GlobalVariables {
   // Static variable to hold the IP address
-  static var ipAddress = "No IP address set";
+  static var ipAddress = "No IP address set"; // SET IP IN APP
   static var port = 5000;
   // Static variable to hold the tilt angle
   static double tiltAngle = 0.0;
