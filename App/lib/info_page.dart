@@ -2,17 +2,20 @@ import 'package:camera/camera.dart';
 import 'package:dart/settings_page.dart';
 import "package:flutter/material.dart";
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:flutter_3d_controller/flutter_3d_controller.dart';
 import 'camera_recording.dart';
-import '../assets/circle.dart';
+import 'package:dart/Assets/circle.dart';
 import 'package:dart/Input_page.dart';
 
 class InfoPage extends StatelessWidget {
   final CameraDescription camera;
   final String infoText;
+  final Flutter3DController animationController;
   const InfoPage({
     super.key,
     required this.camera,
-    required this.infoText
+    required this.infoText,
+    required this.animationController,
   });
 
 
@@ -34,7 +37,7 @@ class InfoPage extends StatelessWidget {
         decoration: const BoxDecoration(color: Color(0xFFEBEEF3)),
         child: Stack(
           children: [
-            Circle(mWidth: mWidth, circleHeight: circleHeight,),
+            Circle(mWidth: mWidth, circleHeight: circleHeight, animationController: animationController),
             Positioned(
               left: (mWidth/8),
               top: circleHeight/2 + 20,
@@ -80,7 +83,7 @@ class InfoPage extends StatelessWidget {
                   Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(builder: (context) => InputPage(
-                          camera: camera))
+                          camera: camera, animationController: animationController,))
                   );
                 },
               ),

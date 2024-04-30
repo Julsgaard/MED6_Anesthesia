@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_3d_controller/flutter_3d_controller.dart';
 import 'camera_services_TCP.dart';
 import 'package:sensors/sensors.dart';
 import 'dart:math' as math;
@@ -14,11 +15,12 @@ import 'state_manager.dart';
 class CameraRecording extends StatefulWidget {
   final CameraDescription camera;
   final String title;
-
+  final Flutter3DController animationController;
   const CameraRecording({
     Key? key,
     required this.title,
     required this.camera,
+    required this.animationController,
   }) : super(key: key);
 
   @override
@@ -160,7 +162,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
 
       child: Stack(
         children: [
-          Circle(mWidth: mWidth, circleHeight: circleHeight,),
+          Circle(mWidth: mWidth, circleHeight: circleHeight,animationController: widget.animationController,),
           Positioned(
             left: (mWidth - cameraWidth)/2,
             top: circleHeight/2 + 10,
@@ -322,7 +324,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
                 ),
               ),
               onPressed: (){
-
+                widget.animationController.playAnimation();
               },
             ),
           ),

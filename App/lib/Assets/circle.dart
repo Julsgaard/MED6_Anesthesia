@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_3d_controller/flutter_3d_controller.dart';
 class Circle extends StatelessWidget {
 
   const Circle({
     super.key,
     required this.mWidth,
     required this.circleHeight,
+    required this.animationController
   });
   final double mWidth;
   final double circleHeight;
+  final Flutter3DController animationController;
 
   @override
   Widget build(BuildContext context) {
@@ -26,6 +29,16 @@ class Circle extends StatelessWidget {
         ),
         shape: OvalBorder(),
         ),
+        alignment: const Alignment(0,1),
+        child: SizedBox(
+          height: circleHeight/2 - 20,
+          child: Flutter3DViewer(
+            progressBarColor: Colors.transparent,
+            controller: animationController,
+            src: 'assets/business_man.glb',
+          ),
+        ),
+
       ),
     );
   }
