@@ -19,7 +19,8 @@ def load_model_and_predict():
     model.load_state_dict(torch.load('mallampati_models/best_model_ResNet34_98%_25_epochs_2_classes.pth',
                                      map_location=device))
 
-    # model.to(device)
+    # Move the model to the device
+    model.to(device)
 
     # Set the model to evaluation mode
     model.eval()

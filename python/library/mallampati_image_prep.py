@@ -5,9 +5,7 @@ from torch.utils.data import DataLoader, random_split
 from library.functions import imshow_cv
 
 
-def prepare_image_data(DisplayImages=False):
-    dataset_path = 'mallampati_datasets/Second dataset (2 classes)'
-
+def prepare_image_data(path='mallampati_datasets/mallampati_training_data (2 classes)', display_images=False):
     transform = transforms.Compose([
         transforms.Resize(224),
         transforms.CenterCrop(224),
@@ -16,7 +14,7 @@ def prepare_image_data(DisplayImages=False):
     ])
 
     # Load the dataset and apply the transformations
-    dataset = ImageFolder(root=dataset_path, transform=transform)
+    dataset = ImageFolder(root=path, transform=transform)
 
     # Splitting the dataset into train, validation, and test sets
     train_size = int(0.7 * len(dataset))  # 70% for training
@@ -35,7 +33,7 @@ def prepare_image_data(DisplayImages=False):
     print(f"Number of validation samples: {len(validation_dataset)}")
     print(f"Number of testing samples: {len(test_dataset)}")
 
-    if DisplayImages:
+    if display_images:
         # Example code to display images from each dataset
         for i, (inputs, labels) in enumerate(train_loader):
             if i == 10:  # Display first 10 images
@@ -45,8 +43,42 @@ def prepare_image_data(DisplayImages=False):
     return train_loader, validation_loader, test_loader
 
 
-def prepare_augmented_image_data():  # TODO: Try this
-    dataset_path = 'mallampati_datasets/Second dataset (2 classes)'
+def prepare_training_and_validation_data(path='mallampati_datasets/mallampati_training_data (2 classes)',
+                                         display_images=False):
+    transform = transforms.Compose([
+        transforms.Resize(224),
+        transforms.CenterCrop(224),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+    ])
+
+    # Load the dataset and apply the transformations
+    dataset = ImageFolder(root=path, transform=transform)
+
+    # Splitting the dataset into train and validation sets
+    train_size = int(0.85 * len(dataset))  # 85% for training
+    validation_size = len(dataset) - train_size  # Remaining for validation
+
+    train_dataset, validation_dataset = random_split(dataset, [train_size, validation_size])
+
+    # Creating data loaders for training, validation, and testing
+    train_loader = DataLoader(train_dataset, batch_size=4, shuffle=True)
+    validation_loader = DataLoader(validation_dataset, batch_size=4, shuffle=False)
+
+    print(f"Number of training samples: {len(train_dataset)}")
+    print(f"Number of validation samples: {len(validation_dataset)}")
+
+    if display_images:
+        # Example code to display images from each dataset
+        for i, (inputs, labels) in enumerate(train_loader):
+            if i == 10:  # Display first 10 images
+                break
+            imshow_cv(inputs[0])  # Display the first image from the batch
+
+    return train_loader, validation_loader
+
+
+def prepare_augmented_image_data(path='mallampati_datasets/mallampati_training_data (2 classes)'):  # TODO: Try this
 
     # Augmented transformations for training
     train_transform_augmented = transforms.Compose([
@@ -67,7 +99,7 @@ def prepare_augmented_image_data():  # TODO: Try this
     ])
 
     # Assuming the same dataset for simplicity, use different paths if you have separate datasets
-    full_dataset = ImageFolder(root=dataset_path)
+    full_dataset = ImageFolder(root=path)
 
     # Splitting the dataset
     train_size = int(0.8 * len(full_dataset))
@@ -75,8 +107,8 @@ def prepare_augmented_image_data():  # TODO: Try this
     train_dataset, test_dataset = torch.utils.data.random_split(full_dataset, [train_size, test_size])
 
     # Manually apply transformations by wrapping the dataset subsets
-    train_dataset = ImageFolder(root=dataset_path, transform=train_transform_augmented)
-    test_dataset = ImageFolder(root=dataset_path, transform=test_transform)
+    train_dataset = ImageFolder(root=path, transform=train_transform_augmented)
+    test_dataset = ImageFolder(root=path, transform=test_transform)
 
     # Creating data loaders
     train_loader_augmented = DataLoader(train_dataset, batch_size=4, shuffle=True)
@@ -100,10 +132,7 @@ def prepare_augmented_image_data():  # TODO: Try this
     return train_loader_augmented, test_loader
 
 
-def prepare_test_data():
-    # Define your test dataset path
-    dataset_path = 'mallampati_testset/Dataset'
-
+def prepare_test_data(path='mallampati_testset/Second testset'):
     # Define transformations
     transform = transforms.Compose([
         transforms.Resize(224),  # Resize the shorter side to 224
@@ -113,7 +142,7 @@ def prepare_test_data():
     ])
 
     # Load the dataset and apply the transformations
-    dataset = ImageFolder(root=dataset_path, transform=transform)
+    dataset = ImageFolder(root=path, transform=transform)
 
     # Creating data loader for testing
     test_loader = DataLoader(dataset, batch_size=4, shuffle=False)

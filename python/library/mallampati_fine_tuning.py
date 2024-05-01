@@ -1,6 +1,5 @@
 import copy
 import os
-
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -8,11 +7,6 @@ from torchvision import models
 from library.mallampati_image_prep import prepare_image_data  # Adjusted to return validation_loader
 from library.functions import imshow_cv
 import matplotlib.pyplot as plt
-
-
-# A single measure of accuracy might not tell the whole story. Consider also looking at other metrics like precision, recall, F1 score, and confusion matrices, especially since your dataset is quite small.
-# If your model is overfitting, techniques such as adding dropout, regularization, or data augmentation could help. Additionally, ensure you have a validation set to monitor for overfitting during training.
-# You might want to implement a learning rate scheduler to adjust the learning rate during training to help the model converge more smoothly.
 
 
 # Hyperparameters
@@ -111,6 +105,7 @@ def run_mallampati_model():
     plot_training(training_losses, validation_losses, accuracies, plot_file_path)
 
     print(f"Model and training details saved in folder: {folder_name}")
+    print(f"Best accuracy: {best_acc * 100:.2f}%")
 
 
 def plot_training(training_losses, validation_losses, accuracies, plot_file_path):
@@ -135,6 +130,7 @@ def plot_training(training_losses, validation_losses, accuracies, plot_file_path
     plt.tight_layout()
     plt.savefig(plot_file_path)
     plt.close()
+
 
 if __name__ == "__main__":
     run_mallampati_model()
