@@ -1,10 +1,11 @@
-from library import server, functions, MediapipeFaceDetection, OldHeadAngle, MouthOpeningArea, MouthCrop, Tracker, EyeDetect
+from library import server, functions, MediapipeFaceDetection, MouthOpeningArea, MouthCrop, Tracker, eye_detect
 import threading
 import queue
 
 image_queue = queue.Queue()
 tilt_queue = queue.Queue()
 display_image_queue = queue.Queue()
+eye_level_queue = queue.Queue()
 
 current_image = None
 nose_tracker = None
@@ -17,11 +18,8 @@ if __name__ == '__main__':
     # Initialize face and landmark data
     face_mesh_model = MediapipeFaceDetection.initialize_mediapipe_face_mesh()
 
-    #Initialize eye data
-    eye_mesh_model = EyeDetect.initialize_mediapipe_eye_placement()
-
     # Starts the server in a new thread
-    server_thread = threading.Thread(target=server.start_server, args=(image_queue, tilt_queue))
+    server_thread = threading.Thread(target=server.start_server, args=(image_queue, tilt_queue, eye_level_queue))
     server_thread.start()
 
     # Starts the display_images function in a new thread with the functions_image_queue
@@ -40,11 +38,15 @@ while True:
     # Do something based on the state
     if state == 'Mouth Opening':
         # print("State is Mouth Opening")
-        frame, face_landmarks = EyeDetect.detect_faces_and_landmarks(image_path, eye_mesh_model, is_image=True)
+        eye_level = eye_detect.detect_faces_and_landmarks(image_path, face_mesh_model)
+        eye_level_queue.put(eye_level)  # Put the eye level into the queue
+
 
     elif state == 'Mallampati':
         # print("State is Mallampati")
-        frame, face_landmarks = EyeDetect.detect_faces_and_landmarks(image_path, eye_mesh_model, is_image=True)
+        eye_level = eye_detect.detect_faces_and_landmarks(image_path, face_mesh_model)
+        eye_level_queue.put(eye_level)  # Put the eye level into the queue
+
 
     elif state == 'Neck Movement':
         # print("State is Neck Movement")

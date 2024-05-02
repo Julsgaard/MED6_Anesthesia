@@ -10,7 +10,7 @@ host = '0.0.0.0'
 port = 5000
 
 
-async def handle_client(reader, writer, image_queue, tilt_queue):
+async def handle_client(reader, writer, image_queue, tilt_queue, eye_level_queue):
     """Handles the client connection reads the image data and saves it to a file. The image filename is then put in
     the server_image_queue."""
 
@@ -75,16 +75,11 @@ async def handle_client(reader, writer, image_queue, tilt_queue):
                 print("Unknown state closing connection")
                 break
 
-            # Send the eye level data to the client
-            send_data = {
-                "eye_level": image_counter,  # TODO: Change to eye level
-                "test": "test"
-            }
-            message = json.dumps(send_data)
-            # print(f"Sending: {message}")
+            eye_level = eye_level_queue.get()  # Get the eye level from the queue
+            # print(f"Eye Level: {eye_level}")
 
-            writer.write(message.encode())
-            await writer.drain()
+            # Send data to the client
+            await send_to_client(eye_level, writer)
 
             # Prints the FPS, current state, lux value, and tilt angle every second
             frame_counter, prev_time = print_every_x(
@@ -98,9 +93,25 @@ async def handle_client(reader, writer, image_queue, tilt_queue):
 
     except asyncio.IncompleteReadError:
         print(f"Client disconnected: {client_addr}")
+    except ConnectionResetError:
+        print(f"Connection reset by client: {client_addr}")
     finally:
         writer.close()
         await writer.wait_closed()
+
+
+async def send_to_client(eye_level, writer):
+    # Send the eye level data to the client
+    send_data = {
+        "eye_level": eye_level,  # TODO: Change to eye level
+        "test": "test"
+    }
+    message = json.dumps(send_data)
+    # print(f"Sending: {message}")
+
+    writer.write(message.encode())
+
+    await writer.drain()
 
 
 async def video_stream(reader, image_queue, session_path, current_state, image_counter):
@@ -195,15 +206,15 @@ def print_every_x(frame_counter, prev_time, current_state, lux_value, tilt_angle
     return frame_counter, prev_time
 
 
-async def async_server(image_queue, tilt_queue):
+async def async_server(image_queue, tilt_queue, eye_level_queue):
     """Starts the server and listens for incoming connections"""
 
-    server = await asyncio.start_server(lambda r, w: handle_client(r, w, image_queue, tilt_queue), host, port)
+    server = await asyncio.start_server(lambda r, w: handle_client(r, w, image_queue, tilt_queue, eye_level_queue), host, port)
     sock_name = server.sockets[0].getsockname()
     print(f"Starting server on {sock_name}")
     async with server:
         await server.serve_forever()
 
 
-def start_server(image_queue, tilt_queue):
-    asyncio.run(async_server(image_queue, tilt_queue))
+def start_server(image_queue, tilt_queue, eye_level_queue):
+    asyncio.run(async_server(image_queue, tilt_queue, eye_level_queue))
