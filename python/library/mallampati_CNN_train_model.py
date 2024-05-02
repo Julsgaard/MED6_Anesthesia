@@ -115,8 +115,6 @@ def save_model(model, identifier=''):
 
 
 if __name__ == '__main__':
-    # Create the layers for the CNN
-    # layers = create_layers()
 
     # Initialize model, optimizer, and loss function
     model, optimizer, criterion = initialize_model()
