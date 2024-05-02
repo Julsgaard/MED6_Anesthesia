@@ -2,7 +2,7 @@ import datetime
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from library.mallampati_image_prep import prepare_image_data, prepare_training_and_validation_data
+from library.mallampati_image_prep import prepare_training_validation_and_test_loaders, prepare_training_and_validation_loaders
 
 
 def initialize_model():
@@ -81,30 +81,6 @@ def train_model(model, train_loader, validation_loader, criterion, optimizer, de
     return model
 
 
-def test_model(model, test_loader, device):
-    """Test the model using the test data loader and return the test accuracy"""
-
-    model.eval()  # Set the model to evaluation mode
-    total = 0
-    correct = 0
-
-    with torch.no_grad():
-        for images, labels in test_loader:
-            images, labels = images.to(device), labels.to(device)
-            outputs = model(images)
-            _, predicted = torch.max(outputs.data, 1)
-            total += labels.size(0)
-            correct += (predicted == labels).sum().item()
-
-            # Print predictions and actual labels
-            # for p, a in zip(predicted, labels):
-            #     print(f"Predicted: {p.item()}, Actual: {a.item()}")
-
-    test_acc = correct / total
-    print(f'Test Accuracy: {test_acc:.4f}')
-    return test_acc
-
-
 def save_model(model, identifier=''):
     """Save the model to a file"""
 
@@ -115,15 +91,11 @@ def save_model(model, identifier=''):
 
 
 if __name__ == '__main__':
-
     # Initialize model, optimizer, and loss function
     model, optimizer, criterion = initialize_model()
 
-    # Load data using DataLoader
-    train_loader, validation_loader, test_loader = prepare_image_data(display_images=True, path='mallampati_datasets/mallampati_training_data (2 classes)')
-
     # Use the following line if you want to use only training and validation data
-    # train_loader, validation_loader = prepare_training_and_validation_data(display_images=False, path='mallampati_datasets/New Data')
+    train_loader, validation_loader = prepare_training_and_validation_loaders(image_pixel_size=64, display_images=False, path='mallampati_datasets/New Data')
 
     # Check for GPU else use CPU
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -131,9 +103,6 @@ if __name__ == '__main__':
 
     # Train the model
     trained_model = train_model(model, train_loader, validation_loader, criterion, optimizer, device, num_epochs=15)
-
-    # Test the model on the test set
-    test_accuracy = test_model(trained_model, test_loader, device)
 
     # Save the model
     save_model(trained_model, 'mallampati_CNN')

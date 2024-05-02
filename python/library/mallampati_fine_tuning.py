@@ -4,7 +4,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torchvision import models
-from library.mallampati_image_prep import prepare_image_data  # Adjusted to return validation_loader
+from library.mallampati_image_prep import prepare_training_validation_and_test_loaders  # Adjusted to return validation_loader
 from library.functions import imshow_cv
 import matplotlib.pyplot as plt
 
@@ -16,7 +16,7 @@ num_epochs = 25  # The number of epochs to train the model
 
 
 def run_mallampati_model():
-    train_loader, validation_loader, _ = prepare_image_data()
+    train_loader, validation_loader, _ = prepare_training_validation_and_test_loaders()
 
     model = models.resnet34(pretrained=True)
     for param in model.parameters():

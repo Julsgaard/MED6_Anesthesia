@@ -5,10 +5,10 @@ from torch.utils.data import DataLoader, random_split
 from library.functions import imshow_cv
 
 
-def prepare_image_data(path='mallampati_datasets/mallampati_training_data (2 classes)', display_images=False):
+def prepare_training_validation_and_test_loaders(image_pixel_size=224, path='mallampati_datasets/mallampati_training_data (2 classes)', display_images=False):
     transform = transforms.Compose([
-        transforms.Resize(64),
-        transforms.CenterCrop(64),
+        transforms.Resize(image_pixel_size),
+        transforms.CenterCrop(image_pixel_size),
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
     ])
@@ -43,11 +43,11 @@ def prepare_image_data(path='mallampati_datasets/mallampati_training_data (2 cla
     return train_loader, validation_loader, test_loader
 
 
-def prepare_training_and_validation_data(path='mallampati_datasets/mallampati_training_data (2 classes)',
-                                         display_images=False):
+def prepare_training_and_validation_loaders(image_pixel_size=224, path='mallampati_datasets/mallampati_training_data (2 classes)',
+                                            display_images=False):
     transform = transforms.Compose([
-        transforms.Resize(224),
-        transforms.CenterCrop(224),
+        transforms.Resize(image_pixel_size),
+        transforms.CenterCrop(image_pixel_size),
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
     ])
@@ -78,12 +78,12 @@ def prepare_training_and_validation_data(path='mallampati_datasets/mallampati_tr
     return train_loader, validation_loader
 
 
-def prepare_augmented_image_data(path='mallampati_datasets/mallampati_training_data (2 classes)'):  # TODO: Try this
+def prepare_augmented_image_data(image_pixel_size=224, path='mallampati_datasets/mallampati_training_data (2 classes)'):  # TODO: Try this
 
     # Augmented transformations for training
     train_transform_augmented = transforms.Compose([
-        transforms.Resize(256),
-        transforms.CenterCrop(224),
+        transforms.Resize(image_pixel_size),
+        transforms.CenterCrop(image_pixel_size),
         transforms.RandomHorizontalFlip(),
         transforms.RandomRotation(10),
         transforms.ToTensor(),
@@ -92,8 +92,8 @@ def prepare_augmented_image_data(path='mallampati_datasets/mallampati_training_d
 
     # Standard transformations for testing (no augmentation)
     test_transform = transforms.Compose([
-        transforms.Resize(256),
-        transforms.CenterCrop(224),
+        transforms.Resize(image_pixel_size),
+        transforms.CenterCrop(image_pixel_size),
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
     ])
@@ -132,11 +132,11 @@ def prepare_augmented_image_data(path='mallampati_datasets/mallampati_training_d
     return train_loader_augmented, test_loader
 
 
-def prepare_test_data(path='mallampati_testset/Second testset'):
+def prepare_test_loader(image_pixel_size=224, path='mallampati_testset/Second testset'):
     # Define transformations
     transform = transforms.Compose([
-        transforms.Resize(224),  # Resize the shorter side to 224
-        transforms.CenterCrop(224),  # Crop the longer side to 224
+        transforms.Resize(image_pixel_size),  # Resize the shorter side to 224
+        transforms.CenterCrop(image_pixel_size),  # Crop the longer side to 224
         transforms.ToTensor(),  # Convert the image to a PyTorch tensor
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])  # Normalize
     ])
@@ -153,5 +153,5 @@ def prepare_test_data(path='mallampati_testset/Second testset'):
 
 
 if __name__ == "__main__":
-    prepare_image_data()
+    prepare_training_validation_and_test_loaders()
     # prepare_augmented_image_data()

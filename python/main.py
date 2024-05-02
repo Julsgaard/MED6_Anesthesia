@@ -54,7 +54,6 @@ while True:
         if chin_nose_distance is not None:
              print(f"Distance between chin and nose is: {chin_nose_distance}")
 
-
     else:
         print("Invalid state")
 
