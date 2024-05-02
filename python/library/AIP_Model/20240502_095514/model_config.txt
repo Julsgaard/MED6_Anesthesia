@@ -1,0 +1,17 @@
+Model Configuration and Hyperparameters:
+
+Layers:
+{'type': 'conv', 'out_channels': 16, 'kernel_size': 3, 'padding': 1}
+{'type': 'relu'}
+{'type': 'pool', 'kernel_size': 2, 'stride': 2}
+{'type': 'conv', 'out_channels': 32, 'kernel_size': 3, 'padding': 1}
+{'type': 'relu'}
+{'type': 'pool', 'kernel_size': 2, 'stride': 2}
+
+Hyperparameters:
+batch_size: 16
+learning_rate: 0.001
+num_epochs: 20
+
+Validation Accuracy: 88.68%
+Test Accuracy: 94.94%

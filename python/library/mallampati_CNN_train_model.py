@@ -147,7 +147,7 @@ if __name__ == '__main__':
     print("Using device:", device)
 
     # Train the model
-    trained_model = train_model(model, train_loader, validation_loader, criterion, optimizer, device, num_epochs=25)
+    trained_model = train_model(model, train_loader, validation_loader, criterion, optimizer, device, num_epochs=10)
 
     # Test the model
     test_accuracy = test_model(trained_model, test_loader, device)
