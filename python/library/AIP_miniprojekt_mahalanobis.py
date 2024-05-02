@@ -23,6 +23,7 @@ class FeatureExtractor(nn.Module):
                 layer = nn.ReLU()
             self.layers.append(layer)
 
+
     def forward(self, x):
         for layer in self.layers:
             x = layer(x)
