@@ -40,7 +40,7 @@ if __name__ == '__main__':
     model.eval()
 
     # Prepare the test data
-    test_loader = prepare_test_data('mallampati_datasets/New Test')
+    test_loader = prepare_test_data('mallampati_datasets/mallampati_training_data (2 classes)')
 
     # Run predictions
     run_predictions(model, test_loader)

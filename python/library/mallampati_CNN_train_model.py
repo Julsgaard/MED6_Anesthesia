@@ -127,7 +127,6 @@ def save_model(model, identifier=''):
     filename = f'mallampati_models/CNN models/model_{identifier}_{timestamp}.pth'
     torch.save(model.state_dict(), filename)
     print(f'Model saved as {filename}')
-    return filename
 
 
 if __name__ == '__main__':
@@ -138,7 +137,7 @@ if __name__ == '__main__':
     model, optimizer, criterion = initialize_model(layers)
 
     # Load data using DataLoader
-    train_loader, validation_loader, test_loader = prepare_image_data(display_images=False, path='mallampati_datasets/New Data')
+    train_loader, validation_loader, test_loader = prepare_image_data(display_images=False, path='mallampati_datasets/mallampati_training_data (2 classes)')
 
     # Use the following line if you want to use only training and validation data
     # train_loader, validation_loader = prepare_training_and_validation_data(display_images=False, path='mallampati_datasets/New Data')
@@ -154,4 +153,4 @@ if __name__ == '__main__':
     test_accuracy = test_model(trained_model, test_loader, device)
 
     # Save the model
-    model_path = save_model(trained_model, 'mallampati_CNN')
+    save_model(trained_model, 'mallampati_CNN')
