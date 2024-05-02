@@ -4,8 +4,6 @@ import os
 import cv2
 import numpy as np
 import time
-
-import main
 from library import functions
 
 host = '0.0.0.0'
@@ -79,7 +77,7 @@ async def handle_client(reader, writer, image_queue, tilt_queue):
 
             # Send the eye level data to the client
             send_data = {
-                "eye_level": main.eye_within_threshold,  # TODO: Change to eye level
+                "eye_level": image_counter,  # TODO: Change to eye level
                 "test": "test"
             }
             message = json.dumps(send_data)

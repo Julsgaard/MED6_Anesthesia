@@ -10,13 +10,10 @@ current_image = None
 nose_tracker = None
 chin_tracker = None
 
-global eye_within_threshold #BRAIN
-
 if __name__ == '__main__':
     functions.check_for_logs_folder()  # Check if the logs folder exists, if not create it
     functions.delete_empty_folders_in_logs()  # Delete empty folders in the logs folder to prevent clutter
 
-    eye_within_threshold = 1 #BRAIN
     # Initialize face and landmark data
     face_mesh_model = MediapipeFaceDetection.initialize_mediapipe_face_mesh()
 
@@ -43,8 +40,7 @@ while True:
     # Do something based on the state
     if state == 'Mouth Opening':
         # print("State is Mouth Opening")
-        eye_within_threshold = EyeDetect.detect_faces_and_landmarks(image_path, eye_mesh_model, is_image=True)
-
+        frame, face_landmarks = EyeDetect.detect_faces_and_landmarks(image_path, eye_mesh_model, is_image=True)
 
     elif state == 'Mallampati':
         # print("State is Mallampati")
