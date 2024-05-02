@@ -5,38 +5,23 @@ import torch.optim as optim
 from library.mallampati_image_prep import prepare_image_data, prepare_training_and_validation_data
 
 
-def create_layers():
-    """Function to create a dictionary of layers for the CNN"""
-    layers = {
-        'conv1': nn.Conv2d(3, 32, kernel_size=3, padding=1),  # 3 input channels for RGB images
-        'conv2': nn.Conv2d(32, 64, kernel_size=3, padding=1),  # 32 input channels from the previous layer
-        'conv3': nn.Conv2d(64, 128, kernel_size=3, padding=1),  # 64 input channels from the previous layer
-        'pool': nn.MaxPool2d(2, 2),  # Max pooling layer with a kernel size of 2 and stride of 2
-        'relu': nn.ReLU(),  # ReLU activation function
-        'flatten': nn.Flatten(),  # Flatten layer to convert 2D data to 1D for the fully connected layers
-        'fc1': nn.Linear(128 * 28 * 28, 512),  # 128 channels from the last conv layer, 28x28 image size
-        'fc2': nn.Linear(512, 2)  # 512 input features from the previous layer
-    }
-    return layers
-
-
-def initialize_model(layers):
+def initialize_model():
     """Function to initialize the model, optimizer, and loss function for training"""
 
     model = nn.Sequential(
-        layers['conv1'],
-        layers['relu'],
-        layers['pool'],
-        layers['conv2'],
-        layers['relu'],
-        layers['pool'],
-        layers['conv3'],
-        layers['relu'],
-        layers['pool'],
-        layers['flatten'],
-        layers['fc1'],
-        layers['relu'],
-        layers['fc2']
+        nn.Conv2d(3, 32, kernel_size=3, padding=1),
+        nn.ReLU(),
+        nn.MaxPool2d(2, 2),
+        nn.Conv2d(32, 64, kernel_size=3, padding=1),
+        nn.ReLU(),
+        nn.MaxPool2d(2, 2),
+        nn.Conv2d(64, 128, kernel_size=3, padding=1),
+        nn.ReLU(),
+        nn.MaxPool2d(2, 2),
+        nn.Flatten(),
+        nn.Linear(128 * 28 * 28, 512),
+        nn.ReLU(),
+        nn.Linear(512, 2)
     )
     optimizer = optim.Adam(model.parameters(), lr=0.001)  # Using Adam optimizer
     criterion = nn.CrossEntropyLoss()  # Cross-entropy loss
@@ -112,8 +97,8 @@ def test_model(model, test_loader, device):
             correct += (predicted == labels).sum().item()
 
             # Print predictions and actual labels
-            for p, a in zip(predicted, labels):
-                print(f"Predicted: {p.item()}, Actual: {a.item()}")
+            # for p, a in zip(predicted, labels):
+            #     print(f"Predicted: {p.item()}, Actual: {a.item()}")
 
     test_acc = correct / total
     print(f'Test Accuracy: {test_acc:.4f}')
@@ -131,10 +116,10 @@ def save_model(model, identifier=''):
 
 if __name__ == '__main__':
     # Create the layers for the CNN
-    layers = create_layers()
+    # layers = create_layers()
 
     # Initialize model, optimizer, and loss function
-    model, optimizer, criterion = initialize_model(layers)
+    model, optimizer, criterion = initialize_model()
 
     # Load data using DataLoader
     train_loader, validation_loader, test_loader = prepare_image_data(display_images=False, path='mallampati_datasets/mallampati_training_data (2 classes)')
@@ -147,7 +132,7 @@ if __name__ == '__main__':
     print("Using device:", device)
 
     # Train the model
-    trained_model = train_model(model, train_loader, validation_loader, criterion, optimizer, device, num_epochs=10)
+    trained_model = train_model(model, train_loader, validation_loader, criterion, optimizer, device, num_epochs=15)
 
     # Test the model
     test_accuracy = test_model(trained_model, test_loader, device)

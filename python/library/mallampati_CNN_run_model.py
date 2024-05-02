@@ -1,6 +1,6 @@
 import torch
 from library.mallampati_image_prep import prepare_test_data
-from library.mallampati_CNN_train_model import create_layers, initialize_model
+from library.mallampati_CNN_train_model import initialize_model
 
 
 def run_predictions(model, test_loader):
@@ -20,14 +20,11 @@ def run_predictions(model, test_loader):
 
 
 if __name__ == '__main__':
-    # Create the layers for the CNN
-    layers = create_layers()
-
     # Initialize the model
-    model, optimizer, criterion = initialize_model(layers)
+    model, optimizer, criterion = initialize_model()
 
     # Load the pre-trained model
-    model.load_state_dict(torch.load('mallampati_models/CNN models/model_mallampati_CNN_20240502_000217.pth'))
+    model.load_state_dict(torch.load('mallampati_models/CNN models/model_mallampati_CNN_20240502_102121.pth'))
 
     # Move the model to the device
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
