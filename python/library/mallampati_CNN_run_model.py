@@ -27,7 +27,7 @@ if __name__ == '__main__':
     model, optimizer, criterion = initialize_model()
 
     # Load the pre-trained model
-    model.load_state_dict(torch.load('mallampati_models/CNN models/model_mallampati_CNN_20240502_205901.pth'))
+    model.load_state_dict(torch.load('mallampati_models/CNN models/model_mallampati_CNN_20240502_210726.pth'))
 
     # Move the model to the device
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -37,7 +37,7 @@ if __name__ == '__main__':
     model.to(device)
 
     # Prepare the test data
-    test_loader = prepare_test_loader(image_pixel_size=64, path='mallampati_datasets/mallampati_training_data (2 classes)')
+    test_loader = prepare_test_loader(image_pixel_size=64, path='mallampati_datasets/New Test')
 
     # Run predictions
     run_predictions(model, test_loader)
