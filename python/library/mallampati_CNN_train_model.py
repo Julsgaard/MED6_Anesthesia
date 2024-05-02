@@ -19,7 +19,7 @@ def initialize_model():
         nn.ReLU(),
         nn.MaxPool2d(2, 2),
         nn.Flatten(),
-        nn.Linear(128 * 28 * 28, 512),
+        nn.Linear(128 * 8 * 8, 512),
         nn.ReLU(),
         nn.Linear(512, 2)
     )
@@ -120,7 +120,7 @@ if __name__ == '__main__':
     model, optimizer, criterion = initialize_model()
 
     # Load data using DataLoader
-    train_loader, validation_loader, test_loader = prepare_image_data(display_images=False, path='mallampati_datasets/mallampati_training_data (2 classes)')
+    train_loader, validation_loader, test_loader = prepare_image_data(display_images=True, path='mallampati_datasets/mallampati_training_data (2 classes)')
 
     # Use the following line if you want to use only training and validation data
     # train_loader, validation_loader = prepare_training_and_validation_data(display_images=False, path='mallampati_datasets/New Data')
@@ -132,7 +132,7 @@ if __name__ == '__main__':
     # Train the model
     trained_model = train_model(model, train_loader, validation_loader, criterion, optimizer, device, num_epochs=15)
 
-    # Test the model
+    # Test the model on the test set
     test_accuracy = test_model(trained_model, test_loader, device)
 
     # Save the model
