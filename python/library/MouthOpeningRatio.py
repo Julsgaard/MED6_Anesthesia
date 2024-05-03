@@ -1,7 +1,7 @@
 from scipy.spatial import distance as dist
 
 
-def calculate_mouth_opening_area(face_landmarks):
+def calculate_mouth_opening_ratio(face_landmarks):
     """Calculates the mouth opening ratio (MOR) based on specified MediaPipe facial landmarks."""
     # Updated indices for MediaPipe
     indices = [78, 191, 80, 81, 82, 13, 312, 311, 310, 415, 308, 324, 318, 402, 317, 14, 87, 178, 88, 95]

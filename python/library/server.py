@@ -51,7 +51,6 @@ async def handle_client(reader, writer, image_queue, tilt_queue, eye_level_queue
 
             current_state_data = await reader.readexactly(4)
             current_state = int.from_bytes(current_state_data, 'big')
-            # print(f"Current State: {current_state}")
 
             if current_state == 0:  # Mouth Opening state
                 current_state = 'Mouth Opening'

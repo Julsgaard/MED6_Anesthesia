@@ -1,7 +1,7 @@
 import cv2
 import dlib
 import os
-from library.MouthOpeningArea import calculate_mouth_opening_area
+from library.MouthOpeningRatio import calculate_mouth_opening_area
 from library.HeadAngle_ImageProcessing import calculate_face_ratio
 
 

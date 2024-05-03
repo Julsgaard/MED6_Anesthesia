@@ -1,6 +1,6 @@
 import cv2
 import mediapipe as mp
-from library import MouthOpeningArea, Tracker
+from library import MouthOpeningRatio, Tracker
 #import Tracker #Udkommenter den her linje hvis du vil teste scriptet direkte
 
 
@@ -72,9 +72,7 @@ if __name__ == "__main__":
         #area = MouthOpeningArea.calculate_mouth_opening_area(face_landmarks)
         #print(f"Area: {area}")
 
-        nose_tracker, chin_tracker, frame, chin_nose_distance = Tracker.add_chin_and_nose_tracker(frame, face_landmarks, nose_tracker,chin_tracker)
-        if chin_nose_distance is not None:
-            print(f"Distance between chin and nose is: {chin_nose_distance}")
+        nose_tracker, chin_tracker, frame = Tracker.add_chin_and_nose_tracker(frame, face_landmarks, nose_tracker,chin_tracker)
 
 
 

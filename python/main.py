@@ -1,4 +1,4 @@
-from library import server, functions, MediapipeFaceDetection, MouthOpeningArea, MouthCrop, Tracker, eye_detect
+from library import server, functions, MediapipeFaceDetection, MouthOpeningRatio, MouthCrop, Tracker, eye_detect
 import threading
 import queue
 
@@ -37,40 +37,42 @@ while True:
 
     # Do something based on the state
     if state == 'Mouth Opening':
-        # print("State is Mouth Opening")
+        # Check for eye level
         eye_level = eye_detect.detect_faces_and_landmarks(image_path, face_mesh_model)
         eye_level_queue.put(eye_level)  # Put the eye level into the queue
+
+        # Detect face and generate landmarks
+        frame, face_landmarks = MediapipeFaceDetection.detect_faces_and_landmarks(image_path, face_mesh_model,
+                                                                                     is_image=True)
+        if face_landmarks:
+            # Calculate mouth opening ratio
+            mor = MouthOpeningRatio.calculate_mouth_opening_ratio(face_landmarks)
+            print(f"Mouth opening ratio: {mor}")
+
 
 
     elif state == 'Mallampati':
-        # print("State is Mallampati")
+        # Check for eye level
         eye_level = eye_detect.detect_faces_and_landmarks(image_path, face_mesh_model)
         eye_level_queue.put(eye_level)  # Put the eye level into the queue
 
+        # Crop mouth out from images
+        frame, face_landmarks = MediapipeFaceDetection.detect_faces_and_landmarks(image_path, face_mesh_model,
+                                                                                  is_image=True)
+        if face_landmarks:
+            cropped_image = MouthCrop.crop_mouth_region(frame, face_landmarks)
+
+            # Classify it using mallampati model here and store the class in a list or something maybe
+            # Then after a certain amount of images/time, take the mean class(?)
+
 
     elif state == 'Neck Movement':
-        # print("State is Neck Movement")
-        frame, face_landmarks = MediapipeFaceDetection.detect_faces_and_landmarks(image_path, face_mesh_model, is_image=True)
-        nose_tracker, chin_tracker, frame, chin_nose_distance = Tracker.add_chin_and_nose_tracker(frame, face_landmarks, nose_tracker,
-                                                                                  chin_tracker)
-        if chin_nose_distance is not None:
-             print(f"Distance between chin and nose is: {chin_nose_distance}")
-
+        # Detect face and calculate angle based on nose, mouth points that we track.
+        print("TEST")
+        #frame, face_landmarks = MediapipeFaceDetection.detect_faces_and_landmarks(image_path, face_mesh_model, is_image=True)
+        #nose_tracker, chin_tracker, frame = Tracker.add_chin_and_nose_tracker(frame, face_landmarks, nose_tracker,
+                                                                                  #chin_tracker)
     else:
         print("Invalid state")
 
-    # print(f"Received image: {image_path}")
-    # Neck angle using only the phone sensor (Needs 20 entries to calculate, which is like 8-10 seconds? (Maybe i should make it time based instead))
-    # absolute_neck_angle, default_tilt_angle = NeckAngle_PhoneSensor.store_and_calculate_absolute_tilt_angle(tilt_queue.get())
 
-    # Detect faces and landmarks
-    # frame, face_landmarks = MediapipeFaceDetection.detect_faces_and_landmarks(image_path, face_mesh_model,
-    #                                                                           is_image=True)
-    #
-    # if face_landmarks:
-    #     nose_tracker, chin_tracker, frame = Tracker.add_chin_and_nose_tracker(frame, face_landmarks, nose_tracker,
-    #                                                                           chin_tracker)
-    #     # HeadAngle.store_head_angle_information(tilt_queue.get(), face_landmarks,image_path)
-    #     display_image_queue.put(frame)
-    # else:
-    #     display_image_queue.put(frame)
