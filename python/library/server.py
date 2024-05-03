@@ -61,7 +61,7 @@ async def handle_client(reader, writer, image_queue, tilt_queue, eye_level_queue
                 eye_level = eye_level_queue.get()  # Get the eye level from the queue
 
                 send_data = {
-                    "eye_level": eye_level,  # TODO: Change to eye level
+                    "eye_level": eye_level,
                     "test": "test"
                 }
 
@@ -77,7 +77,7 @@ async def handle_client(reader, writer, image_queue, tilt_queue, eye_level_queue
                 eye_level = eye_level_queue.get()  # Get the eye level from the queue
 
                 send_data = {
-                    "eye_level": eye_level,  # TODO: Change to eye level
+                    "eye_level": eye_level,
                     "test": "test"
                 }
 
