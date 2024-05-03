@@ -43,13 +43,11 @@ while True:
 
         # Detect face and generate landmarks
         frame, face_landmarks = MediapipeFaceDetection.detect_faces_and_landmarks(image_path, face_mesh_model,
-                                                                                     is_image=True)
+                                                                                  is_image=True)
         if face_landmarks:
             # Calculate mouth opening ratio
             mor = MouthOpeningRatio.calculate_mouth_opening_ratio(face_landmarks)
             print(f"Mouth opening ratio: {mor}")
-
-
 
     elif state == 'Mallampati':
         # Check for eye level
@@ -65,15 +63,14 @@ while True:
             # Classify it using mallampati model here and store the class in a list or something maybe
             # Then after a certain amount of images/time, take the mean class(?)
 
-
     elif state == 'Neck Movement':
-        eye_level = eye_detect.detect_faces_and_landmarks(image_path, face_mesh_model)
-        eye_level_queue.put(eye_level)  # Put the eye level into the queue
+        # eye_level = eye_detect.detect_faces_and_landmarks(image_path, face_mesh_model)
+        # eye_level_queue.put(eye_level)  # Put the eye level into the queue
+
         # Detect face and calculate angle based on nose, mouth points that we track.
-        frame, face_landmarks = MediapipeFaceDetection.detect_faces_and_landmarks(image_path, face_mesh_model, is_image=True)
+        frame, face_landmarks = MediapipeFaceDetection.detect_faces_and_landmarks(image_path, face_mesh_model,
+                                                                                  is_image=True)
         nose_tracker, chin_tracker, frame = Tracker.add_chin_and_nose_tracker(frame, face_landmarks, nose_tracker,
-                                                                                  chin_tracker)
+                                                                              chin_tracker)
     else:
         print("Invalid state")
-
-

@@ -93,15 +93,13 @@ def imshow_cv(inp, title=None):
 
 
 def find_state_for_image_path(image_path):
-    #print(f"Image path: {image_path}")  # Debugging line
+    #print(f"Image path: {image_path}")
 
-    # Extract the base directory or folder name from the image path
+    # Get the base directory of the image path
     base_directory = os.path.basename(os.path.dirname(image_path))
+    # print(f"Base directory: {base_directory}")
 
-    # print(f"Base directory: {base_directory}")  # Debugging line
-
-
-    # Define actions based on directory names
+    # Return the state based on the base directory
     if base_directory.lower() == 'mallampati':
         return "Mallampati"
     elif base_directory.lower() == 'mouth opening':

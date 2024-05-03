@@ -58,11 +58,31 @@ async def handle_client(reader, writer, image_queue, tilt_queue, eye_level_queue
                 image_counter, lux_value, tilt_angle = await video_stream(reader, image_queue, session_path,
                                                                           current_state, image_counter)
 
+                eye_level = eye_level_queue.get()  # Get the eye level from the queue
+
+                send_data = {
+                    "eye_level": eye_level,  # TODO: Change to eye level
+                    "test": "test"
+                }
+
+                # Send data to the client
+                await send_to_client(send_data, writer)
+
             elif current_state == 1:  # Mallampati state
                 current_state = 'Mallampati'
 
                 image_counter, lux_value, tilt_angle = await video_stream(reader, image_queue, session_path,
                                                                           current_state, image_counter)
+
+                eye_level = eye_level_queue.get()  # Get the eye level from the queue
+
+                send_data = {
+                    "eye_level": eye_level,  # TODO: Change to eye level
+                    "test": "test"
+                }
+
+                # Send data to the client
+                await send_to_client(send_data, writer)
 
             elif current_state == 2:  # Neck Movement state
                 current_state = 'Neck Movement'
@@ -70,15 +90,18 @@ async def handle_client(reader, writer, image_queue, tilt_queue, eye_level_queue
                 image_counter, lux_value, tilt_angle = await video_stream(reader, image_queue, session_path,
                                                                           current_state, image_counter)
 
+                # eye_level = eye_level_queue.get()  # Get the eye level from the queue (To clear the queue)
+
+                send_data = {
+                    "test": "test"
+                }
+
+                # Send data to the client
+                await send_to_client(send_data, writer)
+
             else:
                 print("Unknown state closing connection")
                 break
-
-            eye_level = eye_level_queue.get()  # Get the eye level from the queue
-            # print(f"Eye Level: {eye_level}")
-
-            # Send data to the client
-            await send_to_client(eye_level, writer)
 
             # Prints the FPS, current state, lux value, and tilt angle every second
             frame_counter, prev_time = print_every_x(
@@ -99,12 +122,7 @@ async def handle_client(reader, writer, image_queue, tilt_queue, eye_level_queue
         await writer.wait_closed()
 
 
-async def send_to_client(eye_level, writer):
-    # Send the eye level data to the client
-    send_data = {
-        "eye_level": eye_level,  # TODO: Change to eye level
-        "test": "test"
-    }
+async def send_to_client(send_data, writer):
     message = json.dumps(send_data)
     # print(f"Sending: {message}")
 
@@ -208,7 +226,8 @@ def print_every_x(frame_counter, prev_time, current_state, lux_value, tilt_angle
 async def async_server(image_queue, tilt_queue, eye_level_queue):
     """Starts the server and listens for incoming connections"""
 
-    server = await asyncio.start_server(lambda r, w: handle_client(r, w, image_queue, tilt_queue, eye_level_queue), host, port)
+    server = await asyncio.start_server(lambda r, w: handle_client(r, w, image_queue, tilt_queue, eye_level_queue),
+                                        host, port)
     sock_name = server.sockets[0].getsockname()
     print(f"Starting server on {sock_name}")
     async with server:
