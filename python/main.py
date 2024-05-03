@@ -67,11 +67,12 @@ while True:
 
 
     elif state == 'Neck Movement':
+        eye_level = eye_detect.detect_faces_and_landmarks(image_path, face_mesh_model)
+        eye_level_queue.put(eye_level)  # Put the eye level into the queue
         # Detect face and calculate angle based on nose, mouth points that we track.
-        print("TEST")
-        #frame, face_landmarks = MediapipeFaceDetection.detect_faces_and_landmarks(image_path, face_mesh_model, is_image=True)
-        #nose_tracker, chin_tracker, frame = Tracker.add_chin_and_nose_tracker(frame, face_landmarks, nose_tracker,
-                                                                                  #chin_tracker)
+        frame, face_landmarks = MediapipeFaceDetection.detect_faces_and_landmarks(image_path, face_mesh_model, is_image=True)
+        nose_tracker, chin_tracker, frame = Tracker.add_chin_and_nose_tracker(frame, face_landmarks, nose_tracker,
+                                                                                  chin_tracker)
     else:
         print("Invalid state")
 
