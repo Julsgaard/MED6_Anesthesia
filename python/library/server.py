@@ -117,6 +117,8 @@ async def handle_client(reader, writer, image_queue, tilt_queue, eye_level_queue
         print(f"Client disconnected: {client_addr}")
     except ConnectionResetError:
         print(f"Connection reset by client: {client_addr}")
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
     finally:
         writer.close()
         await writer.wait_closed()

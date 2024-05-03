@@ -1,3 +1,5 @@
+import numpy as np
+from PIL import Image
 import torch
 from torchvision import transforms
 from torchvision.datasets import ImageFolder
@@ -5,7 +7,9 @@ from torch.utils.data import DataLoader, random_split
 from library.functions import imshow_cv
 
 
-def prepare_training_validation_and_test_loaders(image_pixel_size=224, path='mallampati_datasets/mallampati_training_data (2 classes)', display_images=False):
+def prepare_training_validation_and_test_loaders(image_pixel_size=224,
+                                                 path='mallampati_datasets/mallampati_training_data (2 classes)',
+                                                 display_images=False):
     transform = transforms.Compose([
         transforms.Resize(image_pixel_size),
         transforms.CenterCrop(image_pixel_size),
@@ -33,8 +37,7 @@ def prepare_training_validation_and_test_loaders(image_pixel_size=224, path='mal
     print(f"Number of validation samples: {len(validation_dataset)}")
     print(f"Number of testing samples: {len(test_dataset)}")
 
-    if display_images:
-        # Example code to display images from each dataset
+    if display_images:  # Display a few images
         for i, (inputs, labels) in enumerate(train_loader):
             if i == 10:  # Display first 10 images
                 break
@@ -43,7 +46,8 @@ def prepare_training_validation_and_test_loaders(image_pixel_size=224, path='mal
     return train_loader, validation_loader, test_loader
 
 
-def prepare_training_and_validation_loaders(image_pixel_size=224, path='mallampati_datasets/mallampati_training_data (2 classes)',
+def prepare_training_and_validation_loaders(image_pixel_size=224,
+                                            path='mallampati_datasets/mallampati_training_data (2 classes)',
                                             display_images=False):
     transform = transforms.Compose([
         transforms.Resize(image_pixel_size),
@@ -78,7 +82,8 @@ def prepare_training_and_validation_loaders(image_pixel_size=224, path='mallampa
     return train_loader, validation_loader
 
 
-def prepare_augmented_image_data(image_pixel_size=224, path='mallampati_datasets/mallampati_training_data (2 classes)'):  # TODO: Try this
+def prepare_augmented_image_data(image_pixel_size=224,
+                                 path='mallampati_datasets/mallampati_training_data (2 classes)'):  # TODO: Try this
 
     # Augmented transformations for training
     train_transform_augmented = transforms.Compose([
@@ -150,6 +155,21 @@ def prepare_test_loader(image_pixel_size=224, path='mallampati_testset/Second te
     print(f"Number of testing samples: {len(dataset)}")
 
     return test_loader
+
+
+def prepare_mallampati_image_for_loader(image, image_pixel_size=224):
+    # Check if the image is a NumPy array and convert it to PIL Image
+    if isinstance(image, np.ndarray):
+        # Convert numpy array to PIL Image
+        image = Image.fromarray(image)
+
+    transform = transforms.Compose([
+        transforms.Resize(image_pixel_size),
+        transforms.CenterCrop(image_pixel_size),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+    ])
+    return transform(image)
 
 
 if __name__ == "__main__":

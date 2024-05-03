@@ -3,7 +3,30 @@ from library.mallampati_image_prep import prepare_test_loader
 from library.mallampati_CNN_train_model import initialize_model
 
 
-def run_predictions(model, test_loader):
+def load_model(device, model_path='mallampati_models/CNN models/model_mallampati_CNN_20240503_205354.pth'):
+    """Load the pre-trained model and run predictions on the test set"""
+
+    # Initialize the model
+    model, optimizer, criterion = initialize_model()
+
+    # Load the pre-trained model
+    model.load_state_dict(torch.load(model_path))
+
+    model.to(device)
+
+    return model
+
+
+def find_device():
+    """Find the device to run the model on"""
+
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    print(f"Device: {device}")
+
+    return device
+
+
+def run_predictions_on_test_loader(model, test_loader, device):
     """Run predictions on the test set and print the total accuracy"""
 
     model.eval()  # Set the model to evaluation mode
@@ -22,22 +45,28 @@ def run_predictions(model, test_loader):
     print(f"Total Accuracy: {accuracy:.2f}%")
 
 
+def run_predictions_on_image(model, image, device):
+    """Run predictions on a single image from the pipeline and return the predicted class"""
+
+    model.eval()  # Set the model to evaluation mode
+
+    with torch.no_grad():
+        image = image.to(device)
+        output = model(image)
+        _, predicted = torch.max(output.data, 1)
+
+        return predicted
+
+
 if __name__ == '__main__':
-    # Initialize the model
-    model, optimizer, criterion = initialize_model()
+    # Find the device
+    device = find_device()
 
-    # Load the pre-trained model
-    model.load_state_dict(torch.load('mallampati_models/CNN models/model_mallampati_CNN_20240502_210726.pth'))
-
-    # Move the model to the device
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    print("Using device:", device)
-
-    # Move the model to the device
-    model.to(device)
+    # Load the model and move to device
+    model = load_model(device)
 
     # Prepare the test data
     test_loader = prepare_test_loader(image_pixel_size=64, path='mallampati_datasets/New Test')
 
     # Run predictions
-    run_predictions(model, test_loader)
+    run_predictions_on_test_loader(model, test_loader, device)
