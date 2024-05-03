@@ -154,7 +154,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
     double buttonWidth = (mWidth/4);
     double buttonHeight = (mHeight/16);
 
-    double mouthOverlayScale = 0.5; //Juster den her for at gøre mouthoverlay større/mindre, skal være mellem 0-1 (Tror enten den skal være 0.4 eller 0.5)
+    double mouthOverlayScale = 0.3; //Juster den her for at gøre mouthoverlay større/mindre, skal være mellem 0-1 (Tror enten den skal være 0.4 eller 0.5)
 
     return Material(
 
