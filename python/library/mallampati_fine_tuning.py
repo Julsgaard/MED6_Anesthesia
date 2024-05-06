@@ -11,14 +11,14 @@ import matplotlib.pyplot as plt
 # Hyperparameters
 num_classes = 2  # The number of classes in the dataset
 learning_rate = 1e-3  # The learning rate for the optimizer
-num_epochs = 30  # The number of epochs to train the model
+num_epochs = 15  # The number of epochs to train the model
 
 
 def run_mallampati_model():
     train_loader = prepare_loader(path='mallampati_datasets/training_data(ManualSplit)')
     validation_loader = prepare_loader(path='mallampati_datasets/validation_data(ManualSplit)')
 
-    model = models.resnet34(pretrained=True)
+    model = models.resnet101(weights='ResNet101_Weights.DEFAULT')
     for param in model.parameters():
         param.requires_grad = False
     num_ftrs = model.fc.in_features
