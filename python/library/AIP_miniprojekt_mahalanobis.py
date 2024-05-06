@@ -4,7 +4,7 @@ from torchvision import transforms, datasets
 from torch.utils.data import DataLoader
 import numpy as np
 from scipy.spatial.distance import mahalanobis
-from library.mallampati_image_prep import prepare_training_loader, prepare_validation_loader
+from library.mallampati_image_prep import prepare_loader
 from library.mallampati_CNN_run_model import load_model, find_device
 
 
@@ -33,17 +33,19 @@ class FeatureExtractor(nn.Module):
 #     return dataloader
 
 # Feature extraction
-def extract_features(dataloader, model):
+def extract_features(dataloader, model, device=torch.device('cpu')):
+    model.to(device)  # Move the model to the GPU if available
     model.eval()
     features = []
-    labels = []
+    labels = torch.Tensor().to(device)  # Initialize labels as an empty tensor on the device
     with torch.no_grad():
         for images, labels_batch in dataloader:
+            images = images.to(device)
+            labels = torch.tensor(labels).to(device)
             feature = model(images)
             features.append(feature)
-            labels.extend(labels_batch)
+            labels = torch.cat((labels, labels_batch))
     features = torch.cat(features)
-    labels = torch.tensor(labels)
     return features, labels
 
 # Mahalanobis Distance Classifier
@@ -86,16 +88,14 @@ def main():
     # Often used after ReLU layer
 
     # Load and extract features
-    train_loader = prepare_training_loader(training_path='mallampati_datasets/training_data(ManualSplit)',
-                                           image_pixel_size=64, display_images=False)
-    test_loader = prepare_validation_loader(validation_path='mallampati_datasets/test_data(ManualSplit)',
-                                                  image_pixel_size=64)
+    train_loader = prepare_loader(path='mallampati_datasets/training_data(ManualSplit)', image_pixel_size=64)
+    test_loader = prepare_loader(path='mallampati_datasets/test_data(ManualSplit)', image_pixel_size=64)
     # If you want to use the model that is created inside this script, use this code:
     #train_features, train_labels = extract_features(train_loader, FeatureExtractor(layers_config))
     #test_features, test_labels = extract_features(test_loader, FeatureExtractor(layers_config))
 
     # If you want to use a pretrained model, use this code:
-    feature_extractor_model = FeatureExtractor(load_model(find_device(), 'mallampati_models/CNN models/model_mallampati_CNN_20240506_102522.pth'))
+    feature_extractor_model = FeatureExtractor(load_model(find_device(), 'mallampati_models/CNN models/model_mallampati_CNN_20240506_151656.pth'))
     train_features, train_labels = extract_features(train_loader, feature_extractor_model)
     test_features, test_labels = extract_features(test_loader, feature_extractor_model)
 

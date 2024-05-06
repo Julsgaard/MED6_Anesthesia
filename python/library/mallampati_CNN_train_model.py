@@ -2,11 +2,8 @@ import datetime
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from torchvision.datasets import ImageFolder
-from torchvision import transforms
+from library.mallampati_image_prep import prepare_loader
 
-from library.mallampati_image_prep import prepare_training_validation_and_test_loaders, prepare_training_and_validation_loaders, prepare_training_loader, prepare_validation_loader
-from torch.utils.data import DataLoader
 
 def initialize_model():
     """Function to initialize the model, optimizer, and loss function for training"""
@@ -31,8 +28,17 @@ def initialize_model():
     return model, optimizer, criterion
 
 
+def find_device():
+    """Find the device to run the model on"""
+
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    print(f"Device: {device}")
+
+    return device
+
+
 def train_model(model, train_loader, validation_loader, criterion, optimizer, device, num_epochs=15):
-    """Train the model using the training and validation data loaders for a specified number of epochs."""
+    """Train the model using the training and validation data loaders for a specified number of epochs"""
 
     model.to(device)  # Move the model to the GPU if available
 
@@ -84,11 +90,11 @@ def train_model(model, train_loader, validation_loader, criterion, optimizer, de
     return model
 
 
-def save_model(model, identifier=''):
+def save_model(model):
     """Save the model to a file"""
 
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    filename = f'mallampati_models/CNN models/model_{identifier}_{timestamp}.pth'
+    filename = f'mallampati_models/CNN models/model_mallampati_CNN_{timestamp}.pth'
     torch.save(model.state_dict(), filename)
     print(f'Model saved as {filename}')
 
@@ -98,21 +104,17 @@ if __name__ == '__main__':
     model, optimizer, criterion = initialize_model()
 
     # Random split training and validation data
-    #train_loader, validation_loader = prepare_training_and_validation_loaders(image_pixel_size=64, display_images=False, path='mallampati_datasets/New Data')
-
-
+    # train_loader, validation_loader = prepare_training_and_validation_loaders(image_pixel_size=64, display_images=False, path='mallampati_datasets/New Data')
 
     # Manual split training and validation data
-    train_loader = prepare_training_loader(training_path='mallampati_datasets/training_data(ManualSplit)', image_pixel_size=64, display_images=False)
-    validation_loader = prepare_validation_loader(validation_path='mallampati_datasets/validation_data(ManualSplit)', image_pixel_size=64)
+    train_loader = prepare_loader(path='mallampati_datasets/training_data(ManualSplit)', image_pixel_size=64)
+    validation_loader = prepare_loader(path='mallampati_datasets/validation_data(ManualSplit)', image_pixel_size=64)
 
-
-    # Check for GPU else use CPU
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    print("Using device:", device)
+    # Find the device to run the model on (GPU or CPU)
+    device = find_device()
 
     # Train the model
-    trained_model = train_model(model, train_loader, validation_loader, criterion, optimizer, device, num_epochs=15)
+    trained_model = train_model(model, train_loader, validation_loader, criterion, optimizer, device, num_epochs=20)
 
     # Save the model
-    save_model(trained_model, 'mallampati_CNN')
+    save_model(trained_model)

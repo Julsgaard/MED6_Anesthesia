@@ -1,7 +1,7 @@
 import torch
 from torch import nn
 from torchvision import models
-from library.mallampati_image_prep import prepare_test_loader
+from library.mallampati_image_prep import prepare_loader
 
 
 def load_model_and_predict():
@@ -26,7 +26,7 @@ def load_model_and_predict():
     model.eval()
 
     # Gather and prepare the data
-    test_loader = prepare_test_loader()
+    test_loader = prepare_loader('mallampati_datasets/test_data(ManualSplit)')
 
     # Initialize the confusion matrix
     confusion_matrix = torch.zeros(num_classes, num_classes)

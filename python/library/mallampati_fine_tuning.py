@@ -4,19 +4,19 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torchvision import models
-from library.mallampati_image_prep import prepare_training_validation_and_test_loaders  # Adjusted to return validation_loader
-from library.functions import imshow_cv
+from mallampati_image_prep import prepare_loader
+from functions import imshow_cv
 import matplotlib.pyplot as plt
-
 
 # Hyperparameters
 num_classes = 2  # The number of classes in the dataset
 learning_rate = 1e-3  # The learning rate for the optimizer
-num_epochs = 25  # The number of epochs to train the model
+num_epochs = 30  # The number of epochs to train the model
 
 
 def run_mallampati_model():
-    train_loader, validation_loader, _ = prepare_training_validation_and_test_loaders()
+    train_loader = prepare_loader(path='mallampati_datasets/training_data(ManualSplit)')
+    validation_loader = prepare_loader(path='mallampati_datasets/validation_data(ManualSplit)')
 
     model = models.resnet34(pretrained=True)
     for param in model.parameters():
@@ -88,7 +88,7 @@ def run_mallampati_model():
             best_model_wts = copy.deepcopy(model.state_dict())
 
     model.load_state_dict(best_model_wts)
-    folder_name = f'mallampati_models/{best_acc * 100:.2f}%_{num_epochs}_epochs'
+    folder_name = f'mallampati_models/ResNet models/{best_acc * 100:.2f}%_{num_epochs}_epochs'
     os.makedirs(folder_name, exist_ok=True)
 
     # Save the model

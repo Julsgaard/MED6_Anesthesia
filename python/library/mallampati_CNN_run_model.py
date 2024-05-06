@@ -1,18 +1,9 @@
 import torch
-from library.mallampati_image_prep import prepare_test_loader
-from library.mallampati_CNN_train_model import initialize_model
+from library.mallampati_image_prep import prepare_loader
+from library.mallampati_CNN_train_model import initialize_model, find_device
 
 
-def find_device():
-    """Find the device to run the model on"""
-
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    print(f"Device: {device}")
-
-    return device
-
-
-def load_model(device, model_path='mallampati_models/CNN models/model_mallampati_CNN_20240506_102522.pth'):
+def load_model(device, model_path='mallampati_models/CNN models/model_mallampati_CNN_20240506_154141.pth'):
     """Load the pre-trained model and run predictions on the test set"""
 
     # Initialize the model
@@ -66,7 +57,7 @@ if __name__ == '__main__':
     model = load_model(device)
 
     # Prepare the test data
-    test_loader = prepare_test_loader(image_pixel_size=64, path='mallampati_datasets/test_data(ManualSplit)')
+    test_loader = prepare_loader(path='mallampati_datasets/test_data(ManualSplit)', image_pixel_size=64)
 
     # Run predictions
     run_predictions_on_test_loader(model, test_loader, device)
