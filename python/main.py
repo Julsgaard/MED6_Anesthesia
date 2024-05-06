@@ -29,7 +29,7 @@ if __name__ == '__main__':
 
     # Find the device and load the model for the AI model
     device = mallampati_CNN_run_model.find_device()
-    model = mallampati_CNN_run_model.load_model(device, model_path='library/mallampati_models/CNN models/model_mallampati_CNN_20240503_205354.pth')
+    model = mallampati_CNN_run_model.load_model(device, model_path='library/mallampati_models/CNN models/model_mallampati_CNN_20240506_102522.pth')
 
     while True:
         # Get the image path from the server image queue
@@ -55,8 +55,8 @@ if __name__ == '__main__':
 
             if face_landmarks:
                 # Calculate mouth opening ratio
-                mor = MouthOpeningRatio.calculate_mouth_opening_ratio(face_landmarks)
-                print(f"Mouth opening ratio: {mor}")
+                MouthOpeningRatio.lip_distance_monitor(face_landmarks)
+
 
         elif state == 'Mallampati':
             # Check for eye level

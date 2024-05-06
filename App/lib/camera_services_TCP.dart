@@ -18,7 +18,7 @@ class CameraServices {
   static BrightnessController? _brightnessController;
 
 
-  static Future<void> streamCameraFootage(CameraController controller, StateManager stateManager, {int frameIntervalMs = 50}) async {
+  static Future<void> streamCameraFootage(CameraController controller, StateManager stateManager, {int frameIntervalMs = 250}) async {
     // 50 corresponds to approximately 20 frames per second, test other values as needed
 
     if (isStreaming) {

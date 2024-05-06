@@ -5,6 +5,8 @@ import statistics
 default_inner_lip_distance = None
 num_data_points = 5  # Antallet af distancer den bruger ti at beregne default lip distance. Tager median værdien af disse.
 distances = []
+
+
 def calculate_mouth_opening_ratio(face_landmarks):
     """Calculates the mouth opening ratio (MOR) based on specified MediaPipe facial landmarks."""
     # Updated indices for MediaPipe
@@ -41,9 +43,11 @@ def calculate_polygon_area(face_landmarks):
 
     return area
 
+
 def calculate_distance(landmark1, landmark2):
     """Calculate the Euclidean distance between two landmarks."""
     return ((landmark1.x - landmark2.x) ** 2 + (landmark1.y - landmark2.y) ** 2) ** 0.5
+
 
 def lip_distance_monitor(landmarks):
     global default_inner_lip_distance
