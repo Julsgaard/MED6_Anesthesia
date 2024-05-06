@@ -71,6 +71,7 @@ class CameraServices {
 
     static void sendTiltAngleOverTCP(double tiltAngle, NetworkClient networkClient) {
       // Convert to integer for sending over TCP
+      //print('Tiltangle : ${GlobalVariables.tiltAngle}');
       int tiltAngleInt = tiltAngle.toInt();
 
       // Use ByteData for the conversion to bytes
