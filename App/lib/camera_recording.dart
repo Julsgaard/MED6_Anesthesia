@@ -286,8 +286,8 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
           ),
           if (GlobalVariables.overlayNumber > 0)
             Positioned(
-                right: 75,
-                top: 165,
+                right: mWidth/2,
+                top: 180,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
@@ -303,56 +303,6 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
                         ),
                       child: _getTextForCondition(),
                     ),
-                    if (GlobalVariables.overlayNumber == 1 && GlobalVariables.luxValue >= 0)
-                      Text(
-                        'Brightness too low!',
-                        style: TextStyle(fontSize: 30.0),
-                      ),
-                    if (GlobalVariables.overlayNumber == 1 && GlobalVariables.luxValue >= 150)
-                      Text(
-                        'Brighttness too high!',
-                        style: TextStyle(fontSize: 30.0),
-                      ),
-                    if (GlobalVariables.overlayNumber == 2 && GlobalVariables.eyeLevel == 0)
-                      Container(
-                        padding: EdgeInsets.all(16.0),
-                        decoration: BoxDecoration(
-                          color: Colors.blue.withOpacity(0.5), // Adjust the opacity as needed
-                          borderRadius: BorderRadius.circular(5.0),
-                          border: Border.all(
-                            color: Colors.black, // Border color
-                            width: 2.0, // Optional: adds rounded corners
-                          ),
-                        ),
-                        child: Text(
-                            'No face deteced!',
-                            style: TextStyle(
-                              fontSize: 30.0,
-                              color: Colors.white,
-                            )
-                        ),
-                      ),
-
-                    if (GlobalVariables.overlayNumber == 2 && GlobalVariables.eyeLevel == 2)
-                      Text(
-                        'Eyes too low',
-                        style: TextStyle(fontSize: 32),
-                      ),
-                    if (GlobalVariables.overlayNumber == 2 && GlobalVariables.eyeLevel == 3)
-                      Text(
-                        'Eyes too high',
-                        style: TextStyle(fontSize: 32),
-                      ),
-                    if (GlobalVariables.overlayNumber == 3 && GlobalVariables.tiltAngle >= -90)
-                      Text(
-                        'You have tilted down',
-                        style: TextStyle(fontSize: 32),
-                      ),
-                    if (GlobalVariables.overlayNumber == 3 && GlobalVariables.tiltAngle >= 90)
-                      Text(
-                        'You have tilted up',
-                        style: TextStyle(fontSize: 32),
-                      ),
                   ],
                 )),
           Positioned(
@@ -450,19 +400,19 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
   Widget _getTextForCondition () {
     switch (GlobalVariables.overlayNumber) {
       case 1:
-        return _buildStyledText('Text for Condition 1', FontWeight.bold, Colors.white, 30.0);
+        return _buildStyledText('Brightness too low!', FontWeight.bold, Colors.white, 30.0);
       case 2:
-        return _buildStyledText('Text for Condition 1', FontWeight.bold, Colors.white, 30.0);
+        return _buildStyledText('Brightness too high!', FontWeight.bold, Colors.white, 30.0);
       case 3:
-        return _buildStyledText('Text for Condition 1', FontWeight.bold, Colors.white, 30.0);
+        return _buildStyledText('No face detected', FontWeight.bold, Colors.white, 30.0);
       case 4:
-        return _buildStyledText('Text for Condition 1', FontWeight.bold, Colors.white, 30.0);
+        return _buildStyledText('Eyes too low', FontWeight.bold, Colors.white, 30.0);
       case 5:
-        return _buildStyledText('Text for Condition 1', FontWeight.bold, Colors.white, 30.0);
+        return _buildStyledText('Eyes too high', FontWeight.bold, Colors.white, 30.0);
       case 6:
-        return _buildStyledText('Text for Condition 1', FontWeight.bold, Colors.white, 30.0);
+        return _buildStyledText('You have tilted down', FontWeight.bold, Colors.white, 30.0);
       case 7:
-        return _buildStyledText('Text for Condition 1', FontWeight.bold, Colors.white, 30.0);
+        return _buildStyledText('You have tilted up', FontWeight.bold, Colors.white, 30.0);
       default:
         return Text('Detection error');
     }
