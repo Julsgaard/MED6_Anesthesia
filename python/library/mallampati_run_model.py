@@ -1,7 +1,7 @@
 import torch
 from torch import nn
 from torchvision import models
-from library.mallampati_image_prep import prepare_test_data
+from library.mallampati_image_prep import prepare_loader
 
 
 def load_model_and_predict():
@@ -12,20 +12,25 @@ def load_model_and_predict():
     print(f"Device: {device}")
 
     # Load the pre-trained model
-    model = models.resnet34()
+    model = models.resnet101(weights='ResNet101_Weights.DEFAULT')
     num_features = model.fc.in_features
     print(f"Number of features: {num_features}")
-    model.fc = nn.Linear(num_features, num_classes)
-    model.load_state_dict(torch.load('mallampati_models/best_model_ResNet34_98%_25_epochs_2_classes.pth',
-                                     map_location=device))
+    model.fc = nn.Sequential(
+        nn.Linear(num_features, 512),
+        nn.ReLU(),
+        nn.Dropout(0.5),
+        nn.Linear(512, num_classes)
+    )
+    model.load_state_dict(torch.load('mallampati_models/ResNet models/97.33%_15_epochs/model.pth'))
 
-    # model.to(device)
+    # Move the model to the device
+    model.to(device)
 
     # Set the model to evaluation mode
     model.eval()
 
     # Gather and prepare the data
-    test_loader = prepare_test_data()
+    test_loader = prepare_loader(path='mallampati_datasets/test_data(ManualSplit)')
 
     # Initialize the confusion matrix
     confusion_matrix = torch.zeros(num_classes, num_classes)

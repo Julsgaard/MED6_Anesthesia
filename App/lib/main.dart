@@ -18,6 +18,7 @@ class GlobalVariables {
   static double tiltAngle = 0.0;
   static int luxValue = 0;
   static int eyeLevel = 0;
+  static int overlayNumber = 0;
 }
 
 

@@ -18,7 +18,7 @@ class CameraServices {
   static BrightnessController? _brightnessController;
 
 
-  static Future<void> streamCameraFootage(CameraController controller, StateManager stateManager, {int frameIntervalMs = 50}) async {
+  static Future<void> streamCameraFootage(CameraController controller, StateManager stateManager, {int frameIntervalMs = 250}) async {
     // 50 corresponds to approximately 20 frames per second, test other values as needed
 
     if (isStreaming) {
@@ -71,6 +71,7 @@ class CameraServices {
 
     static void sendTiltAngleOverTCP(double tiltAngle, NetworkClient networkClient) {
       // Convert to integer for sending over TCP
+      //print('Tiltangle : ${GlobalVariables.tiltAngle}');
       int tiltAngleInt = tiltAngle.toInt();
 
       // Use ByteData for the conversion to bytes

@@ -5,7 +5,6 @@ import threading
 import numpy as np
 import torch
 
-
 # Directory where images from the phone will be saved
 logs_folder = 'logs'
 
@@ -54,9 +53,23 @@ def display_images(display_image_queue):
         if isinstance(current_image, str):
             # Read the image from the provided path
             image = cv.imread(current_image)
+
         elif isinstance(current_image, np.ndarray):
             # current_image is an actual image
             image = current_image
+
+        elif torch.is_tensor(current_image):
+            image = current_image.numpy().transpose((1, 2, 0))
+
+            # Reverse the normalization
+            # mean = np.array([0.485, 0.456, 0.406])
+            # std = np.array([0.229, 0.224, 0.225])
+            # image = image * std + mean  # First reverse the normalization
+            # image = np.clip(image, 0, 1)  # Then clip to the range [0, 1]
+
+            # Convert it to [0, 255] for display
+            # image = (image * 255).astype(np.uint8)
+
         else:
             print("Invalid image or image path provided.")
             continue
@@ -73,7 +86,7 @@ def display_images(display_image_queue):
 
 
 # Function to display the predicted images
-def imshow_cv(inp, title=None):
+def imshow_cv(inp):
     if isinstance(inp, torch.Tensor):
         inp = inp.numpy().transpose((1, 2, 0))
 
@@ -87,21 +100,19 @@ def imshow_cv(inp, title=None):
     inp = (inp * 255).astype(np.uint8)
 
     # Display the image
-    cv.imshow(title if title else 'Image', inp)
+    cv.imshow('Image', inp)
     cv.waitKey(0)  # Wait for a key press to proceed
     cv.destroyAllWindows()  # Close the window after key press
 
 
 def find_state_for_image_path(image_path):
-    #print(f"Image path: {image_path}")  # Debugging line
+    #print(f"Image path: {image_path}")
 
-    # Extract the base directory or folder name from the image path
+    # Get the base directory of the image path
     base_directory = os.path.basename(os.path.dirname(image_path))
+    # print(f"Base directory: {base_directory}")
 
-    # print(f"Base directory: {base_directory}")  # Debugging line
-
-
-    # Define actions based on directory names
+    # Return the state based on the base directory
     if base_directory.lower() == 'mallampati':
         return "Mallampati"
     elif base_directory.lower() == 'mouth opening':
@@ -111,3 +122,12 @@ def find_state_for_image_path(image_path):
     else:
         return "Unknown category"
 
+
+def save_prediction_to_file(image_path, prediction):
+    # Extract the session path from the image path
+    session_path = os.path.dirname(image_path)
+
+    # Create a new file in the session directory with the prediction
+    with open(f"{session_path}/1. predictions.txt", 'a') as file:
+        file.write(f"{os.path.basename(image_path)}: {prediction}\n")
+        # print(f"Prediction saved to {session_path}/1. predictions.txt")

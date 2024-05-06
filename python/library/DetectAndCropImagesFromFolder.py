@@ -64,37 +64,21 @@ def crop_mouth_region(frame, landmarks):
 
 
 def detect_faces_and_landmarks(image_path, face_mesh):
-    """
-    Detects faces and landmarks in an image.
-    """
     frame = cv2.imread(image_path)
     if frame is None:
         print(f"Failed to load image from {image_path}")
-        return None, None
+        return None, False
 
-    # Convert the BGR image to RGB.
     image_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-
-    # Process the image and find faces and their landmarks.
     results = face_mesh.process(image_rgb)
-
-    # Check if any faces were found
     if not results.multi_face_landmarks:
         print("No faces detected.")
-        return frame, None
+        return frame, False  # Return frame and False indicating no faces detected
 
-    # Draw face landmarks for specific indices and crop the mouth region
-    for face_landmarks in results.multi_face_landmarks:
-        for idx, landmark in enumerate(face_landmarks.landmark):
-            if idx in inner_lip_indices:
-                x = int(landmark.x * frame.shape[1])
-                y = int(landmark.y * frame.shape[0])
-                cv2.circle(frame, (x, y), 1, (0, 255, 0), -1)
-        # Crop the mouth region from the frame
-        cropped_mouth = crop_mouth_region(frame, face_landmarks.landmark)
-        return cropped_mouth, face_landmarks.landmark  # Return the cropped mouth region
-
-    return frame, None
+    # Assuming you process the first face found
+    face_landmarks = results.multi_face_landmarks[0]
+    cropped_mouth = crop_mouth_region(frame, face_landmarks.landmark)
+    return cropped_mouth, True  # Return cropped mouth and True indicating face(s) detected
 
 def initialize_mediapipe_face_mesh():
     """
@@ -106,25 +90,27 @@ def initialize_mediapipe_face_mesh():
 
 if __name__ == "__main__":
     face_mesh = initialize_mediapipe_face_mesh()
-    image_folder_path = 'MallampatiTrainingData'  # Path to your folder containing images
-    save_folder_path = 'Cropped_images'  # Path to the folder where cropped images will be saved
+    image_folder_path = 'UncroppedImages'
+    save_folder_path = 'CroppedImages'
+    no_faces_folder_path = 'NoFaceImages'  # Folder for images where no faces are detected
 
-    # Create the save folder if it doesn't exist
     if not os.path.exists(save_folder_path):
         os.makedirs(save_folder_path)
+    if not os.path.exists(no_faces_folder_path):
+        os.makedirs(no_faces_folder_path)
 
     for filename in os.listdir(image_folder_path):
-        image_path = os.path.join(image_folder_path, filename)
-        # Check if the file is an image
-        if image_path.lower().endswith(('.png', '.jpg', '.jpeg')):
-            cropped_frame, _ = detect_faces_and_landmarks(image_path, face_mesh)
-            if cropped_frame is not None:
-                # Construct the path for saving the cropped image
+        if filename.lower().endswith(('.png', '.jpg', '.jpeg')):
+            image_path = os.path.join(image_folder_path, filename)
+            cropped_frame, faces_detected = detect_faces_and_landmarks(image_path, face_mesh)
+            if faces_detected:
                 save_path = os.path.join(save_folder_path, 'cropped_' + filename)
-                # Save the cropped image
                 cv2.imwrite(save_path, cropped_frame)
                 print(f"Cropped image saved to {save_path}")
+            else:
+                no_face_save_path = os.path.join(no_faces_folder_path, filename)
+                cv2.imwrite(no_face_save_path, cropped_frame)
+                print(f"Image with no faces saved to {no_face_save_path}")
 
-    # Cleanup
     cv2.destroyAllWindows()
     face_mesh.close()

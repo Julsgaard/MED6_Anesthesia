@@ -50,6 +50,24 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
       setState(() {
         GlobalVariables.tiltAngle = math.atan2(event.y, event.z) * 180 / math.pi;
       });
+      if (GlobalVariables.luxValue <= 0) {
+        GlobalVariables.overlayNumber = 1;
+      } else if (GlobalVariables.luxValue >= 150) {
+        GlobalVariables.overlayNumber = 2;
+      } else if (GlobalVariables.eyeLevel == 0) {
+        GlobalVariables.overlayNumber = 3;
+      } else if (GlobalVariables.eyeLevel == 2) {
+        GlobalVariables.overlayNumber = 4;
+      } else if (GlobalVariables.eyeLevel == 3) {
+        GlobalVariables.overlayNumber = 5;
+      } else if (GlobalVariables.tiltAngle < 80) {
+        GlobalVariables.overlayNumber = 6;
+      } else if (GlobalVariables.tiltAngle > 100) {
+        GlobalVariables.overlayNumber = 7;
+      } else {
+        // Default case if no other condition is met
+        GlobalVariables.overlayNumber = 0;
+      }
     });
 
     WidgetsBinding.instance.addObserver(this);
@@ -156,7 +174,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
     double buttonWidth = (mWidth/4);
     double buttonHeight = (mHeight/16);
 
-    double mouthOverlayScale = 0.5; //Juster den her for at gøre mouthoverlay større/mindre, skal være mellem 0-1 (Tror enten den skal være 0.4 eller 0.5)
+    double mouthOverlayScale = 0.3; //Juster den her for at gøre mouthoverlay større/mindre, skal være mellem 0-1 (Tror enten den skal være 0.4 eller 0.5)
 
     return Material(
 
@@ -221,18 +239,19 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
                             child: CameraPreview(_controller),
                           ),
                         ),
-                         Positioned.fill( //THIS WHERE THE MOUTH IMAGE IS PLACED
-                           child: Transform.translate(
-                             offset: Offset(0, 30), // Adjust the 100 to move it further down or less
-                             child: Transform.scale(
-                               scale: mouthOverlayScale,
-                               child: Image.asset(
-                                 'assets/mallampatti_1.png',
-                                 fit: BoxFit.contain,
-                               ),
-                             ),
-                           ),
-                         ),
+                        if (stateManager.currentState == States.mallampati)
+                          Positioned.fill( //THIS WHERE THE MOUTH IMAGE IS PLACED
+                            child: Transform.translate(
+                              offset: Offset(0, 30), // Adjust the 100 to move it further down or less
+                              child: Transform.scale(
+                                scale: mouthOverlayScale,
+                                child: Image.asset(
+                                  'assets/mallampatti_1.png',
+                                  fit: BoxFit.contain,
+                                ),
+                              ),
+                            ),
+                          ),
                       ],
                     );
                   } else {
@@ -242,6 +261,29 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
               ),
             ),
           ),
+          if (GlobalVariables.overlayNumber > 0)
+            Align(
+                alignment: Alignment.center,
+                child: Padding(
+                  padding: EdgeInsets.only(top: 500), // Sets the top offset
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Container(
+                          padding: EdgeInsets.all(16.0),
+                          decoration: BoxDecoration(
+                            color: Colors.blue.withOpacity(0.5), // Adjust the opacity as needed
+                            borderRadius: BorderRadius.circular(5.0),
+                            border: Border.all(
+                              color: Colors.black, // Border color
+                              width: 2.0, // Optional: adds rounded corners
+                          ),
+                        ),
+                      child: _getTextForCondition(),
+                    ),
+                  ],
+                )),
+            ),
           Positioned(
             right: buttonPosW,
             top: mHeight- buttonPosH,
@@ -331,6 +373,37 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
 
         ]
       )
+    );
+  }
+
+  Widget _getTextForCondition () {
+    switch (GlobalVariables.overlayNumber) {
+      case 1:
+        return _buildStyledText('Brightness too low!', FontWeight.bold, Colors.white, 30.0);
+      case 2:
+        return _buildStyledText('Brightness too high!', FontWeight.bold, Colors.white, 30.0);
+      case 3:
+        return _buildStyledText('No face detected', FontWeight.bold, Colors.white, 30.0);
+      case 4:
+        return _buildStyledText('Eyes too low', FontWeight.bold, Colors.white, 30.0);
+      case 5:
+        return _buildStyledText('Eyes too high', FontWeight.bold, Colors.white, 30.0);
+      case 6:
+        return _buildStyledText('You have tilted down', FontWeight.bold, Colors.white, 30.0);
+      case 7:
+        return _buildStyledText('You have tilted up', FontWeight.bold, Colors.white, 30.0);
+      default:
+        return Text('Detection error');
+    }
+  }
+
+  Widget _buildStyledText(String text, FontWeight fontWeight, Color color, double textSize) {
+    return Text(
+      text,
+      style: TextStyle(
+        fontWeight: fontWeight,
+        color: color,
+      ),
     );
   }
 }
