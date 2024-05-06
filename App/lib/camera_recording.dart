@@ -48,6 +48,50 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
       setState(() {
         GlobalVariables.tiltAngle = math.atan2(event.y, event.z) * 180 / math.pi;
       });
+      if (GlobalVariables.luxValue <= 0 && GlobalVariables.overlayNumber == 0)
+      {
+        GlobalVariables.overlayNumber = 1;
+      }
+      if (GlobalVariables.luxValue >= 150 && GlobalVariables.overlayNumber == 0)
+      {
+        GlobalVariables.overlayNumber = 2;
+      }
+      if (GlobalVariables.luxValue >= 0 && GlobalVariables.luxValue <= 150 && GlobalVariables.overlayNumber == 1 || GlobalVariables.overlayNumber == 2)
+      {
+        GlobalVariables.overlayNumber = 0;
+      }
+      if (GlobalVariables.eyeLevel == 0 && GlobalVariables.overlayNumber == 0)
+      {
+        GlobalVariables.overlayNumber = 3;
+      }
+      if (GlobalVariables.eyeLevel == 2 && GlobalVariables.overlayNumber == 0)
+      {
+        GlobalVariables.overlayNumber = 4;
+      }
+      if (GlobalVariables.eyeLevel == 3  && GlobalVariables.overlayNumber == 0)
+      {
+        GlobalVariables.overlayNumber = 5;
+      }
+      if (GlobalVariables.eyeLevel == 1 && GlobalVariables.overlayNumber == 3 ||GlobalVariables.overlayNumber == 4||GlobalVariables.overlayNumber == 5)
+      {
+        GlobalVariables.overlayNumber = 0;
+      }
+      if (GlobalVariables.tiltAngle >= -90 && GlobalVariables.overlayNumber == 0)
+      {
+        GlobalVariables.overlayNumber = 6;
+      }
+      if (GlobalVariables.tiltAngle >= 90 && GlobalVariables.overlayNumber == 0)
+      {
+        GlobalVariables.overlayNumber = 7;
+      }
+      if (GlobalVariables.tiltAngle <= -90 && GlobalVariables.tiltAngle <= 90 && GlobalVariables.overlayNumber == 6 || GlobalVariables.overlayNumber == 7)
+      {
+        GlobalVariables.overlayNumber = 0;
+      }
+      if (GlobalVariables.luxValue >= 0 && GlobalVariables.luxValue <= 150 && GlobalVariables.eyeLevel == 1 && GlobalVariables.tiltAngle <= -90 && GlobalVariables.tiltAngle <= 90)
+        {
+          GlobalVariables.overlayNumber = 0;
+        }
     });
 
     WidgetsBinding.instance.addObserver(this);
@@ -240,6 +284,77 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
               ),
             ),
           ),
+          if (GlobalVariables.overlayNumber > 0)
+            Positioned(
+                right: 75,
+                top: 165,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Container(
+                        padding: EdgeInsets.all(16.0),
+                        decoration: BoxDecoration(
+                          color: Colors.blue.withOpacity(0.5), // Adjust the opacity as needed
+                          borderRadius: BorderRadius.circular(5.0),
+                          border: Border.all(
+                            color: Colors.black, // Border color
+                            width: 2.0, // Optional: adds rounded corners
+                          ),
+                        ),
+                      child: _getTextForCondition(),
+                    ),
+                    if (GlobalVariables.overlayNumber == 1 && GlobalVariables.luxValue >= 0)
+                      Text(
+                        'Brightness too low!',
+                        style: TextStyle(fontSize: 30.0),
+                      ),
+                    if (GlobalVariables.overlayNumber == 1 && GlobalVariables.luxValue >= 150)
+                      Text(
+                        'Brighttness too high!',
+                        style: TextStyle(fontSize: 30.0),
+                      ),
+                    if (GlobalVariables.overlayNumber == 2 && GlobalVariables.eyeLevel == 0)
+                      Container(
+                        padding: EdgeInsets.all(16.0),
+                        decoration: BoxDecoration(
+                          color: Colors.blue.withOpacity(0.5), // Adjust the opacity as needed
+                          borderRadius: BorderRadius.circular(5.0),
+                          border: Border.all(
+                            color: Colors.black, // Border color
+                            width: 2.0, // Optional: adds rounded corners
+                          ),
+                        ),
+                        child: Text(
+                            'No face deteced!',
+                            style: TextStyle(
+                              fontSize: 30.0,
+                              color: Colors.white,
+                            )
+                        ),
+                      ),
+
+                    if (GlobalVariables.overlayNumber == 2 && GlobalVariables.eyeLevel == 2)
+                      Text(
+                        'Eyes too low',
+                        style: TextStyle(fontSize: 32),
+                      ),
+                    if (GlobalVariables.overlayNumber == 2 && GlobalVariables.eyeLevel == 3)
+                      Text(
+                        'Eyes too high',
+                        style: TextStyle(fontSize: 32),
+                      ),
+                    if (GlobalVariables.overlayNumber == 3 && GlobalVariables.tiltAngle >= -90)
+                      Text(
+                        'You have tilted down',
+                        style: TextStyle(fontSize: 32),
+                      ),
+                    if (GlobalVariables.overlayNumber == 3 && GlobalVariables.tiltAngle >= 90)
+                      Text(
+                        'You have tilted up',
+                        style: TextStyle(fontSize: 32),
+                      ),
+                  ],
+                )),
           Positioned(
             right: buttonPosW,
             top: mHeight- buttonPosH,
@@ -329,6 +444,37 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
 
         ]
       )
+    );
+  }
+
+  Widget _getTextForCondition () {
+    switch (GlobalVariables.overlayNumber) {
+      case 1:
+        return _buildStyledText('Text for Condition 1', FontWeight.bold, Colors.white, 30.0);
+      case 2:
+        return _buildStyledText('Text for Condition 1', FontWeight.bold, Colors.white, 30.0);
+      case 3:
+        return _buildStyledText('Text for Condition 1', FontWeight.bold, Colors.white, 30.0);
+      case 4:
+        return _buildStyledText('Text for Condition 1', FontWeight.bold, Colors.white, 30.0);
+      case 5:
+        return _buildStyledText('Text for Condition 1', FontWeight.bold, Colors.white, 30.0);
+      case 6:
+        return _buildStyledText('Text for Condition 1', FontWeight.bold, Colors.white, 30.0);
+      case 7:
+        return _buildStyledText('Text for Condition 1', FontWeight.bold, Colors.white, 30.0);
+      default:
+        return Text('Detection error');
+    }
+  }
+
+  Widget _buildStyledText(String text, FontWeight fontWeight, Color color, double textSize) {
+    return Text(
+      text,
+      style: TextStyle(
+        fontWeight: fontWeight,
+        color: color,
+      ),
     );
   }
 }
