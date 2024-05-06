@@ -76,11 +76,11 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
       {
         GlobalVariables.overlayNumber = 0;
       }
-      if (GlobalVariables.tiltAngle >= -90 && GlobalVariables.overlayNumber == 0)
+      if (GlobalVariables.tiltAngle > -90 && GlobalVariables.overlayNumber == 0)
       {
         GlobalVariables.overlayNumber = 6;
       }
-      if (GlobalVariables.tiltAngle >= 90 && GlobalVariables.overlayNumber == 0)
+      if (GlobalVariables.tiltAngle > 90 && GlobalVariables.overlayNumber == 0)
       {
         GlobalVariables.overlayNumber = 7;
       }
@@ -286,7 +286,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
           ),
           if (GlobalVariables.overlayNumber > 0)
             Positioned(
-                right: mWidth/2,
+                right: 100,
                 top: 180,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -397,7 +397,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
     );
   }
 
-  Widget _getTextForCondition () {
+   Widget _getTextForCondition () {
     switch (GlobalVariables.overlayNumber) {
       case 1:
         return _buildStyledText('Brightness too low!', FontWeight.bold, Colors.white, 30.0);
