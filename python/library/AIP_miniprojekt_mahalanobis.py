@@ -4,41 +4,33 @@ from torchvision import transforms, datasets
 from torch.utils.data import DataLoader
 import numpy as np
 from scipy.spatial.distance import mahalanobis
+from library.mallampati_image_prep import prepare_training_loader, prepare_validation_loader
+from library.mallampati_CNN_run_model import load_model, find_device
+
 
 # Define the Feature Extractor
 class FeatureExtractor(nn.Module):
-    def __init__(self, layers_config):
+    def __init__(self, base_model):
         super(FeatureExtractor, self).__init__()
-        self.layers = nn.ModuleList()
-        in_channels = 3  # Assuming input images are RGB
-
-        for config in layers_config:
-            if config['type'] == 'conv':
-                layer = nn.Conv2d(in_channels, config['out_channels'], kernel_size=config['kernel_size'],
-                                  padding=config['padding'])
-                in_channels = config['out_channels']
-            elif config['type'] == 'pool':
-                layer = nn.MaxPool2d(kernel_size=config['kernel_size'], stride=config['stride'])
-            elif config['type'] == 'relu':
-                layer = nn.ReLU()
-            self.layers.append(layer)
+        # Load a pre-trained ResNet and remove its final fully connected layer
+        self.features = nn.Sequential(*list(base_model.children())[:-1])
 
     def forward(self, x):
-        for layer in self.layers:
-            x = layer(x)
-        x = x.view(x.size(0), -1)  # Flatten the output for feature vector
+        x = self.features(x)  # Extract features
+        x = torch.flatten(x, 1)  # Flatten the features
         return x
 
+
 # Data loader
-def load_data(data_dir, batch_size):
-    transform = transforms.Compose([
-        transforms.Resize((64, 64)),
-        transforms.ToTensor(),
-        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-    ])
-    dataset = datasets.ImageFolder(root=data_dir, transform=transform)
-    dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
-    return dataloader
+# def load_data(data_dir, batch_size):
+#     transform = transforms.Compose([
+#         transforms.Resize((64, 64)),
+#         transforms.ToTensor(),
+#         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+#     ])
+#     dataset = datasets.ImageFolder(root=data_dir, transform=transform)
+#     dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
+#     return dataloader
 
 # Feature extraction
 def extract_features(dataloader, model):
@@ -74,17 +66,14 @@ def mahalanobis_classifier(features, labels, regularization=1e-5):
 
 # Main function
 def main():
-    train_dir = 'AIP_Data/TrainingData'
-    test_dir = 'AIP_Data/TestData'
-    batch_size = 16
-    layers_config = [
-        {'type': 'conv', 'out_channels': 16, 'kernel_size': 3, 'padding': 1},
-        {'type': 'relu'},
-        {'type': 'pool', 'kernel_size': 2, 'stride': 2},
-        {'type': 'conv', 'out_channels': 32, 'kernel_size': 3, 'padding': 1},
-        {'type': 'relu'},
-        {'type': 'pool', 'kernel_size': 2, 'stride': 2}
-    ]
+    # layers_config = [
+    #     {'type': 'conv', 'out_channels': 16, 'kernel_size': 3, 'padding': 1},
+    #     {'type': 'relu'},
+    #     {'type': 'pool', 'kernel_size': 2, 'stride': 2},
+    #     {'type': 'conv', 'out_channels': 32, 'kernel_size': 3, 'padding': 1},
+    #     {'type': 'relu'},
+    #     {'type': 'pool', 'kernel_size': 2, 'stride': 2}
+    # ]
 
     # Convolutional Layer: Extracts a wide array of features from the input image through convolution.
 
@@ -97,10 +86,18 @@ def main():
     # Often used after ReLU layer
 
     # Load and extract features
-    train_loader = load_data(train_dir, batch_size)
-    test_loader = load_data(test_dir, batch_size)
-    train_features, train_labels = extract_features(train_loader, FeatureExtractor(layers_config))
-    test_features, test_labels = extract_features(test_loader, FeatureExtractor(layers_config))
+    train_loader = prepare_training_loader(training_path='mallampati_datasets/training_data(ManualSplit)',
+                                           image_pixel_size=64, display_images=False)
+    test_loader = prepare_validation_loader(validation_path='mallampati_datasets/test_data(ManualSplit)',
+                                                  image_pixel_size=64)
+    # If you want to use the model that is created inside this script, use this code:
+    #train_features, train_labels = extract_features(train_loader, FeatureExtractor(layers_config))
+    #test_features, test_labels = extract_features(test_loader, FeatureExtractor(layers_config))
+
+    # If you want to use a pretrained model, use this code:
+    feature_extractor_model = FeatureExtractor(load_model(find_device(), 'mallampati_models/CNN models/model_mallampati_CNN_20240506_102522.pth'))
+    train_features, train_labels = extract_features(train_loader, feature_extractor_model)
+    test_features, test_labels = extract_features(test_loader, feature_extractor_model)
 
     # Train and apply classifier
     classifier = mahalanobis_classifier(train_features, train_labels, regularization=1e-5)
@@ -109,10 +106,10 @@ def main():
     print(f"Accuracy on test dataset: {accuracy * 100:.2f}%")
 
     # After extracting features
-    np.save('AIP_Feature_Data/train_features.npy', train_features.numpy())
-    np.save('AIP_Feature_Data/train_labels.npy', train_labels.numpy())
-    np.save('AIP_Feature_Data/test_features.npy', test_features.numpy())
-    np.save('AIP_Feature_Data/test_labels.npy', test_labels.numpy())
+    #np.save('AIP_Feature_Data/train_features.npy', train_features.numpy())
+    #np.save('AIP_Feature_Data/train_labels.npy', train_labels.numpy())
+    #np.save('AIP_Feature_Data/test_features.npy', test_features.numpy())
+    #np.save('AIP_Feature_Data/test_labels.npy', test_labels.numpy())
 
 if __name__ == '__main__':
     main()

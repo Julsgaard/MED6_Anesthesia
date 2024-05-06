@@ -12,7 +12,7 @@ def find_device():
     return device
 
 
-def load_model(device, model_path='mallampati_models/CNN models/model_mallampati_CNN_20240503_205354.pth'):
+def load_model(device, model_path='mallampati_models/CNN models/model_mallampati_CNN_20240506_102522.pth'):
     """Load the pre-trained model and run predictions on the test set"""
 
     # Initialize the model
@@ -66,7 +66,7 @@ if __name__ == '__main__':
     model = load_model(device)
 
     # Prepare the test data
-    test_loader = prepare_test_loader(image_pixel_size=64, path='mallampati_datasets/New Test')
+    test_loader = prepare_test_loader(image_pixel_size=64, path='mallampati_datasets/test_data(ManualSplit)')
 
     # Run predictions
     run_predictions_on_test_loader(model, test_loader, device)

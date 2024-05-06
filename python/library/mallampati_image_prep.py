@@ -10,12 +10,7 @@ from library.functions import imshow_cv
 def prepare_training_validation_and_test_loaders(image_pixel_size=224,
                                                  path='mallampati_datasets/mallampati_training_data (2 classes)',
                                                  display_images=False):
-    transform = transforms.Compose([
-        transforms.Resize(image_pixel_size),
-        transforms.CenterCrop(image_pixel_size),
-        transforms.ToTensor(),
-        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-    ])
+    transform = prepare_transform(image_pixel_size)
 
     # Load the dataset and apply the transformations
     dataset = ImageFolder(root=path, transform=transform)
@@ -170,6 +165,38 @@ def prepare_mallampati_image_for_loader(image, image_pixel_size=224):
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
     ])
     return transform(image)
+
+def prepare_data_loader(path, image_pixel_size, batch_size, shuffle, transform):
+    dataset = ImageFolder(root=path, transform=transform)
+    data_loader = DataLoader(dataset, batch_size=batch_size, shuffle=shuffle)
+    return data_loader
+
+def prepare_transform(image_pixel_size=224):
+    return transforms.Compose([
+        transforms.Resize(image_pixel_size),
+        transforms.CenterCrop(image_pixel_size),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+    ])
+
+def prepare_training_loader(training_path, image_pixel_size=224, display_images=False):
+    'Prepare training data loader when the training data already is manually split (So just provide the folder)'
+    transform = prepare_transform(image_pixel_size)
+    train_loader = prepare_data_loader(training_path, image_pixel_size, batch_size=4, shuffle=True, transform=transform)
+
+    if display_images:
+        for i, (inputs, labels) in enumerate(train_loader):
+            if i == 10:
+                break
+            imshow_cv(inputs[0])
+
+    return train_loader
+
+def prepare_validation_loader(validation_path, image_pixel_size=224):
+    'Prepare the validation data when the data already is manually split (So just provide the folder)'
+    transform = prepare_transform(image_pixel_size)
+    validation_loader = prepare_data_loader(validation_path, image_pixel_size, batch_size=4, shuffle=False, transform=transform)
+    return validation_loader
 
 
 if __name__ == "__main__":

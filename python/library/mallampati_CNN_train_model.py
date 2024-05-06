@@ -2,8 +2,11 @@ import datetime
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from library.mallampati_image_prep import prepare_training_validation_and_test_loaders, prepare_training_and_validation_loaders
+from torchvision.datasets import ImageFolder
+from torchvision import transforms
 
+from library.mallampati_image_prep import prepare_training_validation_and_test_loaders, prepare_training_and_validation_loaders, prepare_training_loader, prepare_validation_loader
+from torch.utils.data import DataLoader
 
 def initialize_model():
     """Function to initialize the model, optimizer, and loss function for training"""
@@ -28,7 +31,7 @@ def initialize_model():
     return model, optimizer, criterion
 
 
-def train_model(model, train_loader, validation_loader, criterion, optimizer, device, num_epochs=25):
+def train_model(model, train_loader, validation_loader, criterion, optimizer, device, num_epochs=15):
     """Train the model using the training and validation data loaders for a specified number of epochs."""
 
     model.to(device)  # Move the model to the GPU if available
@@ -94,8 +97,15 @@ if __name__ == '__main__':
     # Initialize model, optimizer, and loss function
     model, optimizer, criterion = initialize_model()
 
-    # Use the following line if you want to use only training and validation data
-    train_loader, validation_loader = prepare_training_and_validation_loaders(image_pixel_size=64, display_images=False, path='mallampati_datasets/New Data')
+    # Random split training and validation data
+    #train_loader, validation_loader = prepare_training_and_validation_loaders(image_pixel_size=64, display_images=False, path='mallampati_datasets/New Data')
+
+
+
+    # Manual split training and validation data
+    train_loader = prepare_training_loader(training_path='mallampati_datasets/training_data(ManualSplit)', image_pixel_size=64, display_images=False)
+    validation_loader = prepare_validation_loader(validation_path='mallampati_datasets/validation_data(ManualSplit)', image_pixel_size=64)
+
 
     # Check for GPU else use CPU
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
