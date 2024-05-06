@@ -237,18 +237,19 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
                             child: CameraPreview(_controller),
                           ),
                         ),
-                         Positioned.fill( //THIS WHERE THE MOUTH IMAGE IS PLACED
-                           child: Transform.translate(
-                             offset: Offset(0, 30), // Adjust the 100 to move it further down or less
-                             child: Transform.scale(
-                               scale: mouthOverlayScale,
-                               child: Image.asset(
-                                 'assets/mallampatti_1.png',
-                                 fit: BoxFit.contain,
-                               ),
-                             ),
-                           ),
-                         ),
+                        if (stateManager.currentState == States.mallampati)
+                          Positioned.fill( //THIS WHERE THE MOUTH IMAGE IS PLACED
+                            child: Transform.translate(
+                              offset: Offset(0, 30), // Adjust the 100 to move it further down or less
+                              child: Transform.scale(
+                                scale: mouthOverlayScale,
+                                child: Image.asset(
+                                  'assets/mallampatti_1.png',
+                                  fit: BoxFit.contain,
+                                ),
+                              ),
+                            ),
+                          ),
                       ],
                     );
                   } else {
