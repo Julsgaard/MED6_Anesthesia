@@ -52,7 +52,7 @@ def train_model(model, train_loader, validation_loader, criterion, optimizer, de
             images, labels = images.to(device), labels.to(device)  # Move images and labels to the device (GPU or CPU)
             optimizer.zero_grad()  # Zero the parameter gradients
             outputs = model(images)  # Forward pass: compute the predicted outputs by passing inputs to the model
-            loss = criterion(outputs, labels)  # Compute loss
+            loss = criterion(outputs, labels)  # Compute loss between predicted outputs and true labels
             loss.backward()  # Backward pass: compute gradient of the loss with respect to model parameters
             optimizer.step()  # Perform a single optimization step (parameter update)
 
@@ -61,8 +61,8 @@ def train_model(model, train_loader, validation_loader, criterion, optimizer, de
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
 
-        epoch_loss = running_loss / total
-        epoch_acc = correct / total
+        epoch_loss = running_loss / total  # Calculate the average loss for the epoch
+        epoch_acc = correct / total  # Calculate the accuracy for the epoch
 
         # Validation phase
         model.eval()  # Set model to evaluate mode

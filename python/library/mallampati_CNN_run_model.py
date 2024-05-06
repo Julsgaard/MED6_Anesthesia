@@ -3,7 +3,7 @@ from library.mallampati_image_prep import prepare_loader
 from library.mallampati_CNN_train_model import initialize_model, find_device
 
 
-def load_model(device, model_path='mallampati_models/CNN models/model_mallampati_CNN_20240506_155617.pth'):
+def load_model(device, model_path='mallampati_models/CNN models/model_mallampati_CNN_Best.pth'):
     """Load the pre-trained model and run predictions on the test set"""
 
     # Initialize the model

@@ -1,11 +1,9 @@
 import torch
 import torch.nn as nn
-from torchvision import transforms, datasets
-from torch.utils.data import DataLoader
 import numpy as np
 from scipy.spatial.distance import mahalanobis
 from library.mallampati_image_prep import prepare_loader
-from library.mallampati_CNN_run_model import load_model, find_device
+from library.mallampati_CNN_run_model import load_model
 
 
 # Define the Feature Extractor
@@ -33,7 +31,7 @@ class FeatureExtractor(nn.Module):
 #     return dataloader
 
 # Feature extraction
-def extract_features(dataloader, model, device=torch.device('cpu')):
+def extract_features(dataloader, model, device):
     model.to(device)  # Move the model to the GPU if available
     model.eval()
     features = []
@@ -94,10 +92,13 @@ def main():
     #train_features, train_labels = extract_features(train_loader, FeatureExtractor(layers_config))
     #test_features, test_labels = extract_features(test_loader, FeatureExtractor(layers_config))
 
+    # Set device to CPU
+    device = torch.device("cpu")
+
     # If you want to use a pretrained model, use this code:
-    feature_extractor_model = FeatureExtractor(load_model(find_device(), 'mallampati_models/CNN models/model_mallampati_CNN_20240506_155617.pth'))
-    train_features, train_labels = extract_features(train_loader, feature_extractor_model)
-    test_features, test_labels = extract_features(test_loader, feature_extractor_model)
+    feature_extractor_model = FeatureExtractor(load_model(device, 'mallampati_models/CNN models/model_mallampati_CNN_Best.pth'))
+    train_features, train_labels = extract_features(train_loader, feature_extractor_model, device)
+    test_features, test_labels = extract_features(test_loader, feature_extractor_model, device)
 
     # Train and apply classifier
     classifier = mahalanobis_classifier(train_features, train_labels, regularization=1e-5)
