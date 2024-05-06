@@ -114,7 +114,7 @@ if __name__ == '__main__':
     device = find_device()
 
     # Train the model
-    trained_model = train_model(model, train_loader, validation_loader, criterion, optimizer, device, num_epochs=20)
+    trained_model = train_model(model, train_loader, validation_loader, criterion, optimizer, device, num_epochs=15)
 
     # Save the model
     save_model(trained_model)

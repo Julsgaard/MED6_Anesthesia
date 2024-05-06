@@ -95,7 +95,7 @@ def main():
     #test_features, test_labels = extract_features(test_loader, FeatureExtractor(layers_config))
 
     # If you want to use a pretrained model, use this code:
-    feature_extractor_model = FeatureExtractor(load_model(find_device(), 'mallampati_models/CNN models/model_mallampati_CNN_20240506_151656.pth'))
+    feature_extractor_model = FeatureExtractor(load_model(find_device(), 'mallampati_models/CNN models/model_mallampati_CNN_20240506_155617.pth'))
     train_features, train_labels = extract_features(train_loader, feature_extractor_model)
     test_features, test_labels = extract_features(test_loader, feature_extractor_model)
 

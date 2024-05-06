@@ -160,7 +160,8 @@ cython_debug/
 /library/received_images
 /received_images
 /logs
-/library/mallampati_models
+/library/mallampati_models/CNN models
+/library/mallampati_models/ResNet models
 /library/AIP_Data
 /library/AIP_Model
 /library/AIP_Feature_Data
