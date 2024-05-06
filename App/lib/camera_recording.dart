@@ -48,11 +48,11 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
       setState(() {
         GlobalVariables.tiltAngle = math.atan2(event.y, event.z) * 180 / math.pi;
       });
-      if (GlobalVariables.luxValue <= 0 && GlobalVariables.overlayNumber == 0)
+      if (GlobalVariables.luxValue < 0 && GlobalVariables.overlayNumber == 0)
       {
         GlobalVariables.overlayNumber = 1;
       }
-      if (GlobalVariables.luxValue >= 150 && GlobalVariables.overlayNumber == 0)
+      if (GlobalVariables.luxValue > 150 && GlobalVariables.overlayNumber == 0)
       {
         GlobalVariables.overlayNumber = 2;
       }
