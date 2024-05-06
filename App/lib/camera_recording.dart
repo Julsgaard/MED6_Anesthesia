@@ -58,9 +58,9 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
         GlobalVariables.overlayNumber = 4;
       } else if (GlobalVariables.eyeLevel == 3) {
         GlobalVariables.overlayNumber = 5;
-      } else if (GlobalVariables.tiltAngle < -90) {
+      } else if (GlobalVariables.tiltAngle < 80) {
         GlobalVariables.overlayNumber = 6;
-      } else if (GlobalVariables.tiltAngle > 90) {
+      } else if (GlobalVariables.tiltAngle > 100) {
         GlobalVariables.overlayNumber = 7;
       } else {
         // Default case if no other condition is met
