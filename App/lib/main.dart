@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:camera/camera.dart';
+import 'package:dart/state_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_3d_controller/flutter_3d_controller.dart';
 import 'package:sensors/sensors.dart';
@@ -19,6 +20,7 @@ class GlobalVariables {
   static int luxValue = 0;
   static int eyeLevel = 0;
   static int overlayNumber = 0;
+  static StateManager stateManager = StateManager();
 }
 
 

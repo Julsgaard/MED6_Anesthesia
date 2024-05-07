@@ -81,7 +81,7 @@ flutter:
     - assets/mouth_overlay.png
     - assets/mouth_overlay2.png
     - assets/mallampatti_1.png
-    - assets/business_man.glb
+    - assets/AppAvatar.glb
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

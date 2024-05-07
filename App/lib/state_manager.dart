@@ -1,26 +1,40 @@
 import 'dart:ui';
 
+import 'package:flutter/cupertino.dart';
+
 enum States {
-  mouthOpening,
-  mallampati,
-  neckMovement
+  blinking,
+  mouthOpeningExercise,
+  mouthOpeningIntro,
+  mallampatiExercise,
+  mallampatiIntro,
+  neckMovementExercise,
+  neckMovementIntro,
+  intro,
+  thanks,
+  oopsEyeHeight,
+  oopsFaceParallel,
+
   // ThyromentalDistance,
   // AbilityToPrognath
 }
 
+
 class StateManager {
-  States _currentState = States.mouthOpening; // Initial state set to MouthOpening
+  States _currentState = States.mouthOpeningIntro; // Initial state set to MouthOpening
   List<VoidCallback> _listeners = []; // Listeners to notify upon state change
 
   States get currentState => _currentState; // Getter for the current state
 
   void addListener(VoidCallback listener) {
     _listeners.add(listener); // Method to add a listener
+    print(_listeners);
   }
 
   void notifyListeners() {
-    for (var listener in _listeners) {
-      listener(); // Notify all listeners of a state change
+    print("I NOTIFY LISTENERS");
+    for (var listener in _listeners) { // Notify all listeners of a state change
+        listener();
     }
   }
 
@@ -29,7 +43,7 @@ class StateManager {
     notifyListeners(); // Notify all listeners about the state change
   }
 
-  void removeListener(void Function() onStateChanged) {
-    _listeners.remove(onStateChanged); // Method to remove a listener
+  void removeListener(VoidCallback listener) {
+    _listeners.remove(listener); // Method to remove a listener
   }
 }

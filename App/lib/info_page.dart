@@ -1,13 +1,16 @@
 import 'package:camera/camera.dart';
+import 'package:dart/main.dart';
 import 'package:dart/settings_page.dart';
+import 'package:dart/state_manager.dart';
 import "package:flutter/material.dart";
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_3d_controller/flutter_3d_controller.dart';
 import 'camera_recording.dart';
 import 'package:dart/Assets/circle.dart';
 import 'package:dart/Input_page.dart';
 
-class InfoPage extends StatelessWidget {
+class InfoPage extends StatefulWidget {
   final CameraDescription camera;
   final String infoText;
   final Flutter3DController animationController;
@@ -17,11 +20,22 @@ class InfoPage extends StatelessWidget {
     required this.infoText,
     required this.animationController,
   });
+  @override
+  InfoStage createState() => InfoStage();
+}
+
+class InfoStage extends State<InfoPage>{
+  @override
+  void initState() {
+    super.initState();
+
+
+  }
 
 
   @override
   Widget build(BuildContext context) {
-
+    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {GlobalVariables.stateManager.changeState(States.intro);});
     double mWidth= MediaQuery.of(context).size.width;
     double mHeight= MediaQuery.of(context).size.height;
     double circleHeight = (mHeight/5)*2;
@@ -37,7 +51,7 @@ class InfoPage extends StatelessWidget {
         decoration: const BoxDecoration(color: Color(0xFFEBEEF3)),
         child: Stack(
           children: [
-            Circle(mWidth: mWidth, circleHeight: circleHeight, animationController: animationController),
+            Circle(mWidth: mWidth, circleHeight: circleHeight, animationController: widget.animationController),
             Positioned(
               left: (mWidth/8),
               top: circleHeight/2 + 20,
@@ -45,7 +59,7 @@ class InfoPage extends StatelessWidget {
                 width: textWidth,
                 height: textHeight,
                 child: AutoSizeText(
-                  infoText,
+                  widget.infoText,
                   overflow: TextOverflow.fade,
                   softWrap: true,
                   minFontSize: 20,
@@ -83,7 +97,7 @@ class InfoPage extends StatelessWidget {
                   Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(builder: (context) => InputPage(
-                          camera: camera, animationController: animationController,))
+                          camera: widget.camera, animationController: widget.animationController,))
                   );
                 },
               ),

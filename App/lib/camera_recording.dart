@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_3d_controller/flutter_3d_controller.dart';
 import 'camera_services_TCP.dart';
 import 'package:sensors/sensors.dart';
@@ -34,7 +35,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
   late Timer _timer;
   int _secondsRemaining = 10; // Initial value
   OverlayEntry? overlayEntry;
-  final StateManager stateManager = StateManager();
+  final StateManager stateManager = GlobalVariables.stateManager;
 
   @override
   void initState() {
@@ -128,15 +129,15 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
 
       //TODO: Start countdown after avatar animation or button press
 
-      if (stateManager.currentState == States.mouthOpening) {
+      if (stateManager.currentState == States.mouthOpeningIntro) {
         startTimer(10);
         developer.log('Mouth opening state');
 
-      } else if (stateManager.currentState == States.mallampati) {
+      } else if (stateManager.currentState == States.mallampatiIntro) {
         startTimer(5);
         developer.log('Mallampati state');
 
-      } else if (stateManager.currentState == States.neckMovement) {
+      } else if (stateManager.currentState == States.neckMovementIntro) {
         startTimer(20);
         developer.log('Neck movement state');
 
@@ -164,6 +165,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
 
   @override
   Widget build(BuildContext context) {
+    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {GlobalVariables.stateManager.changeState(States.mouthOpeningIntro);});
     double mWidth= MediaQuery.of(context).size.width;
     double mHeight= MediaQuery.of(context).size.height;
     double circleHeight = (mHeight/5)*2;
@@ -239,7 +241,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
                             child: CameraPreview(_controller),
                           ),
                         ),
-                        if (stateManager.currentState == States.mallampati)
+                        if (stateManager.currentState == States.mallampatiIntro)
                           Positioned.fill( //THIS WHERE THE MOUTH IMAGE IS PLACED
                             child: Transform.translate(
                               offset: Offset(0, 30), // Adjust the 100 to move it further down or less
@@ -366,7 +368,6 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
                 ),
               ),
               onPressed: (){
-                widget.animationController.playAnimation();
               },
             ),
           ),
