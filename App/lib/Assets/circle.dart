@@ -55,7 +55,7 @@ class CircleState extends State<Circle> with WidgetsBindingObserver{
   final StateManager stateManager = GlobalVariables.stateManager;
 
 
-  Future<void> playAnimation() async{
+  Future<void> UpdateAvatarAnimations() async{
     //print("I RUN ISOLATE");
     //await compute(waitForAnimations, widget.animationController);
     final perTimer = Timer.periodic(Duration(milliseconds: 100), (timer) async {
@@ -84,13 +84,13 @@ class CircleState extends State<Circle> with WidgetsBindingObserver{
   @override
   void initState() {
     super.initState();
-    stateManager.addListener(playAnimation);
+    stateManager.addListener(UpdateAvatarAnimations);
   }
   @override
   void dispose() {
     super.dispose();
     //CameraServices.isStreaming = false; // Ensure the stream is turned off when the widget is disposed
-    stateManager.removeListener(playAnimation);
+    stateManager.removeListener(UpdateAvatarAnimations);
   }
 
   @override
