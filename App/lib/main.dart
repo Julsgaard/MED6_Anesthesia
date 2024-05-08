@@ -21,6 +21,7 @@ class GlobalVariables {
   static int eyeLevel = 0;
   static int overlayNumber = 0;
   static StateManager stateManager = StateManager();
+  static bool showState = true;
 }
 
 

@@ -1,16 +1,16 @@
 import 'dart:ui';
-
+import 'dart:developer' as developer; // Import for logging
 import 'package:flutter/cupertino.dart';
 
 enum States {
   blinking,
-  mouthOpeningExercise,
-  mouthOpeningIntro,
-  mallampatiExercise,
-  mallampatiIntro,
-  neckMovementExercise,
-  neckMovementIntro,
   intro,
+  mouthOpeningIntro,
+  mouthOpeningExercise,
+  mallampatiIntro,
+  mallampatiExercise,
+  neckMovementIntro,
+  neckMovementExercise,
   thanks,
   oopsEyeHeight,
   oopsFaceParallel,
@@ -38,22 +38,25 @@ class StateManager {
   }
 
   void notifyListeners() {
-    print("I NOTIFY LISTENERS");
+    //print("I NOTIFY LISTENERS");
     for (var listener in _listeners) { // Notify all listeners of a state change
         listener();
     }
   }
 
   void changeState(States newState) {
-    print("Changing current state to $newState while old state was $_previousState");
+    if (_currentState == newState) return; // If the requested state is the same as the current state, do nothing
+    developer.log("Changing current state to $newState while old state was $_previousState");
     // If the current state is not error state, change the state to the requested state and save the previous state
-    if (_currentState.index !>= 9) { // XD !>=
+    if (_currentState.index < 9) {
+      developer.log("UNDER 9??");
       _previousState = _currentState;
       _currentState = newState;
     }
 
     // If the current state is error state, ignore whatever state change is requested and change to previous state (IDK BUT THIS WORKS)
     else if (_currentState.index >= 9) {
+      developer.log("OVER 9??");
       _currentState = _previousState;
     }
     notifyListeners(); // Notify all listeners about the state change

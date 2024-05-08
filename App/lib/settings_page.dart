@@ -13,6 +13,7 @@ class _SettingsPageState extends State<SettingsPage> {
   final TextEditingController _portController = TextEditingController();
   String _currentIP = '';
   int _currentPort = 0;
+  bool _showState = GlobalVariables.showState; // Use a local copy for the widget
 
   @override
   void initState() {
@@ -24,27 +25,32 @@ class _SettingsPageState extends State<SettingsPage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? ipAddress = prefs.getString('ipAddress');
     int? port = prefs.getInt('port');
+    bool? showState = prefs.getBool('showState') ?? GlobalVariables.showState; // Retrieve or use default
     if (ipAddress != null) {
       setState(() {
         _currentIP = ipAddress;
         _ipController.text = ipAddress;
+        _showState = showState;
       });
     }
     else {
       setState(() {
         _currentIP = GlobalVariables.ipAddress;
+        _showState = showState;
       });
     }
     if (port != null) {
       setState(() {
         _currentPort = port;
         _portController.text = port.toString();
+        _showState = showState;
       });
     }
     else {
       setState(() {
         _currentPort = GlobalVariables.port; // Default port
         _portController.text = GlobalVariables.port.toString(); // Default port as a string
+        _showState = showState;
       });
     }
   }
@@ -53,6 +59,7 @@ class _SettingsPageState extends State<SettingsPage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('ipAddress', _ipController.text);
     await prefs.setInt('port', int.parse(_portController.text));
+    await prefs.setBool('showState', _showState); // Save the state of showState
 
     // Update the current IP and port state variables
     setState(() {
@@ -63,6 +70,7 @@ class _SettingsPageState extends State<SettingsPage> {
     // Update the global IP address and port
     GlobalVariables.ipAddress = _ipController.text;
     GlobalVariables.port = int.parse(_portController.text);
+    GlobalVariables.showState = _showState;
 
     // Close the existing connection
     NetworkClient().closeConnection();
@@ -102,6 +110,15 @@ class _SettingsPageState extends State<SettingsPage> {
             ElevatedButton(
               child: Text('Save'),
               onPressed: _saveSettings,
+            ),
+            SwitchListTile(
+              title: Text('Show Current State'),
+              value: _showState,
+              onChanged: (bool value) {
+                setState(() {
+                  _showState = value;
+                });
+              },
             ),
             ValueListenableBuilder<bool>(
               valueListenable: NetworkClient().connectionStatus,

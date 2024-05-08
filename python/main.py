@@ -29,7 +29,7 @@ if __name__ == '__main__':
 
     # Find the device and load the model for the AI model
     device = mallampati_CNN_run_model.find_device()
-    model = mallampati_CNN_run_model.load_model(device, model_path='library/mallampati_models/model_mallampati_CNN_Best.pth')
+    model = mallampati_CNN_run_model.load_model(device, model_path='library/mallampati_models/CNN Models/model_mallampati_CNN_20240506_102522.pth')
 
     while True:
         # Get the image path from the server image queue
@@ -47,10 +47,11 @@ if __name__ == '__main__':
         eye_level = eye_detect.detect_faces_and_landmarks(image_path, face_mesh_model)
         eye_level_queue.put(eye_level)  # Put the eye level into the queue
 
+
         # Check the state and run the appropriate functions
         if state == 'Mouth Opening':
             # Display the image
-            display_image_queue.put(frame)
+
 
             if face_landmarks:
                 # Calculate mouth opening ratio
@@ -113,16 +114,16 @@ if __name__ == '__main__':
 
         elif state == 'Error State':
 
+            display_image_queue.put(frame)
+
             # Reset default lip distance value
-            MouthOpeningRatio.default_lip_distance = None
-            MouthOpeningRatio.distances = None
+            #MouthOpeningRatio.default_lip_distance = None
+            #MouthOpeningRatio.distances = None
 
             # Reset mallampati predictions
-            predictions = []
+            #predictions = []
 
             # Reset default tracker value
-            Tracker.default_chin_nose_distance = None
+            #Tracker.default_chin_nose_distance = None
+            print("TEMP ERROR HAHAHA")
 
-
-        else:
-            print("Invalid state")

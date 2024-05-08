@@ -26,63 +26,80 @@ class Circle extends StatefulWidget {
   CircleState createState() => CircleState();
 
   final Map<States,String> animationList= {
-    States.mouthOpeningExercise: "MouthOpeningExercise",
-    States.mouthOpeningIntro: "MouthOpeningIntro",
-    States.mallampatiExercise: "MallampatiExercise",
-    States.mallampatiIntro: "MallampatiIntro",
-    States.neckMovementExercise: "HeadTiltExercise",
-    States.neckMovementIntro: "NeckMovementIntro",
     States.intro: "Intro",
+    States.mouthOpeningIntro: "MouthOpeningIntro",
+    States.mouthOpeningExercise: "MouthOpeningExercise",
+    States.mallampatiIntro: "MallampatiIntro",
+    States.mallampatiExercise: "MallampatiExercise",
+    States.neckMovementIntro: "NeckMovementIntro",
+    States.neckMovementExercise: "HeadTiltExercise",
     States.thanks: "Final",
     States.oopsEyeHeight: "OopsEyeHeight",
     States.oopsFaceParallel: "OopsFaceParallel",
+    States.oopsNoFace: "OopsNoFaceDetected",
+    States.oopsBrightness: "OopsBrightness",
     States.blinking: "Blinking",
   };
   final Map<String,int> animationLength = {
-    "MouthOpeningExercise": 11459,
-    "MouthOpeningIntro": 20125,
-    "MallampatiExercise": 13750,
-    "MallampatiIntro": 36084,
-    "HeadTiltExercise": 40709,
-    "NeckMovementIntro": 40625,
     "Intro": 21250,
+    "MouthOpeningIntro": 20125,
+    "MouthOpeningExercise": 11459,
+    "MallampatiIntro": 32667,
+    "MallampatiExercise": 13750,
+    "NeckMovementIntro": 40625,
+    "HeadTiltExercise": 40709,
     "Final": 4125,
     "OopsEyeHeight": 10459,
     "OopsFaceParallel": 13834,
+    "OopsNoFaceDetected":7167,
+    "OopsBrightness": 5292,
   };
 }
 class CircleState extends State<Circle> with WidgetsBindingObserver{
   final StateManager stateManager = GlobalVariables.stateManager;
 
 
-  bool waitingForAnimation = false;
-  Future<void> UpdateAvatarAnimations() async{
+  Future<void> UpdateAvatarAnimations() async {
     try {
-      //print("I WAIT FOR ANIMATIONS");
-      List<String> animations = [];
-      animations = await widget.animationController.getAvailableAnimations();
+      // Fetch the list of available animations
+      List<String> animations = await widget.animationController.getAvailableAnimations();
 
-      if(animations.isNotEmpty){
-        //print("IPLAYANIMATIONS");
-        String animationName = widget.animationList[stateManager.currentState]!;
+      if (animations.isNotEmpty) {
+        // Get the current state and save it to a local variable
+        var originalState = stateManager.currentState;
+
+        // Get the animation name for the original state
+        String animationName = widget.animationList[originalState]!;
+
+        // Play the animation for the original state
         widget.animationController.playAnimation(animationName: animationName);
+
+        // If the current animation is not the blinking animation, proceed to blink
         if (animationName != "Blinking") {
-          Future.delayed(Duration(milliseconds: widget.animationLength[animationName]!), () {
-            stateManager.changeState(States.blinking);
-            //print("IstartBlinking");
-          });
-        } else {
-          widget.animationController.playAnimation(animationName: animationName);
+          // Wait for the current animation to finish
+          await Future.delayed(Duration(milliseconds: widget.animationLength[animationName]!));
+
+          // Loop to continuously play blinking animation until the state changes
+          while (stateManager.currentState == originalState) {
+            print("Inside while loop");
+            widget.animationController.playAnimation(animationName: "Blinking");
+            await Future.delayed(Duration(milliseconds: 500));
+          }
         }
-      }else{
+      } else {
+        // If no animations are available, retry after a short delay
         await Future.delayed(const Duration(milliseconds: 100));
         UpdateAvatarAnimations();
       }
-    } catch (e){
+    } catch (e) {
+      // On error, retry after a short delay
+      print("Catch clause");
       await Future.delayed(const Duration(milliseconds: 100));
       UpdateAvatarAnimations();
     }
   }
+
+
 
   @override
   void initState() {
