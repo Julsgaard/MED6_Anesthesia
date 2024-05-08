@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:math';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:flutter_3d_controller/flutter_3d_controller.dart';
 import 'camera_services_TCP.dart';
 import 'package:sensors/sensors.dart';
 import 'dart:math' as math;
@@ -14,11 +16,12 @@ import 'state_manager.dart';
 class CameraRecording extends StatefulWidget {
   final CameraDescription camera;
   final String title;
-
+  final Flutter3DController animationController;
   const CameraRecording({
     Key? key,
     required this.title,
     required this.camera,
+    required this.animationController,
   }) : super(key: key);
 
   @override
@@ -31,12 +34,12 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
   late StreamSubscription<AccelerometerEvent> accelerometerSubscription;
   int _secondsRemaining = 10; // Initial value
   OverlayEntry? overlayEntry;
-  final StateManager stateManager = StateManager();
+  final StateManager stateManager = GlobalVariables.stateManager;
 
   @override
   void initState() {
     super.initState();
-
+    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {GlobalVariables.stateManager.changeState(States.mouthOpeningIntro);});
     stateManager.addListener(_onStateChanged); // Listen to state changes
 
     // Listener for accelerometer events
@@ -144,13 +147,15 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
       //TODO: Start avatar animation for each state
       //TODO: Start countdown after avatar animation or button press
 
-      if (stateManager.currentState == States.mouthOpening) {
+      if (stateManager.currentState == States.mouthOpeningIntro) {
         startTimer(10);
         developer.log('Mouth opening state');
-      } else if (stateManager.currentState == States.mallampati) {
+
+      } else if (stateManager.currentState == States.mallampatiIntro) {
         startTimer(5);
         developer.log('Mallampati state');
-      } else if (stateManager.currentState == States.neckMovement) {
+
+      } else if (stateManager.currentState == States.neckMovementIntro) {
         startTimer(20);
         developer.log('Neck movement state');
       } else {
@@ -194,7 +199,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
 
       child: Stack(
         children: [
-          Circle(mWidth: mWidth, circleHeight: circleHeight,),
+          Circle(mWidth: mWidth, circleHeight: circleHeight,animationController: widget.animationController,),
           Positioned(
             left: (mWidth - cameraWidth)/2,
             top: circleHeight/2 + 10,
@@ -253,7 +258,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
                             child: CameraPreview(_controller),
                           ),
                         ),
-                        if (stateManager.currentState == States.mallampati)
+                        if (stateManager.currentState == States.mallampatiIntro)
                           Positioned.fill( //THIS WHERE THE MOUTH IMAGE IS PLACED
                             child: Transform.translate(
                               offset: Offset(0, 30), // Adjust the 100 to move it further down or less
@@ -380,7 +385,6 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
                 ),
               ),
               onPressed: (){
-
               },
             ),
           ),
