@@ -40,7 +40,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
   @override
   void initState() {
     super.initState();
-
+    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {GlobalVariables.stateManager.changeState(States.mouthOpeningIntro);});
     stateManager.addListener(_onStateChanged); // Listen to state changes
 
     // Listener for accelerometer events
@@ -165,7 +165,6 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
 
   @override
   Widget build(BuildContext context) {
-    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {GlobalVariables.stateManager.changeState(States.mouthOpeningIntro);});
     double mWidth= MediaQuery.of(context).size.width;
     double mHeight= MediaQuery.of(context).size.height;
     double circleHeight = (mHeight/5)*2;

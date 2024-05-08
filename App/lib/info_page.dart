@@ -28,14 +28,12 @@ class InfoStage extends State<InfoPage>{
   @override
   void initState() {
     super.initState();
-
-
+    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {GlobalVariables.stateManager.changeState(States.intro);});
   }
 
 
   @override
   Widget build(BuildContext context) {
-    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {GlobalVariables.stateManager.changeState(States.intro);});
     double mWidth= MediaQuery.of(context).size.width;
     double mHeight= MediaQuery.of(context).size.height;
     double circleHeight = (mHeight/5)*2;
