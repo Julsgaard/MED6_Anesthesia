@@ -44,7 +44,7 @@ dependencies:
   camera_android_camerax: ^0.6.0+1
   auto_size_text: ^3.0.0
   camerax: ^0.1.2
-  screen_brightness: ^1.0.0
+  screen_brightness: ^1.0.1
   light: ^3.0.1
   shared_preferences: ^2.0.8
 
