@@ -45,6 +45,7 @@ class NetworkClient {
   }
 
   void _onDataReceived(data) {
+    print("DATA RECIEVED");
     // Convert the data to a string
     String jsonString = utf8.decode(data);
 
@@ -66,6 +67,7 @@ class NetworkClient {
           var eyeLevel = variables['eye_level'];
           GlobalVariables.eyeLevel = eyeLevel;
           developer.log('Received from server: $eyeLevel');
+
 
           var test = variables['test'];
           developer.log('Received from server: $test');

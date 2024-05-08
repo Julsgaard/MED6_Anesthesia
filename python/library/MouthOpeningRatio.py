@@ -7,6 +7,7 @@ num_data_points = 5  # Antallet af distancer den bruger ti at beregne default li
 distances = []
 
 
+
 def calculate_mouth_opening_ratio(face_landmarks):
     """Calculates the mouth opening ratio (MOR) based on specified MediaPipe facial landmarks."""
     # Updated indices for MediaPipe
@@ -61,8 +62,9 @@ def lip_distance_monitor(landmarks):
         if default_inner_lip_distance is None:
             # Calculate the median of the collected distances
             default_inner_lip_distance = statistics.median(distances)
-            print(f"Default inner lip distance set using median: {default_inner_lip_distance:.2f}")
+            #print(f"Default inner lip distance set using median: {default_inner_lip_distance:.2f}")
         else:
             # Calculate the difference in percentage
             difference = ((current_distance - default_inner_lip_distance) / default_inner_lip_distance) * 100
-            print(f"The difference from the default inner lip distance is {difference:.2f}%.")
+            #print(f"The difference from the default inner lip distance is {difference:.2f}%.")
+            return difference

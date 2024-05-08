@@ -98,6 +98,24 @@ async def handle_client(reader, writer, image_queue, tilt_queue, eye_level_queue
 
                 # Send data to the client
                 await send_to_client(send_data, writer)
+            elif current_state == 3: # Error state (In case face isn't detected, brightness is too low, eye level is wrong or tilt is wrong)
+                current_state = 'Error State'
+                image_counter, lux_value, tilt_angle = await video_stream(reader, image_queue, session_path,
+                                                                          current_state, image_counter)
+                if eye_level_queue.qsize() > 0:
+                    eye_level = eye_level_queue.get()  # Get the eye level from the queue
+
+                    send_data = {
+                        "eye_level": eye_level,
+                        "test": "test"
+                    }
+                else:
+                    send_data = {
+                        "test": "test"
+                    }
+
+                # Send data to the client
+                await send_to_client(send_data, writer)
 
             else:
                 print("Unknown state closing connection")
@@ -214,11 +232,11 @@ def print_every_x(frame_counter, prev_time, current_state, lux_value, tilt_angle
     curr_time = time.time()
     if curr_time - prev_time >= print_time:
         fps = frame_counter / (curr_time - prev_time)
-        print("=================================")
+        #print("=================================")
         print(f"Current State: {current_state}")
-        print(f"FPS: {fps}")
-        print(f"Lux Value: {lux_value}")
-        print(f"Tilt Angle: {tilt_angle}")
+        #print(f"FPS: {fps}")
+        #print(f"Lux Value: {lux_value}")
+        #print(f"Tilt Angle: {tilt_angle}")
         # print(f"Image ByteSize: {size}")
         frame_counter = 0
         prev_time = curr_time
