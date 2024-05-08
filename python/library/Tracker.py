@@ -3,6 +3,7 @@ import math
 
 default_chin_nose_distance = None  # Initialize the default distance to None
 
+
 def initialize_tracker(frame, initial_position):
     """Initializes the tracker for the specified region."""
     tracker = cv2.TrackerCSRT_create()
@@ -78,6 +79,7 @@ def ensure_bbox_within_frame(bbox, frame_width, frame_height):
     y = max(0, min(y, frame_height - h))
     return (x, y, w, h)
 
+
 def add_chin_and_nose_tracker(frame, face_landmarks, nose_tracker, chin_tracker):
     global default_chin_nose_distance
     box_size = 20  # Box size for tracking
@@ -88,18 +90,25 @@ def add_chin_and_nose_tracker(frame, face_landmarks, nose_tracker, chin_tracker)
     initial_chin_position = (0, 0, box_size, box_size)
 
     if face_landmarks is not None and len(face_landmarks) > 152:
-        nose_x, nose_y = int(face_landmarks[4].x * frame_width - box_size / 2), int(face_landmarks[4].y * frame_height - box_size / 2)
-        chin_x, chin_y = int(face_landmarks[17].x * frame_width - box_size / 2), int(face_landmarks[17].y * frame_height - box_size / 2)
+        nose_x, nose_y = int(face_landmarks[9].x * frame_width - box_size / 2), int(
+            face_landmarks[9].y * frame_height - box_size / 2)
+        chin_x, chin_y = int(face_landmarks[17].x * frame_width - box_size / 2), int(
+            face_landmarks[17].y * frame_height - box_size / 2)
 
-        initial_nose_position = ensure_bbox_within_frame((nose_x, nose_y, box_size, box_size), frame_width, frame_height)
-        initial_chin_position = ensure_bbox_within_frame((chin_x, chin_y, box_size, box_size), frame_width, frame_height)
+        initial_nose_position = ensure_bbox_within_frame((nose_x, nose_y, box_size, box_size), frame_width,
+                                                         frame_height)
+        initial_chin_position = ensure_bbox_within_frame((chin_x, chin_y, box_size, box_size), frame_width,
+                                                         frame_height)
 
         nose_tracker = initialize_tracker(frame, initial_nose_position)
         chin_tracker = initialize_tracker(frame, initial_chin_position)
     else:
-        # Update trackers with last known positions
-        nose_tracker, initial_nose_position = manage_tracking(frame, nose_tracker, initial_nose_position)
-        chin_tracker, initial_chin_position = manage_tracking(frame, chin_tracker, initial_chin_position)
+        # Update trackers with last known positions or attempt to reinitialize
+        nose_tracker, temp_nose_position = manage_tracking(frame, nose_tracker, initial_nose_position)
+        initial_nose_position = temp_nose_position if temp_nose_position is not None else initial_nose_position
+
+        chin_tracker, temp_chin_position = manage_tracking(frame, chin_tracker, initial_chin_position)
+        initial_chin_position = temp_chin_position if temp_chin_position is not None else initial_chin_position
 
     frame = draw_tracking_box(frame, initial_nose_position)
     frame = draw_tracking_box(frame, initial_chin_position)
@@ -109,10 +118,8 @@ def add_chin_and_nose_tracker(frame, face_landmarks, nose_tracker, chin_tracker)
 
     if default_chin_nose_distance is None:
         default_chin_nose_distance = current_chin_nose_distance
-        #print(f"Default chin-nose distance set: {default_chin_nose_distance}")
     else:
         angle = calculate_angle(default_chin_nose_distance, current_chin_nose_distance)
-        #print(f"Current distance: {current_chin_nose_distance}, Angle: {angle} degrees")
 
     return nose_tracker, chin_tracker, frame
 

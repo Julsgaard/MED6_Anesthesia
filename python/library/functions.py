@@ -119,6 +119,8 @@ def find_state_for_image_path(image_path):
         return "Mouth Opening"
     elif base_directory.lower() == 'neck movement':
         return "Neck Movement"
+    elif base_directory.lower() == 'error state':
+        return "Error State"
     else:
         return "Unknown category"
 

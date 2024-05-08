@@ -5,8 +5,8 @@ left_eye_indices = [252, 253, 254, 255, 256, 263, 339, 341, 359, 362, 384, 385, 
 right_eye_indices = [22, 23, 24, 25, 26, 33, 110, 130, 133, 153, 154, 155, 157, 158, 159, 160, 161, 173, 246]
 
 # Thresholds for eye positioning
-UPPER_Y_THRESHOLD = 0.45  # Upper y-coordinate threshold (as a fraction of the frame height)
-LOWER_Y_THRESHOLD = 0.55  # Lower y-coordinate threshold (as a fraction of the frame height)
+UPPER_Y_THRESHOLD = 0.35  # Upper y-coordinate threshold (as a fraction of the frame height)
+LOWER_Y_THRESHOLD = 0.65  # Lower y-coordinate threshold (as a fraction of the frame height)
 
 
 def detect_faces_and_landmarks(source, face_mesh, is_image=True):
@@ -28,7 +28,7 @@ def detect_faces_and_landmarks(source, face_mesh, is_image=True):
     results = face_mesh.process(image_rgb)
 
     if not results.multi_face_landmarks:
-        print("No faces detected.")
+        #print("No faces detected.")
         return 0
 
     for face_landmarks in results.multi_face_landmarks:
@@ -37,10 +37,13 @@ def detect_faces_and_landmarks(source, face_mesh, is_image=True):
         eye_avg_y = (left_eye_y + right_eye_y) / 2  # Average position of both eyes
 
         if eye_avg_y < UPPER_Y_THRESHOLD:
+            #print("Eyes too high")
             return 3  # Eyes too high
         elif eye_avg_y > LOWER_Y_THRESHOLD:
+            #print("Eyes too low")
             return 2  # Eyes too low
         else:
+            #print("Eyes within threshold")
             return 1  # Eyes within threshold
 
     return -2

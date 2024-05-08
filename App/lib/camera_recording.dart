@@ -32,7 +32,6 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
   late CameraController _controller;
   late Future<void> _initializeControllerFuture;
   late StreamSubscription<AccelerometerEvent> accelerometerSubscription;
-  late Timer _timer;
   int _secondsRemaining = 10; // Initial value
   OverlayEntry? overlayEntry;
   final StateManager stateManager = GlobalVariables.stateManager;
@@ -48,26 +47,36 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
       // Assuming the phone is mostly upright, you can calculate the tilt
       // angle around the x-axis using the arctan of the y/z acceleration values.
       // This is a simplification and might need adjustment for your use case.
+
+      // TODO All the state checks are basically just placed inside the accelerometer event listener, maybe change this to a separate function
+
       setState(() {
         GlobalVariables.tiltAngle = math.atan2(event.y, event.z) * 180 / math.pi;
       });
       if (GlobalVariables.luxValue <= 0) {
         GlobalVariables.overlayNumber = 1;
-      } else if (GlobalVariables.luxValue >= 150) {
+      } else if (GlobalVariables.luxValue >= 200) {
         GlobalVariables.overlayNumber = 2;
-      } else if (GlobalVariables.eyeLevel == 0) {
+      } else if (GlobalVariables.eyeLevel == 0 && stateManager.currentState != States.mallampati && stateManager.currentState != States.neckMovement) {
         GlobalVariables.overlayNumber = 3;
-      } else if (GlobalVariables.eyeLevel == 2) {
+      } else if (GlobalVariables.eyeLevel == 2 && stateManager.currentState != States.mallampati && stateManager.currentState != States.neckMovement) {
         GlobalVariables.overlayNumber = 4;
-      } else if (GlobalVariables.eyeLevel == 3) {
+      } else if (GlobalVariables.eyeLevel == 3 && stateManager.currentState != States.mallampati && stateManager.currentState != States.neckMovement) {
         GlobalVariables.overlayNumber = 5;
-      } else if (GlobalVariables.tiltAngle < 80) {
+      } else if (GlobalVariables.tiltAngle < 75) {
         GlobalVariables.overlayNumber = 6;
-      } else if (GlobalVariables.tiltAngle > 100) {
+      } else if (GlobalVariables.tiltAngle > 105) {
         GlobalVariables.overlayNumber = 7;
       } else {
         // Default case if no other condition is met
         GlobalVariables.overlayNumber = 0;
+        if (stateManager.currentState == States.errorState) {
+          stateManager.changeState(stateManager.previousState); // Change state back to the previous state
+        }
+      }
+
+      if (GlobalVariables.overlayNumber > 0 && stateManager.currentState != States.errorState) {
+        stateManager.changeState(States.values[3]); //Sets state to error state
       }
     });
 
@@ -98,9 +107,11 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
     accelerometerSubscription.cancel(); // Cancel the accelerometer subscription
     _controller.dispose(); // Dispose the controller
     WidgetsBinding.instance.removeObserver(this);
-    _timer.cancel();// Remove the observer
+    _timer?.cancel();// Remove the observer
     super.dispose();
   }
+
+  Timer? _timer;  // Declare _timer as nullable
 
   void startTimer(int duration) {
     const oneSecond = Duration(seconds: 1);
@@ -121,12 +132,19 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
     });
   }
 
-  // For handling state changes (mouth opening, mallampati, neck movement)
+  void stopTimer() {
+    if (_timer != null) {
+      _timer!.cancel();
+      overlayEntry?.remove();
+      overlayEntry = null;
+      _timer = null;  // This is valid as _timer is declared nullable
+    }
+  }
+
+// For handling state changes (mouth opening, mallampati, neck movement)
   void _onStateChanged() {
     setState(() {
-
       //TODO: Start avatar animation for each state
-
       //TODO: Start countdown after avatar animation or button press
 
       if (stateManager.currentState == States.mouthOpeningIntro) {
@@ -140,14 +158,14 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
       } else if (stateManager.currentState == States.neckMovementIntro) {
         startTimer(20);
         developer.log('Neck movement state');
-
-      }
-      else {
+      } else {
+        stopTimer();
         developer.log('Unknown state');
       }
-
     });
   }
+
+
 
   // For the app to pause and resume streaming when it is in the background or foreground
   @override
