@@ -52,7 +52,7 @@ async def handle_client(reader, writer, image_queue, tilt_queue, eye_level_queue
             current_state_data = await reader.readexactly(4)
             current_state = int.from_bytes(current_state_data, 'big')
 
-            if current_state == 0:  # Mouth Opening state
+            if current_state == 1:  # Mouth Opening state
                 current_state = 'Mouth Opening'
 
                 image_counter, lux_value, tilt_angle = await video_stream(reader, image_queue, session_path,
@@ -68,7 +68,7 @@ async def handle_client(reader, writer, image_queue, tilt_queue, eye_level_queue
                 # Send data to the client
                 await send_to_client(send_data, writer)
 
-            elif current_state == 1:  # Mallampati state
+            elif current_state == 3:  # Mallampati state
                 current_state = 'Mallampati'
 
                 image_counter, lux_value, tilt_angle = await video_stream(reader, image_queue, session_path,
@@ -84,7 +84,7 @@ async def handle_client(reader, writer, image_queue, tilt_queue, eye_level_queue
                 # Send data to the client
                 await send_to_client(send_data, writer)
 
-            elif current_state == 2:  # Neck Movement state
+            elif current_state == 5:  # Neck Movement state
                 current_state = 'Neck Movement'
 
                 image_counter, lux_value, tilt_angle = await video_stream(reader, image_queue, session_path,
@@ -98,7 +98,7 @@ async def handle_client(reader, writer, image_queue, tilt_queue, eye_level_queue
 
                 # Send data to the client
                 await send_to_client(send_data, writer)
-            elif current_state == 3: # Error state (In case face isn't detected, brightness is too low, eye level is wrong or tilt is wrong)
+            else:
                 current_state = 'Error State'
                 image_counter, lux_value, tilt_angle = await video_stream(reader, image_queue, session_path,
                                                                           current_state, image_counter)
@@ -116,10 +116,6 @@ async def handle_client(reader, writer, image_queue, tilt_queue, eye_level_queue
 
                 # Send data to the client
                 await send_to_client(send_data, writer)
-
-            else:
-                print("Unknown state closing connection")
-                break
 
             # Prints the FPS, current state, lux value, and tilt angle every second
             frame_counter, prev_time = print_every_x(

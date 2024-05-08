@@ -29,7 +29,7 @@ if __name__ == '__main__':
 
     # Find the device and load the model for the AI model
     device = mallampati_CNN_run_model.find_device()
-    model = mallampati_CNN_run_model.load_model(device, model_path='library/mallampati_models/model_mallampati_CNN_Best.pth')
+    model = mallampati_CNN_run_model.load_model(device, model_path='library/mallampati_models/CNN Models/model_mallampati_CNN_20240506_102522.pth')
 
     while True:
         # Get the image path from the server image queue
