@@ -55,13 +55,13 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
       });
       if (GlobalVariables.luxValue <= 0) {
         GlobalVariables.overlayNumber = 1;
-      } else if (GlobalVariables.luxValue >= 200) {
+      } else if (GlobalVariables.luxValue >= 300) {
         GlobalVariables.overlayNumber = 2;
-      } else if (GlobalVariables.eyeLevel == 0 && stateManager.currentState != States.mallampati && stateManager.currentState != States.neckMovement) {
+      } else if (GlobalVariables.eyeLevel == 0 && stateManager.currentState == States.mouthOpeningExercise) {
         GlobalVariables.overlayNumber = 3;
-      } else if (GlobalVariables.eyeLevel == 2 && stateManager.currentState != States.mallampati && stateManager.currentState != States.neckMovement) {
+      } else if (GlobalVariables.eyeLevel == 2 && stateManager.currentState == States.mouthOpeningExercise) {
         GlobalVariables.overlayNumber = 4;
-      } else if (GlobalVariables.eyeLevel == 3 && stateManager.currentState != States.mallampati && stateManager.currentState != States.neckMovement) {
+      } else if (GlobalVariables.eyeLevel == 3 && stateManager.currentState == States.mouthOpeningExercise) {
         GlobalVariables.overlayNumber = 5;
       } else if (GlobalVariables.tiltAngle < 75) {
         GlobalVariables.overlayNumber = 6;
@@ -70,12 +70,12 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
       } else {
         // Default case if no other condition is met
         GlobalVariables.overlayNumber = 0;
-        if (stateManager.currentState == States.errorState) {
+        if (stateManager.currentState.index >= 9) {
           stateManager.changeState(stateManager.previousState); // Change state back to the previous state
         }
       }
 
-      if (GlobalVariables.overlayNumber > 0 && stateManager.currentState != States.errorState) {
+      if (GlobalVariables.overlayNumber > 0 && stateManager.currentState.index >= 9) {
         stateManager.changeState(States.values[3]); //Sets state to error state
       }
     });
@@ -147,18 +147,18 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
       //TODO: Start avatar animation for each state
       //TODO: Start countdown after avatar animation or button press
 
-      if (stateManager.currentState == States.mouthOpeningIntro) {
+      if (stateManager.currentState == States.mouthOpeningExercise) {
         startTimer(10);
         developer.log('Mouth opening state');
 
-      } else if (stateManager.currentState == States.mallampatiIntro) {
+      } else if (stateManager.currentState == States.mallampatiExercise) {
         startTimer(5);
         developer.log('Mallampati state');
 
-      } else if (stateManager.currentState == States.neckMovementIntro) {
+      } else if (stateManager.currentState == States.neckMovementExercise) {
         startTimer(20);
         developer.log('Neck movement state');
-      } else {
+      } else if (stateManager.currentState.index >= 9) {
         stopTimer();
         developer.log('Unknown state');
       }
@@ -349,6 +349,9 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
 
                 // +1 to the current state
                 currentStateInt++;
+
+                //Stops countdown timer if any are running
+                stopTimer();
 
                 // If the incremented state exceeds the maximum, reset it to the first state to prevent an error
                 if (currentStateInt >= States.values.length) {

@@ -14,6 +14,8 @@ enum States {
   thanks,
   oopsEyeHeight,
   oopsFaceParallel,
+  oopsNoFace,
+  oopsBrightness
   // ThyromentalDistance,
   // AbilityToPrognath
 }
@@ -45,13 +47,13 @@ class StateManager {
   void changeState(States newState) {
     print("Changing current state to $newState while old state was $_previousState");
     // If the current state is not error state, change the state to the requested state and save the previous state
-    if (_currentState != States.errorState) {
+    if (_currentState.index !>= 9) { // XD !>=
       _previousState = _currentState;
       _currentState = newState;
     }
 
     // If the current state is error state, ignore whatever state change is requested and change to previous state (IDK BUT THIS WORKS)
-    else if (_currentState == States.errorState) {
+    else if (_currentState.index >= 9) {
       _currentState = _previousState;
     }
     notifyListeners(); // Notify all listeners about the state change
