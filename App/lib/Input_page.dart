@@ -3,17 +3,19 @@ import 'package:camera/camera.dart';
 import "package:flutter/material.dart";
 import 'package:flutter/services.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:flutter_3d_controller/flutter_3d_controller.dart';
 import 'camera_recording.dart';
-import '../assets/circle.dart';
+import 'package:dart/Assets/circle.dart';
 import 'network_client.dart';
 
 // Convert InputPage to StatefulWidget
 class InputPage extends StatefulWidget {
   final CameraDescription camera;
-
+  final Flutter3DController animationController;
   const InputPage({
     Key? key,
     required this.camera,
+    required this.animationController,
   }) : super(key: key);
 
   @override
@@ -47,7 +49,7 @@ class _InputPageState extends State<InputPage> {
         decoration: const BoxDecoration(color: Color(0xFFEBEEF3)),
         child: Stack(
           children: [
-            Circle(mWidth: mWidth, circleHeight: circleHeight,),
+            Circle(mWidth: mWidth, circleHeight: circleHeight,animationController: widget.animationController),
             Positioned(
               left: (mWidth/8),
               top: circleHeight/2 + gab,
@@ -143,7 +145,7 @@ class _InputPageState extends State<InputPage> {
                     // Navigate to the CameraRecording page
                     Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(builder: (context) => CameraRecording(title: 'Flutter Demo Home Page', camera: widget.camera))
+                        MaterialPageRoute(builder: (context) => CameraRecording(title: 'Flutter Demo Home Page', camera: widget.camera, animationController: widget.animationController,))
                     );
                   } else {
                     // Handle the case where weight or difficultyOfIntubation is not entered

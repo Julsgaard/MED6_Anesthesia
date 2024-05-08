@@ -1,23 +1,110 @@
-import 'package:flutter/material.dart';
-class Circle extends StatelessWidget {
+import 'dart:async';
+import 'dart:isolate';
 
-  const Circle({
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:flutter_3d_controller/flutter_3d_controller.dart';
+
+import '../main.dart';
+import '../state_manager.dart';
+
+class Circle extends StatefulWidget {
+
+  Circle({
     super.key,
     required this.mWidth,
     required this.circleHeight,
+    required this.animationController,
   });
+
   final double mWidth;
   final double circleHeight;
+  final Flutter3DController animationController;
+
+  @override
+  CircleState createState() => CircleState();
+
+  final Map<States,String> animationList= {
+    States.mouthOpeningExercise: "MouthOpeningExercise",
+    States.mouthOpeningIntro: "MouthOpeningIntro",
+    States.mallampatiExercise: "MallampatiExercise",
+    States.mallampatiIntro: "MallampatiIntro",
+    States.neckMovementExercise: "HeadTiltExercise",
+    States.neckMovementIntro: "NeckMovementIntro",
+    States.intro: "Intro",
+    States.thanks: "Final",
+    States.oopsEyeHeight: "OopsEyeHeight",
+    States.oopsFaceParallel: "OopsFaceParallel",
+    States.blinking: "Blinking",
+  };
+  final Map<String,int> animationLength = {
+    "MouthOpeningExercise": 11459,
+    "MouthOpeningIntro": 20125,
+    "MallampatiExercise": 13750,
+    "MallampatiIntro": 36084,
+    "HeadTiltExercise": 40709,
+    "NeckMovementIntro": 40625,
+    "Intro": 21250,
+    "Final": 4125,
+    "OopsEyeHeight": 10459,
+    "OopsFaceParallel": 13834,
+  };
+}
+class CircleState extends State<Circle> with WidgetsBindingObserver{
+  final StateManager stateManager = GlobalVariables.stateManager;
+
+
+  bool waitingForAnimation = false;
+  Future<void> UpdateAvatarAnimations() async{
+    try {
+      //print("I WAIT FOR ANIMATIONS");
+      List<String> animations = [];
+      animations = await widget.animationController.getAvailableAnimations();
+
+      if(animations.isNotEmpty){
+        //print("IPLAYANIMATIONS");
+        String animationName = widget.animationList[stateManager.currentState]!;
+        widget.animationController.playAnimation(animationName: animationName);
+        if (animationName != "Blinking") {
+          Future.delayed(Duration(milliseconds: widget.animationLength[animationName]!), () {
+            stateManager.changeState(States.blinking);
+            //print("IstartBlinking");
+          });
+        } else {
+          widget.animationController.playAnimation(animationName: animationName);
+        }
+      }else{
+        await Future.delayed(const Duration(milliseconds: 100));
+        UpdateAvatarAnimations();
+      }
+    } catch (e){
+      await Future.delayed(const Duration(milliseconds: 100));
+      UpdateAvatarAnimations();
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    stateManager.addListener(UpdateAvatarAnimations);
+  }
+  @override
+  void dispose() {
+    super.dispose();
+    //CameraServices.isStreaming = false; // Ensure the stream is turned off when the widget is disposed
+    stateManager.removeListener(UpdateAvatarAnimations);
+  }
 
   @override
   Widget build(BuildContext context) {
-
+    //SchedulerBinding.instance.addPostFrameCallback((timeStamp) {stateManager.changeState(States.intro);});
     return Positioned(
-      left: -mWidth/20,
-      top: -circleHeight/2,
+      left: -widget.mWidth/20,
+      top: -widget.circleHeight/2,
       child: Container(
-        width: mWidth + mWidth/10,
-        height: circleHeight,
+        width: widget.mWidth + widget.mWidth/10,
+        height: widget.circleHeight,
         decoration: const ShapeDecoration(
         gradient: LinearGradient(
         begin: Alignment(0.00, -1.00),
@@ -25,6 +112,16 @@ class Circle extends StatelessWidget {
         colors: [Color(0xFF153867), Color(0xFF38577F), Color(0xFF748EA8)],
         ),
         shape: OvalBorder(),
+        ),
+        alignment: const Alignment(0,1),
+        child: SizedBox(
+          height: widget.circleHeight/2 - 20,
+          child: IgnorePointer(
+            child: Flutter3DViewer(
+              controller: widget.animationController,
+              src: "assets/AppAvatar.glb",
+            ),
+          )
         ),
       ),
     );
