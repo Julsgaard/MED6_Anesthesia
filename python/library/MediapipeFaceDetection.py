@@ -69,10 +69,10 @@ if __name__ == "__main__":
         # Exit loop on 'q' keypress
         frame, face_landmarks = detect_faces_and_landmarks(cap, face_mesh)
 
-        MouthOpeningRatio.lip_distance_monitor(face_landmarks)
+        #MouthOpeningRatio.lip_distance_monitor(face_landmarks)
         #print(f"Area: {area}")
 
-        #nose_tracker, chin_tracker, frame = Tracker.add_chin_and_nose_tracker(frame, face_landmarks, nose_tracker,chin_tracker)
+        nose_tracker, chin_tracker, frame = Tracker.add_chin_and_nose_tracker(frame, face_landmarks, nose_tracker,chin_tracker)
 
 
 

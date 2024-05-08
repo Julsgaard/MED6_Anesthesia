@@ -41,15 +41,14 @@ if __name__ == '__main__':
         # Find the state for the image path
         state = functions.find_state_for_image_path(image_path)
 
+        frame, face_landmarks = MediapipeFaceDetection.detect_faces_and_landmarks(image_path, face_mesh_model,
+                                                                                  is_image=True)
+        # Check for eye level
+        eye_level = eye_detect.detect_faces_and_landmarks(image_path, face_mesh_model)
+        eye_level_queue.put(eye_level)  # Put the eye level into the queue
+
         # Check the state and run the appropriate functions
         if state == 'Mouth Opening':
-            # Check for eye level
-            eye_level = eye_detect.detect_faces_and_landmarks(image_path, face_mesh_model)
-            eye_level_queue.put(eye_level)  # Put the eye level into the queue
-
-            # Detect face and generate landmarks
-            frame, face_landmarks = MediapipeFaceDetection.detect_faces_and_landmarks(image_path, face_mesh_model,
-                                                                                      is_image=True)
             # Display the image
             display_image_queue.put(frame)
 
@@ -59,13 +58,6 @@ if __name__ == '__main__':
 
 
         elif state == 'Mallampati':
-            # Check for eye level
-            eye_level = eye_detect.detect_faces_and_landmarks(image_path, face_mesh_model)
-            eye_level_queue.put(eye_level)  # Put the eye level into the queue
-
-            # Crop mouth out from images
-            frame, face_landmarks = MediapipeFaceDetection.detect_faces_and_landmarks(image_path, face_mesh_model,
-                                                                                      is_image=True)
             if face_landmarks:
                 cropped_image = MouthCrop.crop_mouth_region(frame, face_landmarks)
 
@@ -112,14 +104,25 @@ if __name__ == '__main__':
                 #TODO: We might need a state for Mallampati done, so we can save the final prediction to a file.
 
         elif state == 'Neck Movement':
-            # Detect face and calculate angle based on nose, mouth points that we track.
-            frame, face_landmarks = MediapipeFaceDetection.detect_faces_and_landmarks(image_path, face_mesh_model,
-                                                                                      is_image=True)
+
             nose_tracker, chin_tracker, frame = Tracker.add_chin_and_nose_tracker(frame, face_landmarks, nose_tracker,
                                                                                   chin_tracker)
 
             # Display the image
             display_image_queue.put(frame)
+
+        elif state == 'Error State':
+
+            # Reset default lip distance value
+            MouthOpeningRatio.default_lip_distance = None
+            MouthOpeningRatio.distances = None
+
+            # Reset mallampati predictions
+            predictions = []
+
+            # Reset default tracker value
+            Tracker.default_chin_nose_distance = None
+
 
         else:
             print("Invalid state")
