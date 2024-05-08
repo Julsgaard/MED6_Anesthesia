@@ -58,18 +58,18 @@ class CircleState extends State<Circle> with WidgetsBindingObserver{
   bool waitingForAnimation = false;
   Future<void> UpdateAvatarAnimations() async{
     try {
-      print("I WAIT FOR ANIMATIONS");
+      //print("I WAIT FOR ANIMATIONS");
       List<String> animations = [];
       animations = await widget.animationController.getAvailableAnimations();
 
       if(animations.isNotEmpty){
-        print("IPLAYANIMATIONS");
+        //print("IPLAYANIMATIONS");
         String animationName = widget.animationList[stateManager.currentState]!;
         widget.animationController.playAnimation(animationName: animationName);
         if (animationName != "Blinking") {
           Future.delayed(Duration(milliseconds: widget.animationLength[animationName]!), () {
             stateManager.changeState(States.blinking);
-            print("IstartBlinking");
+            //print("IstartBlinking");
           });
         } else {
           widget.animationController.playAnimation(animationName: animationName);
