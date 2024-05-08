@@ -39,6 +39,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
   @override
   void initState() {
     super.initState();
+    bool showState = true; // Default is true, toggle this to show/hide the state display
     SchedulerBinding.instance.addPostFrameCallback((timeStamp) {GlobalVariables.stateManager.changeState(States.mouthOpeningIntro);});
     stateManager.addListener(_onStateChanged); // Listen to state changes
 
@@ -49,7 +50,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
       // This is a simplification and might need adjustment for your use case.
 
       // TODO All the state checks are basically just placed inside the accelerometer event listener, maybe change this to a separate function
-
+      print("Current state: ${stateManager.currentState}"); // Print the current state for debugging purposes
       setState(() {
         GlobalVariables.tiltAngle = math.atan2(event.y, event.z) * 180 / math.pi;
       });
@@ -76,7 +77,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
       }
 
       if (GlobalVariables.overlayNumber > 0 && stateManager.currentState.index >= 9) {
-        stateManager.changeState(States.values[3]); //Sets state to error state
+        //stateManager.changeState(States.values[3]); //Sets state to error state
       }
     });
 
@@ -149,18 +150,12 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
 
       if (stateManager.currentState == States.mouthOpeningExercise) {
         startTimer(10);
-        developer.log('Mouth opening state');
-
       } else if (stateManager.currentState == States.mallampatiExercise) {
         startTimer(5);
-        developer.log('Mallampati state');
-
       } else if (stateManager.currentState == States.neckMovementExercise) {
         startTimer(20);
-        developer.log('Neck movement state');
       } else if (stateManager.currentState.index >= 9) {
         stopTimer();
-        developer.log('Unknown state');
       }
     });
   }
@@ -227,29 +222,6 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
                 future: _initializeControllerFuture,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.done) {
-
-                    //Sets the focus in the middle of the camera
-                    // double fullWidth = MediaQuery.of(context).size.width;
-                    // double cameraHeight = fullWidth * _controller.value.aspectRatio;
-                    //
-                    // double xp = fullWidth/2 ;
-                    // double yp = cameraHeight/2;
-                    //
-                    // // Ensure the point coordinates are within the valid range
-                    // Offset validPoint = Offset(
-                    //   max(0.0, min(1.0, xp)),
-                    //   max(0.0, min(1.0, yp)),
-                    // );
-                    // try {
-                    //   _controller.setFocusPoint(validPoint);
-                    // } catch (e) {
-                    //   if (e is CameraException) {
-                    //     developer.log('Failed to set focus point');
-                    //   } else {
-                    //     rethrow;
-                    //   }
-                    // }
-
                     return Stack(
                       children: <Widget>[
                         Positioned.fill( // THIS IS WHERE THE CAMERA IS PLACED
@@ -261,13 +233,25 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
                         if (stateManager.currentState == States.mallampatiIntro)
                           Positioned.fill( //THIS WHERE THE MOUTH IMAGE IS PLACED
                             child: Transform.translate(
-                              offset: Offset(0, 30), // Adjust the 100 to move it further down or less
+                              offset: Offset(0, 30), // Adjust the offset to move the image
                               child: Transform.scale(
                                 scale: mouthOverlayScale,
                                 child: Image.asset(
                                   'assets/mallampatti_1.png',
                                   fit: BoxFit.contain,
                                 ),
+                              ),
+                            ),
+                          ),
+                        if (GlobalVariables.showState) // Conditional display of current state
+                          Positioned(
+                            left: buttonPosW - 35,
+                            bottom: buttonPosH + 400, // Adjust the position as needed
+                            child: Text(
+                              'Current State: ${stateManager.currentState.toString().split('.').last}',
+                              style: TextStyle(
+                                color: Colors.blue,
+                                fontSize: 18,
                               ),
                             ),
                           ),
@@ -324,6 +308,9 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
                 ),
               ),
               onPressed: (){
+                if (overlayEntry != null) {
+                  overlayEntry!.remove();
+                }
                 overlayEntry ??= OverlayEntry(builder: (context) {
                     return Positioned(
                       child: SizedBox(
@@ -346,16 +333,15 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
                 Overlay.of(context).insert(overlayEntry!);
                 // Get the current state as an integer
                 int currentStateInt = stateManager.currentState.index;
-
+                print('BUTTON PRESSED and Current state index: $currentStateInt');
                 // +1 to the current state
                 currentStateInt++;
 
-                //Stops countdown timer if any are running
-                stopTimer();
-
                 // If the incremented state exceeds the maximum, reset it to the first state to prevent an error
                 if (currentStateInt >= States.values.length) {
+                  int temp = States.values.length;
                   currentStateInt = 0;
+                  developer.log("Whoops, state index went over $temp");
                 }
 
                 // Convert the incremented integer back to a state
@@ -363,6 +349,9 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
 
                 // Change to the next state
                 stateManager.changeState(nextState);
+
+                //Stops countdown timer if any are running
+                //stopTimer();
 
               },
             ),
@@ -388,6 +377,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
                 ),
               ),
               onPressed: (){
+
               },
             ),
           ),
