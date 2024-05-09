@@ -10,7 +10,7 @@ def load_model(device, model_path='mallampati_models/CNN models/model_mallampati
     model, optimizer, criterion = initialize_model()
 
     # Load the pre-trained model
-    model.load_state_dict(torch.load(model_path))
+    model.load_state_dict(torch.load(model_path, map_location=device))
 
     model.to(device)
 
