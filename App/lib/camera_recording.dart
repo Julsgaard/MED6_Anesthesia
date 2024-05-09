@@ -13,6 +13,8 @@ import 'package:dart/Assets/circle.dart';
 import 'main.dart';
 import 'state_manager.dart';
 import 'package:dart/info_page.dart';
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:audioplayers/audioplayers.dart';
 
 class CameraRecording extends StatefulWidget {
   final CameraDescription camera;
@@ -37,6 +39,8 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
   OverlayEntry? overlayEntry;
   final StateManager stateManager = GlobalVariables.stateManager;
   Timer? _checkForErrorStateTimer;
+  late AudioPlayer audioPlayer;
+
 
   @override
   void initState() {
@@ -123,6 +127,15 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
     super.dispose();
   }
 
+  void playSound(String audio) async {
+    if (audioPlayer.state == PlayerState.playing) {
+      await audioPlayer.stop();
+    }
+    String audioPath = audio;
+    await audioPlayer.play(AssetSource(audioPath));
+  }
+
+
   Timer? _timer;
 
   void startTimer(int duration) {
@@ -184,17 +197,18 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
 
       if (stateManager.currentState == States.mouthOpeningExercise) {
         startTimer(10);
+        playSound('assets/Mouth_Opening_Intro.mp3');
       } else if (stateManager.currentState == States.mallampatiExercise) {
         startTimer(5);
+        playSound('assets/Mallampati_Intro.mp3');
       } else if (stateManager.currentState == States.neckMovementExercise) {
         startTimer(20);
+        playSound("assets/Neck_Movement_Intro.mp3");
       } else if (stateManager.currentState.index >= 8) { //If in error state, stop timer
         stopTimer();
       }
     });
   }
-
-
 
   // For the app to pause and resume streaming when it is in the background or foreground
   @override
