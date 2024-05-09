@@ -47,6 +47,8 @@
     screen_brightness: ^1.0.0
     light: ^3.0.1
     shared_preferences: ^2.0.8
+    audioplayers: ^6.0.0
+    flutter_sound: ^9.0.6
 
     # The following adds the Cupertino Icons font to your application.
     # Use with the CupertinoIcons class for iOS style icons.
@@ -82,6 +84,19 @@
       - assets/mouth_overlay2.png
       - assets/mallampatti_1.png
       - assets/AppAvatar.glb
+      - assets/Final.mp3
+      - assets/Intro.mp3
+      - assets/Mallampati_Exercise.mp3
+      - assets/Mallampati_Intro.mp3
+      - assets/Mouth_Opening_Exercise.mp3
+      - assets/Mouth_Opening_Intro.mp3
+      - assets/Neck_Movement_Exercise.mp3
+      - assets/Neck_Movement_Intro.mp3
+      - assets/Final.mp3
+      - assets/Wrong_eye_height.mp3
+      - assets/Wrong_tilt.mp3
+      - assets/Wrong_face.mp3
+      - assets/Wrong_brightness.mp3
 
     # An image asset can refer to one or more resolution-specific "variants", see
     # https://flutter.dev/assets-and-images/#resolution-aware
