@@ -70,7 +70,7 @@ class CircleState extends State<Circle> with WidgetsBindingObserver{
 
         // Get the animation name for the original state
         String animationName = widget.animationList[originalState]!;
-
+        widget.animationController.setCameraOrbit(0, 90, 100);
         // Play the animation for the original state
         widget.animationController.playAnimation(animationName: animationName);
 
