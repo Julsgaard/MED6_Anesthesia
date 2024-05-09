@@ -14,11 +14,13 @@ class InfoPage extends StatefulWidget {
   final CameraDescription camera;
   final String infoText;
   final Flutter3DController animationController;
+  final bool showContinueButton;
   const InfoPage({
     super.key,
     required this.camera,
     required this.infoText,
     required this.animationController,
+    required this.showContinueButton,
   });
   @override
   InfoStage createState() => InfoStage();
@@ -71,14 +73,15 @@ class InfoStage extends State<InfoPage>{
                 ),
               ),
             ),
-            Positioned(
+            widget.showContinueButton
+                ? Positioned(
               left: buttonPosW,
               top: mHeight- buttonPosH,
               child: TextButton(
                 style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all<Color>(const Color(0xFF153867)),
-                    minimumSize: MaterialStateProperty.all(Size(buttonWidth,buttonHeight,)),
-                    maximumSize: MaterialStateProperty.all(Size(buttonWidth,buttonHeight,)),
+                  backgroundColor: MaterialStateProperty.all<Color>(const Color(0xFF153867)),
+                  minimumSize: MaterialStateProperty.all(Size(buttonWidth,buttonHeight,)),
+                  maximumSize: MaterialStateProperty.all(Size(buttonWidth,buttonHeight,)),
                 ),
                 child: const Text(
                   'I understand\nproceed',
@@ -95,11 +98,12 @@ class InfoStage extends State<InfoPage>{
                   Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(builder: (context) => InputPage(
-                          camera: widget.camera, animationController: widget.animationController,))
+                        camera: widget.camera, animationController: widget.animationController,))
                   );
                 },
               ),
-            ),
+            )
+                : Container(), // Invisible widget
             Positioned(
               right: 10,
               top: 30,
