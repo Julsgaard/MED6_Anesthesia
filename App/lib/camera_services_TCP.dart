@@ -100,10 +100,6 @@ class CameraServices {
       final int uvSize = uvPlane.length;
       final int totalSize = ySize + uvSize;
 
-      // Log the image format, size, and resolution
-      final int width = image.width;
-      final int height = image.height;
-      //developer.log('Image format: $imageFormat, Size: $totalSize bytes, Resolution: ${width}x${height}', name: 'camera.info');
 
       _imagesCaptured++;  // Increment the number of images captured
 
