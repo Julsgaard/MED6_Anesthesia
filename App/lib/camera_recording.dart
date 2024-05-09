@@ -128,6 +128,9 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
 
   void startTimer(int duration) {
     if (overlayEntry != Null){
+      if(_timer != null){
+        _timer!.cancel();
+      }
       overlayEntry ??= OverlayEntry(builder: (context) {
         return Positioned(
           child: SizedBox(
@@ -156,6 +159,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
         timer.cancel();
         overlayEntry?.remove();
         overlayEntry = null;
+        stateManager.nextState();
       } else {
         setState(() {
           _secondsRemaining -= 1;
