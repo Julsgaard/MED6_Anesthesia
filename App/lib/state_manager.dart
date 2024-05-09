@@ -44,7 +44,7 @@ class StateManager {
 
   void changeState(States newState) {
     if (_currentState == newState) return; // If the requested state is the same as the current state, do nothing
-    developer.log("Changing current state to $newState while old state was $_previousState");
+    //developer.log("Changing current state to $newState while old state was $_previousState");
     // If the current state is not error state, change the state to the requested state and save the previous state
     if (_currentState.index < 8) {
       //developer.log("UNDER 8");

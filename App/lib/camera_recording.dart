@@ -362,7 +362,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
               onPressed: (){
                 // Get the current state as an integer
                 int currentStateInt = stateManager.currentState.index;
-                print('BUTTON PRESSED and Current state index: $currentStateInt');
+                //print('BUTTON PRESSED and Current state index: $currentStateInt');
                 // +1 to the current state
                 currentStateInt++;
 
@@ -370,7 +370,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
                 if (currentStateInt >= States.values.length) {
                   int temp = States.values.length;
                   currentStateInt = 0;
-                  developer.log("Whoops, state index went over $temp");
+                  //developer.log("Whoops, state index went over $temp");
                 }
 
                 // Convert the incremented integer back to a state
@@ -406,6 +406,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
                 ),
               ),
               onPressed: (){
+                stateManager.notifyListeners();
 
               },
             ),
