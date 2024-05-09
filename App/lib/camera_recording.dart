@@ -38,6 +38,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
   final StateManager stateManager = GlobalVariables.stateManager;
   Timer? _checkForErrorStateTimer;
 
+
   @override
   void initState() {
     super.initState();
@@ -123,6 +124,8 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
     super.dispose();
   }
 
+
+
   Timer? _timer;
 
   void startTimer(int duration) {
@@ -182,11 +185,11 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
       //TODO: Start avatar animation for each state
       //TODO: Start countdown after avatar animation or button press
 
-      if (stateManager.currentState == States.mouthOpeningExercise) {
+      if (stateManager.currentState == States.mouthOpeningIntro) {
         startTimer(10);
-      } else if (stateManager.currentState == States.mallampatiExercise) {
+      } else if (stateManager.currentState == States.mallampatiIntro) {
         startTimer(5);
-      } else if (stateManager.currentState == States.neckMovementExercise) {
+      } else if (stateManager.currentState == States.neckMovementIntro) {
         startTimer(20);
       } else if (stateManager.currentState.index >= 8) { //If in error state, stop timer
         stopTimer();

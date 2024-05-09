@@ -5,9 +5,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_3d_controller/flutter_3d_controller.dart';
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:audioplayers/audioplayers.dart';
 
 import '../main.dart';
 import '../state_manager.dart';
+
 
 class Circle extends StatefulWidget {
 
@@ -57,6 +60,7 @@ class Circle extends StatefulWidget {
 }
 class CircleState extends State<Circle> with WidgetsBindingObserver{
   final StateManager stateManager = GlobalVariables.stateManager;
+  late AudioPlayer audioPlayer;
 
 
   Future<void> UpdateAvatarAnimations() async {
@@ -73,6 +77,8 @@ class CircleState extends State<Circle> with WidgetsBindingObserver{
         widget.animationController.setCameraOrbit(0, 90, 100);
         // Play the animation for the original state
         widget.animationController.playAnimation(animationName: animationName);
+
+        playSound(stateManager.currentState.index);
 
         // If the current animation is not the blinking animation, proceed to blink
         if (animationName != "Blinking") {
@@ -99,12 +105,67 @@ class CircleState extends State<Circle> with WidgetsBindingObserver{
     }
   }
 
+  Future<void> playSound(int state) async {
+    String audio;
+
+    // Switch case to check for state 0-11 and set the corresponding audio path
+    switch (state) {
+      case 0:
+        audio = "Intro.mp3";
+        break;
+      case 1:
+        audio = "Mouth_Opening_Intro.mp3";
+        break;
+      case 2:
+        audio = "Mouth_Opening_Exercise.mp3";
+        break;
+      case 3:
+        audio = "Mallampati_Intro.mp3";
+        break;
+      case 4:
+        audio = "Mallampati_Exercise.mp3";
+        break;
+      case 5:
+        audio = "Neck_Movement_Intro.mp3";
+        break;
+      case 6:
+        audio = "Neck_Movement_Exercise.mp3";
+        break;
+      case 7:
+        audio = "Final.mp3";
+        break;
+      case 8:
+        audio = "Wrong_eye_height.mp3";
+        break;
+      case 9:
+        audio = "Wrong_tilt.mp3";
+        break;
+      case 10:
+        audio = "Wrong_face.mp3";
+        break;
+      case 11:
+        audio = "Wrong_brightness.mp3";
+        break;
+      default:
+        audio = "How";
+    }
+    if (audioPlayer.state == PlayerState.playing) {
+      await audioPlayer.stop();
+    }
+    try {
+      await audioPlayer.play(AssetSource(audio));
+    } catch (e) {
+      print('Error loading audio: $e');
+    }
+  }
+
 
 
   @override
   void initState() {
     super.initState();
     stateManager.addListener(UpdateAvatarAnimations);
+    audioPlayer = AudioPlayer();
   }
   @override
   void dispose() {
