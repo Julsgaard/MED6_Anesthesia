@@ -97,14 +97,22 @@ class CircleState extends State<Circle> with WidgetsBindingObserver{
       }
     } catch (e) {
       // On error, retry after a short delay
-      print("Catch clause");
+      //print("Catch clause");
       await Future.delayed(const Duration(milliseconds: 100));
       UpdateAvatarAnimations();
     }
-  }
 
+  }
+  bool _isPlaying = false;
+  int _howManyTimesHasSoundRun = 0;
   Future<void> playSound(int state) async {
     String audio;
+    if (_isPlaying) return; // Exit if a sound is already being played
+    _isPlaying = true;
+
+    print("Sound has run $_howManyTimesHasSoundRun times");
+    _howManyTimesHasSoundRun++;
+
 
     // Switch case to check for state 0-11 and set the corresponding audio path
     switch (state) {
@@ -147,13 +155,15 @@ class CircleState extends State<Circle> with WidgetsBindingObserver{
       default:
         audio = "How";
     }
-    if (audioPlayer.state == PlayerState.playing) {
-      await audioPlayer.stop();
-    }
+    audioPlayer.stop();
     try {
-      await audioPlayer.play(AssetSource(audio));
+      print("Attempting to play audio: $audio");
+      audioPlayer.play(AssetSource(audio));
     } catch (e) {
       print('Error loading audio: $e');
+    }
+    finally {
+      _isPlaying = false; // Reset flag after playing
     }
   }
 
@@ -167,9 +177,12 @@ class CircleState extends State<Circle> with WidgetsBindingObserver{
   }
   @override
   void dispose() {
+    print('CircleState disposed');
+    stateManager.removeListener(UpdateAvatarAnimations);
+    audioPlayer.dispose();
     super.dispose();
     //CameraServices.isStreaming = false; // Ensure the stream is turned off when the widget is disposed
-    stateManager.removeListener(UpdateAvatarAnimations);
+
   }
 
   @override

@@ -57,9 +57,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
 
       // TODO All the state checks are basically just placed inside the accelerometer event listener, maybe change this to a separate function
       //print("Current state: ${stateManager.currentState}"); // Print the current state for debugging purposes
-      setState(() {
-        GlobalVariables.tiltAngle = math.atan2(event.y, event.z) * 180 / math.pi;
-      });
+      GlobalVariables.tiltAngle = math.atan2(event.y, event.z) * 180 / math.pi;
     });
 
     WidgetsBinding.instance.addObserver(this);
@@ -129,28 +127,27 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
   Timer? _timer;
 
   void startTimer(int duration) {
-    if (overlayEntry != null) {
-      overlayEntry!.remove();
-    }
-    overlayEntry ??= OverlayEntry(builder: (context) {
-      return Positioned(
-        child: SizedBox(
-          width: 400,
-          height: 300,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              DefaultTextStyle(style: TextStyle(
-                fontSize: 225,
-                fontWeight: FontWeight.bold,
-                color: Colors.black.withOpacity(0.5),),
-                  child: Text('$_secondsRemaining',)
-              )
-            ],
+    if (overlayEntry != Null){
+      overlayEntry ??= OverlayEntry(builder: (context) {
+        return Positioned(
+          child: SizedBox(
+            width: 400,
+            height: 300,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                DefaultTextStyle(style: TextStyle(
+                  fontSize: 225,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black.withOpacity(0.5),),
+                    child: Text('$_secondsRemaining',)
+                )
+              ],
+            ),
           ),
-        ),
-      );
-    });
+        );
+      });
+    }
     Overlay.of(context).insert(overlayEntry!);
     const oneSecond = Duration(seconds: 1);
     _secondsRemaining = duration;
@@ -182,16 +179,14 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
 // For handling state changes (mouth opening, mallampati, neck movement)
   void _onStateChanged() {
     setState(() {
-      //TODO: Start avatar animation for each state
-      //TODO: Start countdown after avatar animation or button press
-
-      if (stateManager.currentState == States.mouthOpeningIntro) {
+      if (stateManager.currentState == States.mouthOpeningExercise) {
         startTimer(10);
-      } else if (stateManager.currentState == States.mallampatiIntro) {
+      } else if (stateManager.currentState == States.mallampatiExercise) {
         startTimer(5);
-      } else if (stateManager.currentState == States.neckMovementIntro) {
+      } else if (stateManager.currentState == States.neckMovementExercise) {
         startTimer(20);
-      } else if (stateManager.currentState.index >= 8) { //If in error state, stop timer
+      }
+      else{
         stopTimer();
       }
     });
@@ -282,7 +277,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
                             child: CameraPreview(_controller),
                           ),
                         ),
-                        if (stateManager.currentState == States.mallampatiIntro)
+                        if (stateManager.currentState == States.mallampatiIntro || stateManager.currentState == States.mallampatiExercise)
                           Positioned.fill( //THIS WHERE THE MOUTH IMAGE IS PLACED
                             child: Transform.translate(
                               offset: Offset(0, 30), // Adjust the offset to move the image
