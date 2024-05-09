@@ -12,6 +12,7 @@ import 'package:dart/info_page.dart';
 import 'package:dart/Assets/circle.dart';
 import 'main.dart';
 import 'state_manager.dart';
+import 'package:dart/info_page.dart';
 
 class CameraRecording extends StatefulWidget {
   final CameraDescription camera;
@@ -35,6 +36,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
   int _secondsRemaining = 10; // Initial value
   OverlayEntry? overlayEntry;
   final StateManager stateManager = GlobalVariables.stateManager;
+  Timer? _checkForErrorStateTimer;
 
   @override
   void initState() {
@@ -42,6 +44,9 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
     bool showState = true; // Default is true, toggle this to show/hide the state display
     SchedulerBinding.instance.addPostFrameCallback((timeStamp) {GlobalVariables.stateManager.changeState(States.mouthOpeningIntro);});
     stateManager.addListener(_onStateChanged); // Listen to state changes
+    _checkForErrorStateTimer = Timer.periodic(Duration(seconds: 0.5.toInt()), (timer) {
+      _checkGlobalVariables();
+    });
 
     // Listener for accelerometer events
     accelerometerSubscription = accelerometerEvents.listen((AccelerometerEvent event) {
@@ -54,31 +59,6 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
       setState(() {
         GlobalVariables.tiltAngle = math.atan2(event.y, event.z) * 180 / math.pi;
       });
-      if (GlobalVariables.luxValue <= 0) {
-        GlobalVariables.overlayNumber = 1;
-      } else if (GlobalVariables.luxValue >= 300) {
-        GlobalVariables.overlayNumber = 2;
-      } else if (GlobalVariables.eyeLevel == 0 && stateManager.currentState == States.mouthOpeningExercise) {
-        GlobalVariables.overlayNumber = 3;
-      } else if (GlobalVariables.eyeLevel == 2 && stateManager.currentState == States.mouthOpeningExercise) {
-        GlobalVariables.overlayNumber = 4;
-      } else if (GlobalVariables.eyeLevel == 3 && stateManager.currentState == States.mouthOpeningExercise) {
-        GlobalVariables.overlayNumber = 5;
-      } else if (GlobalVariables.tiltAngle < 75) {
-        GlobalVariables.overlayNumber = 6;
-      } else if (GlobalVariables.tiltAngle > 105) {
-        GlobalVariables.overlayNumber = 7;
-      } else {
-        // Default case if no other condition is met
-        GlobalVariables.overlayNumber = 0;
-        if (stateManager.currentState.index >= 9) {
-          stateManager.changeState(stateManager.previousState); // Change state back to the previous state
-        }
-      }
-
-      if (GlobalVariables.overlayNumber > 0 && stateManager.currentState.index >= 9) {
-        //stateManager.changeState(States.values[3]); //Sets state to error state
-      }
     });
 
     WidgetsBinding.instance.addObserver(this);
@@ -100,6 +80,37 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
     });
   }
 
+  void _checkGlobalVariables() {
+    if (GlobalVariables.luxValue <= 0) {
+      GlobalVariables.overlayNumber = 1;
+      stateManager.changeState(States.oopsBrightness);
+    } else if (GlobalVariables.luxValue >= 300) {
+      GlobalVariables.overlayNumber = 2;
+      stateManager.changeState(States.oopsBrightness);
+    } else if (GlobalVariables.eyeLevel == 0 && (stateManager.currentState == States.mouthOpeningExercise || stateManager.currentState == States.oopsNoFace)) {
+      GlobalVariables.overlayNumber = 3;
+      stateManager.changeState(States.oopsNoFace);
+    } else if (GlobalVariables.eyeLevel == 2 && (stateManager.currentState == States.mouthOpeningExercise || stateManager.currentState == States.oopsEyeHeight)) {
+      GlobalVariables.overlayNumber = 4;
+      stateManager.changeState(States.oopsEyeHeight);
+    } else if (GlobalVariables.eyeLevel == 3 && (stateManager.currentState == States.mouthOpeningExercise || stateManager.currentState == States.oopsEyeHeight)) {
+      GlobalVariables.overlayNumber = 5;
+      stateManager.changeState(States.oopsEyeHeight);
+    } else if (GlobalVariables.tiltAngle < 75) {
+      GlobalVariables.overlayNumber = 6;
+      stateManager.changeState(States.oopsFaceParallel);
+    } else if (GlobalVariables.tiltAngle > 105) {
+      GlobalVariables.overlayNumber = 7;
+      stateManager.changeState(States.oopsFaceParallel);
+    } else {
+      // Default case if no other condition is met
+      GlobalVariables.overlayNumber = 0;
+      if (stateManager.currentState.index >= 8) {
+        stateManager.changeState(stateManager.previousState); // Change state back to the previous state
+      }
+    }
+  }
+
 
   @override
   void dispose() {
@@ -112,9 +123,32 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
     super.dispose();
   }
 
-  Timer? _timer;  // Declare _timer as nullable
+  Timer? _timer;
 
   void startTimer(int duration) {
+    if (overlayEntry != null) {
+      overlayEntry!.remove();
+    }
+    overlayEntry ??= OverlayEntry(builder: (context) {
+      return Positioned(
+        child: SizedBox(
+          width: 400,
+          height: 300,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              DefaultTextStyle(style: TextStyle(
+                fontSize: 225,
+                fontWeight: FontWeight.bold,
+                color: Colors.black.withOpacity(0.5),),
+                  child: Text('$_secondsRemaining',)
+              )
+            ],
+          ),
+        ),
+      );
+    });
+    Overlay.of(context).insert(overlayEntry!);
     const oneSecond = Duration(seconds: 1);
     _secondsRemaining = duration;
     _timer = Timer.periodic(oneSecond, (timer) {
@@ -126,7 +160,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
         setState(() {
           _secondsRemaining -= 1;
           if (overlayEntry != null) {
-            overlayEntry!.markNeedsBuild(); // Trigger rebuild of OverlayEntry
+            overlayEntry!.markNeedsBuild();
           }
         });
       }
@@ -138,7 +172,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
       _timer!.cancel();
       overlayEntry?.remove();
       overlayEntry = null;
-      _timer = null;  // This is valid as _timer is declared nullable
+      _timer = null;
     }
   }
 
@@ -154,7 +188,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
         startTimer(5);
       } else if (stateManager.currentState == States.neckMovementExercise) {
         startTimer(20);
-      } else if (stateManager.currentState.index >= 9) {
+      } else if (stateManager.currentState.index >= 8) { //If in error state, stop timer
         stopTimer();
       }
     });
@@ -189,6 +223,20 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
     double buttonHeight = (mHeight/16);
 
     double mouthOverlayScale = 0.3; //Juster den her for at gøre mouthoverlay større/mindre, skal være mellem 0-1 (Tror enten den skal være 0.4 eller 0.5)
+
+    if (stateManager.currentState.index == 7) { // Thank you page
+      stopTimer();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => InfoPage(
+            camera: widget.camera,
+            infoText: 'Thanks for participating in the test!',
+            animationController: widget.animationController,
+          )),
+        );
+      });
+    }
 
     return Material(
 
@@ -249,7 +297,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
                             bottom: buttonPosH + 400, // Adjust the position as needed
                             child: Text(
                               'Current State: ${stateManager.currentState.toString().split('.').last}',
-                              style: TextStyle(
+                              style: const TextStyle(
                                 color: Colors.blue,
                                 fontSize: 18,
                               ),
@@ -308,29 +356,6 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
                 ),
               ),
               onPressed: (){
-                if (overlayEntry != null) {
-                  overlayEntry!.remove();
-                }
-                overlayEntry ??= OverlayEntry(builder: (context) {
-                    return Positioned(
-                      child: SizedBox(
-                        width: 400,
-                        height: 300,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            DefaultTextStyle(style: TextStyle(
-                              fontSize: 225,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black.withOpacity(0.5),),
-                                child: Text('$_secondsRemaining',)
-                            )
-                          ],
-                        ),
-                      ),
-                    );
-                  });
-                Overlay.of(context).insert(overlayEntry!);
                 // Get the current state as an integer
                 int currentStateInt = stateManager.currentState.index;
                 print('BUTTON PRESSED and Current state index: $currentStateInt');

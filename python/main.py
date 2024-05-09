@@ -50,8 +50,9 @@ if __name__ == '__main__':
 
         # Check the state and run the appropriate functions
         if state == 'Mouth Opening':
-            # Display the image
 
+            # Display the image
+            display_image_queue.put(frame)
 
             if face_landmarks:
                 # Calculate mouth opening ratio
@@ -125,5 +126,4 @@ if __name__ == '__main__':
 
             # Reset default tracker value
             #Tracker.default_chin_nose_distance = None
-            print("TEMP ERROR HAHAHA")
 
