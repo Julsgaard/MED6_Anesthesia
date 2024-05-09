@@ -28,43 +28,15 @@ class Circle extends StatefulWidget {
   @override
   CircleState createState() => CircleState();
 
-  final Map<States,String> animationList= {
-    States.intro: "Intro",
-    States.mouthOpeningIntro: "MouthOpeningIntro",
-    States.mouthOpeningExercise: "MouthOpeningExercise",
-    States.mallampatiIntro: "MallampatiIntro",
-    States.mallampatiExercise: "MallampatiExercise",
-    States.neckMovementIntro: "NeckMovementIntro",
-    States.neckMovementExercise: "HeadTiltExercise",
-    States.thanks: "Final",
-    States.oopsEyeHeight: "OopsEyeHeight",
-    States.oopsFaceParallel: "OopsFaceParallel",
-    States.oopsNoFace: "OopsNoFaceDetected",
-    States.oopsBrightness: "OopsBrightness",
 
-  };
-  final Map<String,int> animationLength = {
-    "Intro": 21250,
-    "MouthOpeningIntro": 20125,
-    "MouthOpeningExercise": 11459,
-    "MallampatiIntro": 32667,
-    "MallampatiExercise": 13750,
-    "NeckMovementIntro": 40625,
-    "HeadTiltExercise": 40709,
-    "Final": 4125,
-    "OopsEyeHeight": 10459,
-    "OopsFaceParallel": 13834,
-    "OopsNoFaceDetected":7167,
-    "OopsBrightness": 5292,
-  };
 }
 class CircleState extends State<Circle> with WidgetsBindingObserver{
   final StateManager stateManager = GlobalVariables.stateManager;
   late AudioPlayer audioPlayer;
 
-
   Future<void> UpdateAvatarAnimations() async {
     try {
+      print("I update animations");
       // Fetch the list of available animations
       List<String> animations = await widget.animationController.getAvailableAnimations();
 
@@ -73,15 +45,15 @@ class CircleState extends State<Circle> with WidgetsBindingObserver{
         var originalState = stateManager.currentState;
 
         // Get the animation name for the original state
-        String animationName = widget.animationList[originalState]!;
+        String animationName = GlobalVariables.animationList[originalState]!;
         widget.animationController.setCameraOrbit(0, 90, 100);
         // Play the animation for the original state
         widget.animationController.playAnimation(animationName: animationName);
-        playSound(stateManager.currentState.index);
+        playSound(stateManager.currentState);
         // If the current animation is not the blinking animation, proceed to blink
         if (animationName != "Blinking") {
           // Wait for the current animation to finish
-          await Future.delayed(Duration(milliseconds: widget.animationLength[animationName]!));
+          await Future.delayed(Duration(milliseconds: GlobalVariables.animationLength[animationName]!));
 
           // Loop to continuously play blinking animation until the state changes
           widget.animationController.setCameraOrbit(0, 90, 100);
@@ -105,7 +77,7 @@ class CircleState extends State<Circle> with WidgetsBindingObserver{
   }
   bool _isPlaying = false;
   int _howManyTimesHasSoundRun = 0;
-  Future<void> playSound(int state) async {
+  Future<void> playSound(States state) async {
     String audio;
     if (_isPlaying) return; // Exit if a sound is already being played
     _isPlaying = true;
@@ -116,44 +88,45 @@ class CircleState extends State<Circle> with WidgetsBindingObserver{
 
     // Switch case to check for state 0-11 and set the corresponding audio path
     switch (state) {
-      case 0:
+      case States.intro:
         audio = "Intro.mp3";
         break;
-      case 1:
+      case States.mouthOpeningIntro:
         audio = "Mouth_Opening_Intro.mp3";
         break;
-      case 2:
+      case States.mouthOpeningExercise:
         audio = "Mouth_Opening_Exercise.mp3";
         break;
-      case 3:
+      case States.mallampatiIntro:
         audio = "Mallampati_Intro.mp3";
         break;
-      case 4:
+      case States.mallampatiExercise:
         audio = "Mallampati_Exercise.mp3";
         break;
-      case 5:
+      case States.neckMovementIntro:
         audio = "Neck_Movement_Intro.mp3";
         break;
-      case 6:
+      case States.neckMovementExercise:
         audio = "Neck_Movement_Exercise.mp3";
         break;
-      case 7:
+      case States.thanks:
         audio = "Final.mp3";
         break;
-      case 8:
+      case States.oopsEyeHeight:
         audio = "Wrong_eye_height.mp3";
         break;
-      case 9:
+      case States.oopsFaceParallel:
         audio = "Wrong_tilt.mp3";
         break;
-      case 10:
+      case States.oopsNoFace:
         audio = "Wrong_face.mp3";
         break;
-      case 11:
+      case States.oopsBrightness:
         audio = "Wrong_brightness.mp3";
         break;
       default:
         audio = "How";
+        break;
     }
     audioPlayer.stop();
     try {

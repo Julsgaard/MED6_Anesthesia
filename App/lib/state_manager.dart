@@ -25,20 +25,25 @@ class StateManager {
   States _currentState = States.mouthOpeningIntro; // Initial state set to MouthOpening
 // Initial state set to MouthOpening
   States _previousState = States.mouthOpeningIntro; // Use this to keep track of which state the user was in in case of the state being aborted
-  List<VoidCallback> _listeners = []; // Listeners to notify upon state change
+  List<dynamic> _listeners = []; // Listeners to notify upon state change
 
   States get currentState => _currentState; // Getter for the current state
   States get previousState => _previousState; // Getter for the previous state
 
-  void addListener(VoidCallback listener) {
+  void addListener(dynamic listener) {
     _listeners.add(listener); // Method to add a listener
     print(_listeners);
   }
 
-  void notifyListeners() {
+  Future<void> notifyListeners() async{
     //print("I NOTIFY LISTENERS");
-    for (var listener in _listeners) { // Notify all listeners of a state change
-        listener();
+    if (_listeners.isEmpty) return; // If there are no listeners, do nothing
+    for (var listener in _listeners) {
+      if (listener is Function()) {
+        listener(); // Notify all listeners
+      }else if(listener is Future Function()){
+        await listener();
+      }
     }
   }
 
@@ -60,7 +65,7 @@ class StateManager {
     notifyListeners(); // Notify all listeners about the state change
   }
 
-  void removeListener(VoidCallback listener) {
+  void removeListener(dynamic listener) {
     _listeners.remove(listener); // Method to remove a listener
   }
   void nextState(){
