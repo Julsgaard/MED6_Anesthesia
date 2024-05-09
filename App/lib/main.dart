@@ -22,6 +22,35 @@ class GlobalVariables {
   static int overlayNumber = 0;
   static StateManager stateManager = StateManager();
   static bool showState = true;
+  static Map<States,String> animationList= {
+    States.intro: "Intro",
+    States.mouthOpeningIntro: "MouthOpeningIntro",
+    States.mouthOpeningExercise: "MouthOpeningExercise",
+    States.mallampatiIntro: "MallampatiIntro",
+    States.mallampatiExercise: "MallampatiExercise",
+    States.neckMovementIntro: "NeckMovementIntro",
+    States.neckMovementExercise: "HeadTiltExercise",
+    States.thanks: "Final",
+    States.oopsEyeHeight: "OopsEyeHeight",
+    States.oopsFaceParallel: "OopsFaceParallel",
+    States.oopsNoFace: "OopsNoFaceDetected",
+    States.oopsBrightness: "OopsBrightness",
+
+  };
+  static Map<String,int> animationLength = {
+    "Intro": 21250,
+    "MouthOpeningIntro": 20125,
+    "MouthOpeningExercise": 11459,
+    "MallampatiIntro": 32667,
+    "MallampatiExercise": 13750,
+    "NeckMovementIntro": 40625,
+    "HeadTiltExercise": 40709,
+    "Final": 4125,
+    "OopsEyeHeight": 10459,
+    "OopsFaceParallel": 13834,
+    "OopsNoFaceDetected":7167,
+    "OopsBrightness": 5292,
+  };
 }
 
 

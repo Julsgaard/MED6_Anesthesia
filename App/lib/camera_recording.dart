@@ -80,7 +80,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
   }
 
   void _checkGlobalVariables() {
-    if (GlobalVariables.luxValue <= 0) {
+    if (GlobalVariables.luxValue < 0) {
       GlobalVariables.overlayNumber = 1;
       stateManager.changeState(States.oopsBrightness);
     } else if (GlobalVariables.luxValue >= 300) {
@@ -126,48 +126,69 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
 
   Timer? _timer;
 
-  void startTimer(int duration) {
-    if (overlayEntry != Null){
-      if(_timer != null){
-        _timer!.cancel();
-      }
-      overlayEntry ??= OverlayEntry(builder: (context) {
-        return Positioned(
-          child: SizedBox(
-            width: 400,
-            height: 300,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                DefaultTextStyle(style: TextStyle(
-                  fontSize: 225,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black.withOpacity(0.5),),
-                    child: Text('$_secondsRemaining',)
-                )
-              ],
+  void startTimer(int duration, [int startAfterMilliseconds = 0/*, bool countUp = false*/]) {
+    Future.delayed(Duration(milliseconds: startAfterMilliseconds), () {
+      if (overlayEntry != Null){
+        if(_timer != null){
+          _timer!.cancel();
+        }
+        overlayEntry ??= OverlayEntry(builder: (context) {
+          return Positioned(
+            child: SizedBox(
+              width: 400,
+              height: 300,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  DefaultTextStyle(style: TextStyle(
+                    fontSize: 225,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black.withOpacity(0.5),),
+                      child: Text('$_secondsRemaining',)
+                  )
+                ],
+              ),
             ),
-          ),
-        );
-      });
-    }
-    Overlay.of(context).insert(overlayEntry!);
-    const oneSecond = Duration(seconds: 1);
-    _secondsRemaining = duration;
-    _timer = Timer.periodic(oneSecond, (timer) {
-      if (_secondsRemaining <= 0) {
-        timer.cancel();
-        overlayEntry?.remove();
-        overlayEntry = null;
-        stateManager.nextState();
-      } else {
-        setState(() {
-          _secondsRemaining -= 1;
-          if (overlayEntry != null) {
-            overlayEntry!.markNeedsBuild();
-          }
+          );
         });
       }
+
+      Overlay.of(context).insert(overlayEntry!);
+      const oneSecond = Duration(seconds: 1);
+      /*if(!countUp){*/
+        _secondsRemaining = duration;
+        _timer = Timer.periodic(oneSecond, (timer) {
+          if (_secondsRemaining <= 0) {
+            timer.cancel();
+            overlayEntry?.remove();
+            overlayEntry = null;
+            stateManager.nextState();
+          } else {
+            setState(() {
+              _secondsRemaining -= 1;
+              if (overlayEntry != null) {
+                overlayEntry!.markNeedsBuild();
+              }
+            });
+          }
+        });
+      /*}else{
+        _secondsRemaining = 0;
+        _timer = Timer.periodic(oneSecond, (timer) {
+          if (_secondsRemaining >= duration) {
+            timer.cancel();
+            overlayEntry?.remove();
+            overlayEntry = null;
+          } else {
+            setState(() {
+              _secondsRemaining += 1;
+              if (overlayEntry != null) {
+                overlayEntry!.markNeedsBuild();
+              }
+            });
+          }
+        });
+      }*/
     });
   }
 
@@ -183,15 +204,28 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
 // For handling state changes (mouth opening, mallampati, neck movement)
   void _onStateChanged() {
     setState(() {
-      if (stateManager.currentState == States.mouthOpeningExercise) {
-        startTimer(10);
-      } else if (stateManager.currentState == States.mallampatiExercise) {
-        startTimer(5);
-      } else if (stateManager.currentState == States.neckMovementExercise) {
-        startTimer(20);
-      }
-      else{
-        stopTimer();
+      //write a switch case for each state
+      switch(stateManager.currentState){
+        case States.mouthOpeningIntro:
+          startTimer(3, 20667);
+          break;
+        case States.mouthOpeningExercise:
+          startTimer(3, 7125);
+          break;
+        case States.mallampatiIntro:
+          startTimer(3, 32625);
+          break;
+        case States.mallampatiExercise:
+          startTimer(3, 10459);
+          break;
+        case States.neckMovementIntro:
+          startTimer(3, 41042);
+          break;
+        case States.neckMovementExercise:
+          break;
+        default:
+          stopTimer();
+          break;
       }
     });
   }
