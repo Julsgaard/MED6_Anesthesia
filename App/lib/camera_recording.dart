@@ -233,6 +233,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
             camera: widget.camera,
             infoText: 'Thanks for participating in the test!',
             animationController: widget.animationController,
+            showContinueButton: false,
           )),
         );
       });
