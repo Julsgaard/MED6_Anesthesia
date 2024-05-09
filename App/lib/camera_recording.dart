@@ -45,7 +45,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
     bool showState = true; // Default is true, toggle this to show/hide the state display
     SchedulerBinding.instance.addPostFrameCallback((timeStamp) {GlobalVariables.stateManager.changeState(States.mouthOpeningIntro);});
     stateManager.addListener(_onStateChanged); // Listen to state changes
-    _checkForErrorStateTimer = Timer.periodic(Duration(seconds: 0.5.toInt()), (timer) {
+    _checkForErrorStateTimer = Timer.periodic(const Duration(milliseconds: 500), (timer) {
       _checkGlobalVariables();
     });
 
@@ -56,7 +56,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
       // This is a simplification and might need adjustment for your use case.
 
       // TODO All the state checks are basically just placed inside the accelerometer event listener, maybe change this to a separate function
-      print("Current state: ${stateManager.currentState}"); // Print the current state for debugging purposes
+      //print("Current state: ${stateManager.currentState}"); // Print the current state for debugging purposes
       setState(() {
         GlobalVariables.tiltAngle = math.atan2(event.y, event.z) * 180 / math.pi;
       });
