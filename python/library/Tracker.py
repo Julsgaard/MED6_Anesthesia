@@ -118,10 +118,11 @@ def add_chin_and_nose_tracker(frame, face_landmarks, nose_tracker, chin_tracker)
 
     if default_chin_nose_distance is None:
         default_chin_nose_distance = current_chin_nose_distance
+        angle = 0
     else:
         angle = calculate_angle(default_chin_nose_distance, current_chin_nose_distance)
 
-    return nose_tracker, chin_tracker, frame
+    return nose_tracker, chin_tracker, frame, angle
 
 # Example usage:
 # frame = cv2.imread('path_to_image.jpg')

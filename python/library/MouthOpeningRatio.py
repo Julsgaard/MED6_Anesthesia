@@ -63,6 +63,7 @@ def lip_distance_monitor(landmarks):
             # Calculate the median of the collected distances
             default_inner_lip_distance = statistics.median(distances)
             #print(f"Default inner lip distance set using median: {default_inner_lip_distance:.2f}")
+            return 0
         else:
             # Calculate the difference in percentage
             difference = ((current_distance - default_inner_lip_distance) / default_inner_lip_distance) * 100

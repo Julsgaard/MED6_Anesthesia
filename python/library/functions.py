@@ -125,11 +125,11 @@ def find_state_for_image_path(image_path):
         return "Unknown category"
 
 
-def save_prediction_to_file(image_path, prediction):
+def save_results_to_file(image_path, results):
     # Extract the session path from the image path
     session_path = os.path.dirname(image_path)
 
     # Create a new file in the session directory with the prediction
-    with open(f"{session_path}/1. predictions.txt", 'a') as file:
-        file.write(f"{os.path.basename(image_path)}: {prediction}\n")
+    with open(f"{session_path}/1. results.txt", 'a') as file:
+        file.write(f"{os.path.basename(image_path)}: {results}\n")
         # print(f"Prediction saved to {session_path}/1. predictions.txt")

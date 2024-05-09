@@ -230,7 +230,7 @@ def print_every_x(frame_counter, prev_time, current_state, lux_value, tilt_angle
         fps = frame_counter / (curr_time - prev_time)
         #print("=================================")
         print(f"Current State: {current_state}")
-        #print(f"FPS: {fps}")
+        print(f"FPS: {fps}")
         #print(f"Lux Value: {lux_value}")
         #print(f"Tilt Angle: {tilt_angle}")
         # print(f"Image ByteSize: {size}")
