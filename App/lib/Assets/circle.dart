@@ -38,7 +38,7 @@ class Circle extends StatefulWidget {
     States.oopsFaceParallel: "OopsFaceParallel",
     States.oopsNoFace: "OopsNoFaceDetected",
     States.oopsBrightness: "OopsBrightness",
-    States.blinking: "Blinking",
+
   };
   final Map<String,int> animationLength = {
     "Intro": 21250,
