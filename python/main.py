@@ -56,7 +56,10 @@ if __name__ == '__main__':
 
             if face_landmarks:
                 # Calculate mouth opening ratio
-                MouthOpeningRatio.lip_distance_monitor(face_landmarks)
+                lip_distance = MouthOpeningRatio.lip_distance_monitor(face_landmarks)
+                if lip_distance:
+                    print(f"Lip Distance Increase: {lip_distance:.2f}%.")
+                    functions.save_results_to_file(image_path, f"Lip Distance Increase: {lip_distance:.2f}%.")
 
 
         elif state == 'Mallampati':
@@ -80,7 +83,7 @@ if __name__ == '__main__':
                     print("Mallampati Class 1 or 2")
 
                     # Save the prediction to a file
-                    functions.save_prediction_to_file(image_path, "Mallampati Class 1 or 2")
+                    functions.save_results_to_file(image_path, "Mallampati Class 1 or 2")
 
                     # Add prediction to list
                     predictions.append(0)
@@ -89,7 +92,7 @@ if __name__ == '__main__':
                     print("Mallampati Class 3 or 4")
 
                     # Save the prediction to a file
-                    functions.save_prediction_to_file(image_path, "Mallampati Class 3 or 4")
+                    functions.save_results_to_file(image_path, "Mallampati Class 3 or 4")
 
                     # Add prediction to list
                     predictions.append(1)
@@ -107,9 +110,11 @@ if __name__ == '__main__':
 
         elif state == 'Neck Movement':
 
-            nose_tracker, chin_tracker, frame = Tracker.add_chin_and_nose_tracker(frame, face_landmarks, nose_tracker,
+            nose_tracker, chin_tracker, frame, head_angle = Tracker.add_chin_and_nose_tracker(frame, face_landmarks, nose_tracker,
                                                                                   chin_tracker)
-
+            if head_angle:
+                print(f"Head Angle in degrees: {head_angle}")
+                functions.save_results_to_file(image_path, f"Head Angle: {head_angle}")
             # Display the image
             display_image_queue.put(frame)
 
