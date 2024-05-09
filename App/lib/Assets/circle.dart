@@ -84,11 +84,11 @@ class CircleState extends State<Circle> with WidgetsBindingObserver{
           await Future.delayed(Duration(milliseconds: widget.animationLength[animationName]!));
 
           // Loop to continuously play blinking animation until the state changes
-          while (stateManager.currentState == originalState) {
-            widget.animationController.setCameraOrbit(0, 90, 100);
-            widget.animationController.playAnimation(animationName: "Blinking");
-            await Future.delayed(Duration(milliseconds: 500));
-          }
+          widget.animationController.setCameraOrbit(0, 90, 100);
+          widget.animationController.playAnimation(animationName: "Blinking");
+        }else{
+          widget.animationController.setCameraOrbit(0, 90, 100);
+          widget.animationController.playAnimation(animationName: "Blinking");
         }
       } else {
         // If no animations are available, retry after a short delay
