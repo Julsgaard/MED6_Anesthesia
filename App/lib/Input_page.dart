@@ -1,6 +1,9 @@
 import 'dart:typed_data';
 import 'package:camera/camera.dart';
+import 'package:dart/main.dart';
+import 'package:dart/state_manager.dart';
 import "package:flutter/material.dart";
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter_3d_controller/flutter_3d_controller.dart';
@@ -27,6 +30,11 @@ class _InputPageState extends State<InputPage> {
   String weight = '';
   String difficultyOfIntubation = '';
 
+  @override
+  void initState() {
+    super.initState();
+    SchedulerBinding.instance.addPostFrameCallback((timeStamp) { GlobalVariables.stateManager.notifyListeners();});
+  }
 
 
   @override
