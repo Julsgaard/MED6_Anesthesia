@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:camera/camera.dart';
+import 'package:dart/Assets/circle.dart';
 import 'package:dart/state_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_3d_controller/flutter_3d_controller.dart';
@@ -12,6 +13,7 @@ import 'network_client.dart';
 
 List<CameraDescription>? cameras;
 class GlobalVariables {
+  static GlobalKey<CircleState> circleKey = GlobalKey();
   // Static variable to hold the IP address
   static var ipAddress = "No IP address set"; // SET IP IN APP
   static var port = 5000;

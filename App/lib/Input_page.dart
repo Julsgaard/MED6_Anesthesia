@@ -57,7 +57,7 @@ class _InputPageState extends State<InputPage> {
         decoration: const BoxDecoration(color: Color(0xFFEBEEF3)),
         child: Stack(
           children: [
-            Circle(mWidth: mWidth, circleHeight: circleHeight,animationController: widget.animationController),
+            Circle(key: GlobalVariables.circleKey ,mWidth: mWidth, circleHeight: circleHeight,animationController: widget.animationController),
             Positioned(
               left: (mWidth/8),
               top: circleHeight/2 + gab,
