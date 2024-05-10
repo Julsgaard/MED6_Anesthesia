@@ -36,7 +36,7 @@ def run_mallampati_model():
     optimizer = optim.Adam(model.fc.parameters(), lr=learning_rate)
 
     best_model_wts = copy.deepcopy(model.state_dict())
-    best_acc = 0.0
+    best_validation_loss = 0.0
 
     training_losses = []
     validation_losses = []
@@ -84,12 +84,13 @@ def run_mallampati_model():
             f'Validation Loss: {validation_loss:.4f}, Validation Accuracy: {epoch_acc:.4f}')
 
         # deep copy the model if it has the best accuracy so far
-        if epoch_acc > best_acc:
-            best_acc = epoch_acc
+        if validation_loss > best_validation_loss:
+            best_validation_loss = validation_loss
+            best_validation_epoch = epoch
             best_model_wts = copy.deepcopy(model.state_dict())
 
     model.load_state_dict(best_model_wts)
-    folder_name = f'mallampati_models/ResNet models/{best_acc * 100:.2f}%_{num_epochs}_epochs'
+    folder_name = f'mallampati_models/ResNet models/{best_validation_loss:.4f}%_{num_epochs}_epochs'
     os.makedirs(folder_name, exist_ok=True)
 
     # Save the model
@@ -100,13 +101,14 @@ def run_mallampati_model():
         f.write(f'Num Classes: {num_classes}\n')
         f.write(f'Learning Rate: {learning_rate}\n')
         f.write(f'Num Epochs: {num_epochs}\n')
+        f.write(f'Best Validation Loss: {best_validation_loss:.4f}% at epoch: {best_validation_epoch + 1}\n')
 
     # Save the plot
     plot_file_path = os.path.join(folder_name, 'training_validation_plot.png')
     plot_training(training_losses, validation_losses, accuracies, plot_file_path)
 
     print(f"Model and training details saved in folder: {folder_name}")
-    print(f"Best accuracy: {best_acc * 100:.2f}%")
+    print(f"Best validation loss: {best_validation_loss * 100:.2f}% at epoch: {best_validation_epoch + 1}")
 
 
 def plot_training(training_losses, validation_losses, accuracies, plot_file_path):
