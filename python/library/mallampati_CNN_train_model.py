@@ -1,4 +1,6 @@
 import datetime
+import os
+
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -115,6 +117,9 @@ if __name__ == '__main__':
 
     # Train the model
     trained_model = train_model(model, train_loader, validation_loader, criterion, optimizer, device, num_epochs=15)
+
+    # Create folder for model if it does not exist
+    os.makedirs('mallampati_models/CNN models', exist_ok=True)
 
     # Save the model
     save_model(trained_model)
