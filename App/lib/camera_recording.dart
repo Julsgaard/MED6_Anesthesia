@@ -127,32 +127,29 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
   Timer? _timer;
 
   void startTimer(int duration, [int startAfterMilliseconds = 0/*, bool countUp = false*/]) {
-    if (overlayEntry != Null){
-      if(_timer != null){
-        stopTimer();
-      }
-      Future.delayed(Duration(milliseconds: startAfterMilliseconds), () {
-        overlayEntry = OverlayEntry(builder: (context) {
-          return Positioned(
-            child: SizedBox(
-              width: 400,
-              height: 300,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  DefaultTextStyle(style: TextStyle(
-                    fontSize: 225,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black.withOpacity(0.5),),
-                      child: Text('$_secondsRemaining',)
-                  )
-                ],
-              ),
+    stopTimer();
+    Future.delayed(Duration(milliseconds: startAfterMilliseconds), () {
+      overlayEntry = OverlayEntry(builder: (context) {
+        return Positioned(
+          child: SizedBox(
+            width: 400,
+            height: 300,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                DefaultTextStyle(style: TextStyle(
+                  fontSize: 225,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black.withOpacity(0.5),),
+                    child: Text('$_secondsRemaining',)
+                )
+              ],
             ),
-          );
-        });
+          ),
+        );
       });
-    }
+    });
+
     Overlay.of(context).insert(overlayEntry!);
     const oneSecond = Duration(seconds: 1);
     /*if(!countUp){*/
@@ -192,6 +189,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
     if (_timer != null) {
       _timer!.cancel();
       overlayEntry?.remove();
+      overlayEntry?.dispose();
       overlayEntry = null;
       _timer = null;
     }
@@ -389,7 +387,8 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
                 ),
               ),
               onPressed: (){
-                // Get the current state as an integer
+                stateManager.nextState();
+                /*// Get the current state as an integer
                 int currentStateInt = stateManager.currentState.index;
                 //print('BUTTON PRESSED and Current state index: $currentStateInt');
                 // +1 to the current state
@@ -410,7 +409,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
 
                 //Stops countdown timer if any are running
                 //stopTimer();
-
+*/
               },
             ),
           ),
