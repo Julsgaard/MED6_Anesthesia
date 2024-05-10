@@ -23,9 +23,9 @@ enum States {
 
 class StateManager {
   final int _errorStateIndex = 9;
-  States _currentState = States.mouthOpeningIntro; // Initial state set to MouthOpening
+  States _currentState = States.intro; // Initial state set to MouthOpening
 // Initial state set to MouthOpening
-  States _previousState = States.mouthOpeningIntro; // Use this to keep track of which state the user was in in case of the state being aborted
+  States _previousState = States.intro; // Use this to keep track of which state the user was in in case of the state being aborted
   List<dynamic> _listeners = []; // Listeners to notify upon state change
 
   States get currentState => _currentState; // Getter for the current state
@@ -70,6 +70,7 @@ class StateManager {
   void removeListener(dynamic listener) {
     _listeners.remove(listener); // Method to remove a listener
   }
+
   void nextState(){
     int nextIndex = _currentState.index+1;
     if(nextIndex < _errorStateIndex){
