@@ -11,6 +11,7 @@ import 'camera_recording.dart';
 import 'package:dart/Assets/circle.dart';
 import 'network_client.dart';
 
+
 // Convert InputPage to StatefulWidget
 class InputPage extends StatefulWidget {
   final CameraDescription camera;
