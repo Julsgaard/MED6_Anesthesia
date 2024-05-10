@@ -127,12 +127,12 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
   Timer? _timer;
 
   void startTimer(int duration, [int startAfterMilliseconds = 0/*, bool countUp = false*/]) {
-    if (overlayEntry == null){
+    if (overlayEntry != Null){
       if(_timer != null){
         stopTimer();
       }
       Future.delayed(Duration(milliseconds: startAfterMilliseconds), () {
-        overlayEntry ??= OverlayEntry(builder: (context) {
+        overlayEntry = OverlayEntry(builder: (context) {
           return Positioned(
             child: SizedBox(
               width: 400,
