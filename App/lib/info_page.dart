@@ -9,6 +9,7 @@ import 'package:flutter_3d_controller/flutter_3d_controller.dart';
 import 'camera_recording.dart';
 import 'package:dart/Assets/circle.dart';
 import 'package:dart/Input_page.dart';
+import '../state_manager.dart';
 
 class InfoPage extends StatefulWidget {
   final CameraDescription camera;
@@ -27,6 +28,8 @@ class InfoPage extends StatefulWidget {
 }
 
 class InfoStage extends State<InfoPage>{
+
+  final StateManager stateManager = GlobalVariables.stateManager;
   @override
   void initState() {
     super.initState();
@@ -95,6 +98,7 @@ class InfoStage extends State<InfoPage>{
                   ),
                 ),
                 onPressed: (){
+                  stateManager.changeState(States.inputPage);
                   Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(builder: (context) => InputPage(
