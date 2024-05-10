@@ -38,7 +38,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
   final StateManager stateManager = GlobalVariables.stateManager;
   Timer? _checkForErrorStateTimer;
 
-
+  
   @override
   void initState() {
     super.initState();
@@ -279,7 +279,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
 
       child: Stack(
         children: [
-          Circle(mWidth: mWidth, circleHeight: circleHeight,animationController: widget.animationController,),
+          Circle(key: GlobalVariables.circleKey, mWidth: mWidth, circleHeight: circleHeight,animationController: widget.animationController,),
           Positioned(
             left: (mWidth - cameraWidth)/2,
             top: circleHeight/2 + 10,

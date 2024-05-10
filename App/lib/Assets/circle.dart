@@ -14,7 +14,7 @@ import '../state_manager.dart';
 
 class Circle extends StatefulWidget {
 
-  Circle({
+  const Circle({
     super.key,
     required this.mWidth,
     required this.circleHeight,
@@ -33,7 +33,6 @@ class Circle extends StatefulWidget {
 class CircleState extends State<Circle> with WidgetsBindingObserver{
   final StateManager stateManager = GlobalVariables.stateManager;
   late AudioPlayer audioPlayer;
-
   Future<void> UpdateAvatarAnimations() async {
     try {
       print("I update animations");
