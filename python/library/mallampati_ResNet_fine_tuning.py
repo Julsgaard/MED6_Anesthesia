@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 # Hyperparameters
 num_classes = 2  # The number of classes in the dataset
 learning_rate = 0.001  # The learning rate for the optimizer
-num_epochs = 100  # The number of epochs to train the model
+num_epochs = 1000  # The number of epochs to train the model
 
 
 def run_mallampati_model():
@@ -36,7 +36,8 @@ def run_mallampati_model():
     optimizer = optim.Adam(model.fc.parameters(), lr=learning_rate)
 
     best_model_wts = copy.deepcopy(model.state_dict())
-    best_validation_loss = 0.0
+    best_validation_loss = float('inf')
+    best_validation_epoch = 0
 
     training_losses = []
     validation_losses = []
@@ -83,15 +84,18 @@ def run_mallampati_model():
             f'Epoch {epoch + 1}/{num_epochs}, Training Loss: {training_loss:.4f} | '
             f'Validation Loss: {validation_loss:.4f}, Validation Accuracy: {epoch_acc:.4f}')
 
-        # deep copy the model if it has the best accuracy so far
-        if validation_loss > best_validation_loss:
+        # Saves the model with the best validation loss
+        if validation_loss < best_validation_loss:
             best_validation_loss = validation_loss
             best_validation_epoch = epoch
             best_model_wts = copy.deepcopy(model.state_dict())
 
     model.load_state_dict(best_model_wts)
-    folder_name = f'mallampati_models/ResNet models/{best_validation_loss:.4f}%_{num_epochs}_epochs'
+    folder_name = f'mallampati_models/ResNet models/loss_{best_validation_loss:.4f}_{num_epochs}_epochs'
     os.makedirs(folder_name, exist_ok=True)
+
+    print(f"Model and training details saved in folder: {folder_name}")
+    print(f"Best Validation Loss: {best_validation_loss:.4f} at epoch: {best_validation_epoch + 1}")
 
     # Save the model
     torch.save(model.state_dict(), os.path.join(folder_name, 'model.pth'))
@@ -101,14 +105,11 @@ def run_mallampati_model():
         f.write(f'Num Classes: {num_classes}\n')
         f.write(f'Learning Rate: {learning_rate}\n')
         f.write(f'Num Epochs: {num_epochs}\n')
-        f.write(f'Best Validation Loss: {best_validation_loss:.4f}% at epoch: {best_validation_epoch + 1}\n')
+        f.write(f'Best Validation Loss: {best_validation_loss:.4f} at epoch: {best_validation_epoch + 1}\n')
 
     # Save the plot
     plot_file_path = os.path.join(folder_name, 'training_validation_plot.png')
     plot_training(training_losses, validation_losses, accuracies, plot_file_path)
-
-    print(f"Model and training details saved in folder: {folder_name}")
-    print(f"Best validation loss: {best_validation_loss * 100:.2f}% at epoch: {best_validation_epoch + 1}")
 
 
 def plot_training(training_losses, validation_losses, accuracies, plot_file_path):
