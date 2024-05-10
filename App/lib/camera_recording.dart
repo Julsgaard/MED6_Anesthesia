@@ -127,11 +127,11 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
   Timer? _timer;
 
   void startTimer(int duration, [int startAfterMilliseconds = 0/*, bool countUp = false*/]) {
-    Future.delayed(Duration(milliseconds: startAfterMilliseconds), () {
-      if (overlayEntry != Null){
-        if(_timer != null){
-          _timer!.cancel();
-        }
+    if (overlayEntry == null){
+      if(_timer != null){
+        stopTimer();
+      }
+      Future.delayed(Duration(milliseconds: startAfterMilliseconds), () {
         overlayEntry ??= OverlayEntry(builder: (context) {
           return Positioned(
             child: SizedBox(
@@ -151,27 +151,24 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
             ),
           );
         });
-      }
-
-      Overlay.of(context).insert(overlayEntry!);
-      const oneSecond = Duration(seconds: 1);
-      /*if(!countUp){*/
-        _secondsRemaining = duration;
-        _timer = Timer.periodic(oneSecond, (timer) {
-          if (_secondsRemaining <= 0) {
-            timer.cancel();
-            overlayEntry?.remove();
-            overlayEntry = null;
-            stateManager.nextState();
-          } else {
-            setState(() {
-              _secondsRemaining -= 1;
-              if (overlayEntry != null) {
-                overlayEntry!.markNeedsBuild();
-              }
-            });
-          }
-        });
+      });
+    }
+    Overlay.of(context).insert(overlayEntry!);
+    const oneSecond = Duration(seconds: 1);
+    /*if(!countUp){*/
+      _secondsRemaining = duration;
+      _timer = Timer.periodic(oneSecond, (timer) {
+        if (_secondsRemaining <= 0) {
+          stopTimer();
+        } else {
+          setState(() {
+            _secondsRemaining -= 1;
+            if (overlayEntry != null) {
+              overlayEntry!.markNeedsBuild();
+            }
+          });
+        }
+      });
       /*}else{
         _secondsRemaining = 0;
         _timer = Timer.periodic(oneSecond, (timer) {
@@ -189,7 +186,6 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
           }
         });
       }*/
-    });
   }
 
   void stopTimer() {
@@ -260,7 +256,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
 
     double mouthOverlayScale = 0.3; //Juster den her for at gøre mouthoverlay større/mindre, skal være mellem 0-1 (Tror enten den skal være 0.4 eller 0.5)
 
-    if (stateManager.currentState.index == 7) { // Thank you page
+    if (stateManager.currentState.index == 8) { // Thank you page
       stopTimer();
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Navigator.pushReplacement(
