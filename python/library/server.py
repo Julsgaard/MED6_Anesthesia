@@ -52,7 +52,7 @@ async def handle_client(reader, writer, image_queue, tilt_queue, eye_level_queue
             current_state_data = await reader.readexactly(4)
             current_state = int.from_bytes(current_state_data, 'big')
 
-            if current_state == 2:  # Mouth Opening state
+            if current_state == 3:  # Mouth Opening state
                 current_state = 'Mouth Opening'
 
                 image_counter, lux_value, tilt_angle = await video_stream(reader, image_queue, session_path,
@@ -68,7 +68,7 @@ async def handle_client(reader, writer, image_queue, tilt_queue, eye_level_queue
                 # Send data to the client
                 await send_to_client(send_data, writer)
 
-            elif current_state == 4:  # Mallampati state
+            elif current_state == 5:  # Mallampati state
                 current_state = 'Mallampati'
 
                 image_counter, lux_value, tilt_angle = await video_stream(reader, image_queue, session_path,
@@ -84,7 +84,7 @@ async def handle_client(reader, writer, image_queue, tilt_queue, eye_level_queue
                 # Send data to the client
                 await send_to_client(send_data, writer)
 
-            elif current_state == 6:  # Neck Movement state
+            elif current_state == 7:  # Neck Movement state
                 current_state = 'Neck Movement'
 
                 image_counter, lux_value, tilt_angle = await video_stream(reader, image_queue, session_path,
