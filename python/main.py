@@ -1,4 +1,4 @@
-from library import server, functions, MediapipeFaceDetection, MouthOpeningRatio, MouthCrop, Tracker, eye_detect, mallampati_image_prep, mallampati_CNN_run_model, TimerScript
+from library import server, functions, MediapipeFaceDetection, MouthOpeningRatio, MouthCrop, Tracker, eye_detect, mallampati_image_prep, mallampati_CNN_run_model, mallampati_ResNet_run_model, TimerScript
 import threading
 import queue
 
@@ -31,9 +31,12 @@ if __name__ == '__main__':
     # Starts the display_images function in a new thread with the functions_image_queue
     functions.start_display_thread(display_image_queue)
 
-    # Find the device and load the model for the AI model
+    # Find the device (GPU or CPU)
     device = mallampati_CNN_run_model.find_device()
-    model = mallampati_CNN_run_model.load_model(device, model_path='library/mallampati_models/model_mallampati_CNN_Best_Model_CUDA.pth')
+
+    # Load the model (either CNN or ResNet)
+    model = mallampati_CNN_run_model.load_model_CNN(device, model_path='library/mallampati_models/model_mallampati_CNN_Best_Model_CUDA.pth')
+    # model = mallampati_ResNet_run_model.load_model_ResNet(device, model_path='library/mallampati_models/ResNet_98.88%_15_epoch_Best/model.pth')
 
     while True:
         # Get the image path from the server image queue

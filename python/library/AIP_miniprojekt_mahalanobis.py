@@ -3,7 +3,7 @@ import torch.nn as nn
 import numpy as np
 from scipy.spatial.distance import mahalanobis
 from library.mallampati_image_prep import prepare_loader
-from library.mallampati_CNN_run_model import load_model
+from library.mallampati_CNN_run_model import load_model_CNN
 
 
 # Define the Feature Extractor
@@ -96,7 +96,7 @@ def main():
     device = torch.device("cpu")
 
     # If you want to use a pretrained model, use this code:
-    feature_extractor_model = FeatureExtractor(load_model(device, 'mallampati_models/CNN models/model_mallampati_CNN_Best.pth'))
+    feature_extractor_model = FeatureExtractor(load_model_CNN(device, 'mallampati_models/CNN models/model_mallampati_CNN_Best.pth'))
     train_features, train_labels = extract_features(train_loader, feature_extractor_model, device)
     test_features, test_labels = extract_features(test_loader, feature_extractor_model, device)
 
