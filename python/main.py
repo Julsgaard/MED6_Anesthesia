@@ -1,4 +1,4 @@
-from library import server, functions, MediapipeFaceDetection, MouthOpeningRatio, MouthCrop, Tracker, eye_detect, mallampati_image_prep, mallampati_CNN_run_model
+from library import server, functions, MediapipeFaceDetection, MouthOpeningRatio, MouthCrop, Tracker, eye_detect, mallampati_image_prep, mallampati_CNN_run_model, TimerScript
 import threading
 import queue
 
@@ -12,6 +12,10 @@ nose_tracker = None
 chin_tracker = None
 
 predictions = []
+
+# Additional variables to manage state
+current_state = None
+timer = TimerScript.TimerClass()  # Create an instance of Timer
 
 if __name__ == '__main__':
     functions.check_for_logs_folder()  # Check if the logs folder exists, if not create it
@@ -39,7 +43,10 @@ if __name__ == '__main__':
         # display_image_queue.put(image_path)
 
         # Find the state for the image path
-        state = functions.find_state_for_image_path(image_path)
+        new_state = functions.find_state_for_image_path(image_path)
+        if current_state != new_state:
+            current_state = new_state
+            timer.reset()  # Reset timer when state changes
 
         frame, face_landmarks = MediapipeFaceDetection.detect_faces_and_landmarks(image_path, face_mesh_model,
                                                                                   is_image=True)
@@ -49,7 +56,7 @@ if __name__ == '__main__':
 
 
         # Check the state and run the appropriate functions
-        if state == 'Mouth Opening':
+        if current_state == 'Mouth Opening':
 
             # Display the image
             display_image_queue.put(frame)
@@ -62,7 +69,7 @@ if __name__ == '__main__':
                     functions.save_results_to_file(image_path, f"Lip Distance Increase: {lip_distance:.2f}%.")
 
 
-        elif state == 'Mallampati':
+        elif current_state == 'Mallampati':
             if face_landmarks:
                 cropped_image = MouthCrop.crop_mouth_region(frame, face_landmarks)
 
@@ -108,17 +115,28 @@ if __name__ == '__main__':
 
                 #TODO: We might need a state for Mallampati done, so we can save the final prediction to a file.
 
-        elif state == 'Neck Movement':
-
-            nose_tracker, chin_tracker, frame, head_angle = Tracker.add_chin_and_nose_tracker(frame, face_landmarks, nose_tracker,
-                                                                                  chin_tracker)
+        elif current_state == 'Neck Movement':
+            nose_tracker, chin_tracker, frame, head_angle = Tracker.add_chin_and_nose_tracker(frame, face_landmarks,
+                                                                                              nose_tracker,
+                                                                                              chin_tracker)
             if head_angle:
                 print(f"Head Angle in degrees: {head_angle}")
-                functions.save_results_to_file(image_path, f"Head Angle: {head_angle}")
-            # Display the image
+
+                time_elapsed = timer.elapsed_time()
+                print(f"Time elapsed: {time_elapsed}")
+                if time_elapsed < 10:
+                    functions.save_results_to_file(image_path, f"Upper head angle: {head_angle}")
+
+                    #print(f"Stored as Upper Head Angle: {upper_head_angle}")
+                else:
+                    lower_head_angle = head_angle
+                    functions.save_results_to_file(image_path, f"Lower head angle: {head_angle}")
+
+                    #print(f"Stored as Lower Head Angle: {lower_head_angle}")
+
             display_image_queue.put(frame)
 
-        elif state == 'Error State':
+        elif current_state == 'Error State':
 
             display_image_queue.put(frame)
 
