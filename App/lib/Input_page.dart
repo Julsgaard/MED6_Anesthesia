@@ -150,7 +150,7 @@ class _InputPageState extends State<InputPage> {
 
                     // Combine the two lists into one Uint8List and send
                     NetworkClient().sendBinaryData(Uint8List.fromList(weightBytes + difficultyBytes));
-
+                    GlobalVariables.stateManager.nextState();
                     // Navigate to the CameraRecording page
                     Navigator.pushReplacement(
                         context,

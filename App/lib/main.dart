@@ -73,6 +73,7 @@ void main() async {
   runApp(MyApp(camera: frontCamera));
 
   initNetworkClient();
+  GlobalVariables.stateManager.changeState(States.intro);
 }
 
 // Initialize network client

@@ -43,7 +43,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
   void initState() {
     super.initState();
     bool showState = true; // Default is true, toggle this to show/hide the state display
-    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {GlobalVariables.stateManager.changeState(States.mouthOpeningIntro);});
+
     stateManager.addListener(_onStateChanged); // Listen to state changes
     _checkForErrorStateTimer = Timer.periodic(const Duration(milliseconds: 500), (timer) {
       _checkGlobalVariables();
@@ -59,6 +59,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
       //print("Current state: ${stateManager.currentState}"); // Print the current state for debugging purposes
       GlobalVariables.tiltAngle = math.atan2(event.y, event.z) * 180 / math.pi;
     });
+    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {GlobalVariables.stateManager.notifyListeners();});
 
     WidgetsBinding.instance.addObserver(this);
     _controller = CameraController(
@@ -118,7 +119,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
     accelerometerSubscription.cancel(); // Cancel the accelerometer subscription
     _controller.dispose(); // Dispose the controller
     WidgetsBinding.instance.removeObserver(this);
-    _timer?.cancel();// Remove the observer
+    stopTimer();// Remove the observer
     super.dispose();
   }
 
@@ -148,7 +149,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
           ),
         );
       });
-    });
+
 
     Overlay.of(context).insert(overlayEntry!);
     const oneSecond = Duration(seconds: 1);
@@ -157,6 +158,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
       _timer = Timer.periodic(oneSecond, (timer) {
         if (_secondsRemaining <= 0) {
           stopTimer();
+          stateManager.nextState();
         } else {
           setState(() {
             _secondsRemaining -= 1;
@@ -183,20 +185,21 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
           }
         });
       }*/
+    });
   }
 
   void stopTimer() {
     if (_timer != null) {
-      _timer!.cancel();
       overlayEntry?.remove();
       overlayEntry?.dispose();
       overlayEntry = null;
+      _timer!.cancel();
       _timer = null;
     }
   }
 
 // For handling state changes (mouth opening, mallampati, neck movement)
-  void _onStateChanged() {
+  _onStateChanged() {
     setState(() {
       //write a switch case for each state
       switch(stateManager.currentState){
