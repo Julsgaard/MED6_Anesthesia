@@ -30,13 +30,13 @@ class GlobalVariables {
     States.mouthOpeningExercise: "MouthOpeningExercise",
     States.mallampatiIntro: "MallampatiIntro",
     States.mallampatiExercise: "MallampatiExercise",
-    States.neckMovementIntro: "NeckMovementIntro",
+    States.neckMovementIntro: "NeckMovmentIntro",
     States.neckMovementExercise: "HeadTiltExercise",
     States.thanks: "Final",
     States.oopsEyeHeight: "OopsEyeHeight",
-    States.oopsFaceParallel: "OopsFaceParallel",
+    States.oopsFaceParallel: "OopsFaceParrallel",
     States.oopsNoFace: "OopsNoFaceDetected",
-    States.oopsBrightness: "OopsBrightness",
+    States.oopsBrightness: "OopsTooBright",
 
   };
   static Map<String,int> animationLength = {
