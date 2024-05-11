@@ -68,7 +68,7 @@ class _InputPageState extends State<InputPage> {
                 overflow: TextOverflow.fade,
                 softWrap: true,
                 minFontSize: 20,
-                'On this page you shall fill out some information about your medical state and history',
+                'You need to fill out some information about your medical state and history',
                 style: TextStyle(
                   color: Color(0xFF143868),
                   fontSize: 24,
@@ -89,7 +89,8 @@ class _InputPageState extends State<InputPage> {
                     },
                     decoration: const InputDecoration(
                       border: OutlineInputBorder(),
-                      hintText: 'Enter Your weight in kg',
+                      labelText: 'Enter your weight in kg',
+                      hintText: 'Enter your weight in kg',
                     ),
                     keyboardType: TextInputType.number,
                     inputFormatters: <TextInputFormatter>[

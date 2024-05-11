@@ -1,4 +1,5 @@
-from library import server, functions, MediapipeFaceDetection, MouthOpeningRatio, MouthCrop, Tracker, eye_detect, mallampati_image_prep, mallampati_CNN_run_model, mallampati_ResNet_run_model, TimerScript
+from library import server, functions, MediapipeFaceDetection, MouthOpeningRatio, MouthCrop, Tracker, eye_detect, \
+    mallampati_image_prep, mallampati_CNN_run_model, mallampati_ResNet_run_model, TimerScript
 import threading
 import queue
 
@@ -36,7 +37,8 @@ if __name__ == '__main__':
 
     # Load the model (either CNN or ResNet)
     # model = mallampati_CNN_run_model.load_model_CNN(device, model_path='library/mallampati_models/model_mallampati_CNN_Best_Model_CUDA.pth')
-    model = mallampati_ResNet_run_model.load_model_ResNet(device, model_path='library/mallampati_models/loss_0.0183_1000_epochs/model.pth')
+    model = mallampati_ResNet_run_model.load_model_ResNet(device,
+                                                          model_path='library/mallampati_models/loss_0.0183_1000_epochs/model.pth')
 
     while True:
         # Get the image path from the server image queue
@@ -59,14 +61,13 @@ if __name__ == '__main__':
         eye_level = eye_detect.detect_faces_and_landmarks(image_path, face_mesh_model)
         eye_level_queue.put(eye_level)  # Put the eye level into the queue
 
-
         # Check the state and run the appropriate functions
         if current_state == 'Mouth Opening':
             # Timer
             time_elapsed = timer.elapsed_time()
             print(f"Time elapsed: {time_elapsed}")
             #Mouth opening state er lidt ligegyldigt om de åbner munden 'for sent', det vigtigste er at de har munden lukket når exercise starter og det må vi gå ud fra de har
-            if time_elapsed > 2: #Give them X amount of time to open their mouth
+            if time_elapsed > 2:  #Give them X amount of time to open their mouth
 
                 # Display the image
                 display_image_queue.put(frame)
@@ -75,16 +76,14 @@ if __name__ == '__main__':
                     # Calculate mouth opening ratio
                     lip_distance = MouthOpeningRatio.lip_distance_monitor(face_landmarks)
                     if lip_distance:
-                        print(f"Lip Distance Increase: {lip_distance:.2f}%.")
-                        functions.save_results_to_file(image_path, f"Lip Distance Increase: {lip_distance:.2f}%.")
-
+                        functions.save_results_to_file_and_print(f"Lip Distance Increase: {lip_distance:.2f}%.", image_path)
 
         elif current_state == 'Mallampati':
             # Timer
             time_elapsed = timer.elapsed_time()
             print(f"Time elapsed: {time_elapsed}")
-            if time_elapsed > 10: #Give them X amount of time to open their mouth(?)
-            # Ved mallampati går der cirka 10 sekunder fra at exercise starter til at avatar siger "now, open your mouth" så ja
+            if time_elapsed > 10:  #Give them X amount of time to open their mouth(?)
+                # Ved mallampati går der cirka 10 sekunder fra at exercise starter til at avatar siger "now, open your mouth" så ja
                 if face_landmarks:
                     cropped_image = MouthCrop.crop_mouth_region(frame, face_landmarks)
 
@@ -102,56 +101,50 @@ if __name__ == '__main__':
                     predicted = mallampati_CNN_run_model.run_predictions_on_image(model, image_with_extra_dim, device)
 
                     if predicted == 0:
-                        print("Mallampati Class 1 or 2")
-
                         # Save the prediction to a file
-                        functions.save_results_to_file(image_path, "Mallampati Class 1 or 2")
+                        functions.save_results_to_file_and_print("Mallampati Class 1 or 2", image_path)
 
                         # Add prediction to list
                         predictions.append(0)
 
                     elif predicted == 1:
-                        print("Mallampati Class 3 or 4")
-
                         # Save the prediction to a file
-                        functions.save_results_to_file(image_path, "Mallampati Class 3 or 4")
+                        functions.save_results_to_file_and_print("Mallampati Class 3 or 4", image_path)
 
                         # Add prediction to list
                         predictions.append(1)
 
-                    # After 20 predictions, take the mean of the predictions
-                    if len(predictions) >= 20:
+                    # After 10 predictions, take the mean of the predictions
+                    if len(predictions) >= 10:
                         mean_prediction = sum(predictions) / len(predictions)
 
                         if mean_prediction < 0.5:
-                            print(f"User is predicted to be Mallampati Class 1 or 2 | Mean: {mean_prediction}")
+                            functions.save_results_to_file_and_print(
+                                f"User is predicted to be Mallampati Class 1 or 2 | Mean: {mean_prediction}",
+                                image_path, save_only_results=True)
                         else:
-                            print(f"User is predicted to be Mallampati Class 3 or 4 | Mean: {mean_prediction}")
-
-                    #TODO: We might need a state for Mallampati done, so we can save the final prediction to a file.
+                            functions.save_results_to_file_and_print(
+                                f"User is predicted to be Mallampati Class 3 or 4 | Mean: {mean_prediction}",
+                                image_path, save_only_results=True)
 
         elif current_state == 'Neck Movement':
             # Timer
             time_elapsed = timer.elapsed_time()
             print(f"Time elapsed: {time_elapsed}")
-            if time_elapsed > 2: #Give them X amount of time to open their mouth(?)
+            if time_elapsed > 2:  #Give them X amount of time to open their mouth(?)
                 # Head tilt er det også bare vigtigt at de har head i neutral position i starten. Ellers er det vigtigste at vi ved hvornår det er forward tilt og back tilt
                 nose_tracker, chin_tracker, frame, head_angle = Tracker.add_chin_and_nose_tracker(frame, face_landmarks,
                                                                                                   nose_tracker,
                                                                                                   chin_tracker)
                 if head_angle:
-                    print(f"Head Angle in degrees: {head_angle}")
+                    # print(f"Head Angle in degrees: {head_angle}")
 
+                    if time_elapsed < 35:  #Der går cirka 35 sekunder fra at exercise starter til at avatar siger "now, tilt your head forward"
+                        functions.save_results_to_file_and_print(f"Upper head angle: {head_angle}", image_path)
 
-                    if time_elapsed < 35: #Der går cirka 35 sekunder fra at exercise starter til at avatar siger "now, tilt your head forward"
-                        functions.save_results_to_file(image_path, f"Upper head angle: {head_angle}")
-
-                        #print(f"Stored as Upper Head Angle: {upper_head_angle}")
                     else:
                         lower_head_angle = head_angle
-                        functions.save_results_to_file(image_path, f"Lower head angle: {head_angle}")
-
-                        #print(f"Stored as Lower Head Angle: {lower_head_angle}")
+                        functions.save_results_to_file_and_print(f"Lower head angle: {head_angle}", image_path)
 
                 display_image_queue.put(frame)
 
@@ -168,4 +161,3 @@ if __name__ == '__main__':
 
             # Reset default tracker value
             #Tracker.default_chin_nose_distance = None
-
