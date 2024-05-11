@@ -7,7 +7,6 @@ import 'package:flutter/cupertino.dart';
 
 class NetworkClient {
   Socket? _socket; // Socket for the connection
-  bool _isConnected = false;
   final ValueNotifier<bool> connectionStatus = ValueNotifier<bool>(false);
 
 
@@ -33,11 +32,11 @@ class NetworkClient {
     }
   }
 
-  void sendData(String data) {
-    if (_socket != null) {
-      _socket!.add(utf8.encode(data));
-    }
-  }
+  // void sendData(String data) {
+  //   if (_socket != null) {
+  //     _socket!.add(utf8.encode(data));
+  //   }
+  // }
 
   // Method for sending binary data, e.g., compressed camera footage
   void sendBinaryData(Uint8List data) {
@@ -45,7 +44,7 @@ class NetworkClient {
   }
 
   void _onDataReceived(data) {
-    print("DATA RECIEVED");
+    //print("DATA RECIEVED");
     // Convert the data to a string
     String jsonString = utf8.decode(data);
 
@@ -70,7 +69,7 @@ class NetworkClient {
 
 
           var test = variables['test'];
-          developer.log('Received from server: $test');
+          //developer.log('Received from server: $test');
 
         } catch (e) {
           // Log an error if JSON decoding fails

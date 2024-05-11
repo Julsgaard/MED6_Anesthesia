@@ -125,11 +125,21 @@ def find_state_for_image_path(image_path):
         return "Unknown category"
 
 
-def save_results_to_file(image_path, results):
+def save_results_to_file_and_print(results, image_path, print_results=True, save_only_results=False):
+    """Function to save the results to a text file and print them to the console.
+    The function will create the file in the same directory as the image_path."""
+
     # Extract the session path from the image path
     session_path = os.path.dirname(image_path)
 
+    # Print the results
+    if print_results:
+        print(results)
+
     # Create a new file in the session directory with the prediction
     with open(f"{session_path}/1. results.txt", 'a') as file:
-        file.write(f"{os.path.basename(image_path)}: {results}\n")
+        if not save_only_results:
+            file.write(f"{os.path.basename(image_path)}: {results}\n")
         # print(f"Prediction saved to {session_path}/1. predictions.txt")
+        else:
+            file.write(f"{results}\n")
