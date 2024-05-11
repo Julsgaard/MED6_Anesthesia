@@ -40,26 +40,24 @@ class CircleState extends State<Circle> with WidgetsBindingObserver{
       List<String> animations = await widget.animationController.getAvailableAnimations();
 
       if (animations.isNotEmpty) {
+        print("These are the animations $animations");
         // Get the current state and save it to a local variable
-        var originalState = stateManager.currentState;
+        States originalState = stateManager.currentState;
 
         // Get the animation name for the original state
-        String animationName = GlobalVariables.animationList[originalState]!;
+        String? animationName = GlobalVariables.animationList[originalState];
+        print(animationName);
         widget.animationController.setCameraOrbit(0, 90, 100);
         // Play the animation for the original state
-        widget.animationController.playAnimation(animationName: animationName);
-        playSound(stateManager.currentState);
-        // If the current animation is not the blinking animation, proceed to blink
-        if (animationName != "Blinking") {
-          // Wait for the current animation to finish
-          await Future.delayed(Duration(milliseconds: GlobalVariables.animationLength[animationName]!));
-
-          // Loop to continuously play blinking animation until the state changes
-          widget.animationController.setCameraOrbit(0, 90, 100);
+        if(animationName == null){
           widget.animationController.playAnimation(animationName: "Blinking");
-        }else{
-          widget.animationController.setCameraOrbit(0, 90, 100);
-          widget.animationController.playAnimation(animationName: "Blinking");
+          audioPlayer.stop();
+        }else {
+          widget.animationController.playAnimation(animationName: animationName);
+          playSound(stateManager.currentState);
+          Future.delayed(Duration(milliseconds: GlobalVariables.animationLength[animationName]!), () {
+            widget.animationController.playAnimation(animationName: "Blinking");
+          });
         }
       } else {
         // If no animations are available, retry after a short delay
