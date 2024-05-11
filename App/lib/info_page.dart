@@ -33,7 +33,7 @@ class InfoStage extends State<InfoPage>{
   @override
   void initState() {
     super.initState();
-    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {GlobalVariables.stateManager.changeState(States.intro);});
+    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {GlobalVariables.stateManager.notifyListeners();});
   }
 
 
@@ -98,7 +98,7 @@ class InfoStage extends State<InfoPage>{
                   ),
                 ),
                 onPressed: (){
-                  stateManager.changeState(States.inputPage);
+                  stateManager.nextState();
                   Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(builder: (context) => InputPage(
