@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:math';
+import 'package:async/async.dart';
 import 'package:camera/camera.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_3d_controller/flutter_3d_controller.dart';
@@ -37,7 +39,6 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
   OverlayEntry? overlayEntry;
   final StateManager stateManager = GlobalVariables.stateManager;
   Timer? _checkForErrorStateTimer;
-
   
   @override
   void initState() {
@@ -119,17 +120,19 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
     accelerometerSubscription.cancel(); // Cancel the accelerometer subscription
     _controller.dispose(); // Dispose the controller
     WidgetsBinding.instance.removeObserver(this);
-    stopTimer();// Remove the observer
+    stopTimer();
     super.dispose();
   }
 
 
 
   Timer? _timer;
+  Timer? waitTimer;
+  // create a cancelable operation
 
-  void startTimer(int duration, [int startAfterMilliseconds = 0/*, bool countUp = false*/]) {
+  Future<void> startTimer(int duration, [int startAfterMilliseconds = 0/*, bool countUp = false*/]) async{
     stopTimer();
-    Future.delayed(Duration(milliseconds: startAfterMilliseconds), () {
+    waitTimer = Timer(Duration(milliseconds: startAfterMilliseconds), () {
       overlayEntry = OverlayEntry(builder: (context) {
         return Positioned(
           child: SizedBox(
@@ -150,15 +153,15 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
         );
       });
 
-
-    Overlay.of(context).insert(overlayEntry!);
-    const oneSecond = Duration(seconds: 1);
-    /*if(!countUp){*/
+      Overlay.of(context).insert(overlayEntry!);
+      const oneSecond = Duration(seconds: 1);
+      /*if(!countUp){*/
       _secondsRemaining = duration;
       _timer = Timer.periodic(oneSecond, (timer) {
         if (_secondsRemaining <= 0) {
           stopTimer();
           stateManager.nextState();
+          return;
         } else {
           setState(() {
             _secondsRemaining -= 1;
@@ -186,9 +189,15 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
         });
       }*/
     });
+    
   }
-
   void stopTimer() {
+    if(waitTimer != null){
+      waitTimer!.cancel();
+      overlayEntry?.remove();
+      overlayEntry?.dispose();
+      overlayEntry = null;
+    }
     if (_timer != null) {
       overlayEntry?.remove();
       overlayEntry?.dispose();
@@ -204,7 +213,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
       //write a switch case for each state
       switch(stateManager.currentState){
         case States.mouthOpeningIntro:
-          startTimer(3, 20667);
+         startTimer(3, 20667);
           break;
         case States.mouthOpeningExercise:
           startTimer(3, 7125);
@@ -219,6 +228,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
           startTimer(3, 41042);
           break;
         case States.neckMovementExercise:
+          stopTimer();
           break;
         default:
           stopTimer();
@@ -273,7 +283,6 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
     }
 
     return Material(
-
       child: Stack(
         children: [
           Circle(key: GlobalVariables.circleKey, mWidth: mWidth, circleHeight: circleHeight,animationController: widget.animationController,),
