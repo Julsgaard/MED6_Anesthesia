@@ -265,7 +265,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
     double buttonWidth = (mWidth/4);
     double buttonHeight = (mHeight/16);
 
-    double mouthOverlayScale = 0.3; //Juster den her for at gøre mouthoverlay større/mindre, skal være mellem 0-1 (Tror enten den skal være 0.4 eller 0.5)
+    double mouthOverlayScale = 0.3; //Juster den her for at gøre mouthoverlay større/mindre, skal være mellem 0-1 (Sat til 0.3 der hvor vi samlede data til mallampati AI)
 
     if (stateManager.currentState.index == 8) { // Thank you page
       stopTimer();
@@ -321,6 +321,16 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
                             child: CameraPreview(_controller),
                           ),
                         ),
+                        // Add a recording icon to indicate for the user that the camera is recording
+                        if (stateManager.currentState == States.mouthOpeningExercise ||
+                            stateManager.currentState == States.mallampatiExercise ||
+                            stateManager.currentState == States.neckMovementExercise)
+                          Positioned(
+                            top: -10,
+                            left: 4,
+                            child: Image.asset('assets/recording_video_icon.png', width: 50, height: 50)
+                          ),
+
                         if (stateManager.currentState == States.mallampatiIntro || stateManager.currentState == States.mallampatiExercise)
                           Positioned.fill( //THIS WHERE THE MOUTH IMAGE IS PLACED
                             child: Transform.translate(
