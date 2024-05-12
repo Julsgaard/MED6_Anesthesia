@@ -47,9 +47,9 @@ class _InputPageState extends State<InputPage> {
     double textHeight = (mHeight/12)*2;
     double weightInputHeight = (mHeight/15)*2;
     double buttonPosW = (mWidth/4);
-    double buttonPosH = (mHeight/10);
+    double buttonPosH = (mHeight/8);
     double buttonWidth = (mWidth/2);
-    double buttonHeight = (mHeight/15);
+    double buttonHeight = (mHeight/12);
     double gab = 20;
 
     return Material(
@@ -68,7 +68,7 @@ class _InputPageState extends State<InputPage> {
                 overflow: TextOverflow.fade,
                 softWrap: true,
                 minFontSize: 20,
-                'You need to fill out some information about your medical state and history',
+                'Please provide the following information:',
                 style: TextStyle(
                   color: Color(0xFF143868),
                   fontSize: 24,
@@ -102,7 +102,7 @@ class _InputPageState extends State<InputPage> {
               left: (mWidth/8),
               top:(circleHeight/2) + (gab*3) + textHeight + weightInputHeight,
               child: DropdownMenu<String>(
-                label: const Text("Do you have any previous difficulty with intubation?"),
+                label: const Text("Have you had any previous difficulty with intubation?"),
                 width: textWidth,
                 dropdownMenuEntries: const [
                   DropdownMenuEntry( value: "No difficulty", label: "No difficulty",),
@@ -124,11 +124,11 @@ class _InputPageState extends State<InputPage> {
                     maximumSize: MaterialStateProperty.all(Size(buttonWidth,buttonHeight,)),
                 ),
                 child: const Text(
-                  'I have filled out \neverything proceed',
+                  'I have filled out \neverything and am ready to proceed',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 16,
+                    fontSize: 14,
                     fontFamily: 'Inter',
                     fontWeight: FontWeight.w400,
                     height: 0,

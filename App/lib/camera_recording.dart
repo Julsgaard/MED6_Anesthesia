@@ -263,9 +263,9 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
     double circleHeight = (mHeight/5)*2;
     double cameraWidth = (mWidth/7)*6;
     double cameraHeight = (mHeight/12)*8;
-    double buttonPosW = (mWidth/7);
+    double buttonPosW = (mWidth/9);
     double buttonPosH = (mHeight/10);
-    double buttonWidth = (mWidth/4);
+    double buttonWidth = (mWidth/3);
     double buttonHeight = (mHeight/16);
 
     double mouthOverlayScale = 0.3; //Juster den her for at gøre mouthoverlay større/mindre, skal være mellem 0-1 (Sat til 0.3 der hvor vi samlede data til mallampati AI)
@@ -406,7 +406,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 16,
+                  fontSize: 14,
                   fontFamily: 'Inter',
                   fontWeight: FontWeight.w400,
                   height: 0,
@@ -439,12 +439,17 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
               },
             ),
           ),
+
           Positioned(
             left: buttonPosW,
             top: mHeight- buttonPosH,
             child: TextButton(
               style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all<Color>(const Color(0xFF153867)),
+                backgroundColor: MaterialStateProperty.all<Color>(
+                  stateManager.currentState == States.mouthOpeningExercise || stateManager.currentState == States.mallampatiExercise || stateManager.currentState == States.neckMovementExercise ?
+                  const Color(0xFF153867) : const Color(0xFFAAB4BE),
+                ),
+
                 minimumSize: MaterialStateProperty.all(Size(buttonWidth,buttonHeight,)),
                 maximumSize: MaterialStateProperty.all(Size(buttonWidth,buttonHeight,)),
               ),
@@ -453,14 +458,19 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 16,
+                  fontSize: 14,
                   fontFamily: 'Inter',
                   fontWeight: FontWeight.w400,
                   height: 0,
                 ),
               ),
               onPressed: (){
-                stateManager.notifyListeners();
+                if (stateManager.currentState == States.mouthOpeningExercise || stateManager.currentState == States.mallampatiExercise || stateManager.currentState == States.neckMovementExercise) {
+                    int currentStateInt = stateManager.currentState.index;
+                    currentStateInt--;
+                    States state = States.values[currentStateInt];
+                    stateManager.changeState(state);
+                  }
 
               },
             ),
