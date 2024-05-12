@@ -39,7 +39,8 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
   OverlayEntry? overlayEntry;
   final StateManager stateManager = GlobalVariables.stateManager;
   Timer? _checkForErrorStateTimer;
-  
+  bool _isFinalScreenOpen = false;
+
   @override
   void initState() {
     super.initState();
@@ -267,7 +268,8 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
 
     double mouthOverlayScale = 0.3; //Juster den her for at gøre mouthoverlay større/mindre, skal være mellem 0-1 (Sat til 0.3 der hvor vi samlede data til mallampati AI)
 
-    if (stateManager.currentState.index == 8) { // Thank you page
+    if (stateManager.currentState.index == 8 && !_isFinalScreenOpen) { // Thank you page
+      _isFinalScreenOpen = true;
       stopTimer();
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Navigator.pushReplacement(
