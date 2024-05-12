@@ -130,10 +130,10 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
   Timer? _timer;
   Timer? waitTimer;
   // create a cancelable operation
-
-  Future<void> startTimer(int duration, [int startAfterMilliseconds = 0, bool? switchStateAfterwards /*, bool countUp = false*/]) async{
+  int timerRuns = 0;
+  Future<void> startTimer(List<int> duration, [ List<int> startAfterMilliseconds = const [0], List<bool> switchStateAfterwards = const [false] /*, bool countUp = false*/]) async{
     stopTimer();
-    waitTimer = Timer(Duration(milliseconds: startAfterMilliseconds), () {
+    waitTimer = Timer(Duration(milliseconds: startAfterMilliseconds[timerRuns]), () {
       overlayEntry = OverlayEntry(builder: (context) {
         return Positioned(
           child: SizedBox(
@@ -157,12 +157,16 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
       Overlay.of(context).insert(overlayEntry!);
       const oneSecond = Duration(seconds: 1);
       /*if(!countUp){*/
-      _secondsRemaining = duration;
+      _secondsRemaining = duration[timerRuns];
       _timer = Timer.periodic(oneSecond, (timer) {
         if (_secondsRemaining <= 0) {
           stopTimer();
-          if (switchStateAfterwards == true){
+          if (switchStateAfterwards[timerRuns] == true){
+            timerRuns = 0;
             stateManager.nextState();
+          }else {
+            timerRuns++;
+            startTimer(duration, startAfterMilliseconds, switchStateAfterwards);
           }
           return;
         } else {
@@ -216,22 +220,22 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
       //write a switch case for each state
       switch(stateManager.currentState){
         case States.mouthOpeningIntro:
-         startTimer(3, 20667, true);  
+         startTimer([3], [36250], [true]);
           break;
         case States.mouthOpeningExercise:
-          startTimer(3, 7125, true);
+          startTimer([6,7], [3334, 5000], [false, true]);
           break;
         case States.mallampatiIntro:
-          startTimer(3, 32625, true);
+          startTimer([3], [41250], [true]);
           break;
         case States.mallampatiExercise:
-          startTimer(3, 10459, true);
+          startTimer([4], [12708], [true]);
           break;
         case States.neckMovementIntro:
-          startTimer(3, 41042, true);
+          startTimer([3], [46000], [true]);
           break;
         case States.neckMovementExercise:
-          stopTimer();
+          startTimer([0], [47710], [true]);
           break;
         default:
           stopTimer();
