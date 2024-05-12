@@ -40,17 +40,17 @@ class GlobalVariables {
 
   };
   static Map<String,int> animationLength = {
-    "Intro": 21250,
-    "MouthOpeningIntro": 20125,
-    "MouthOpeningExercise": 11459,
-    "MallampatiIntro": 32667,
-    "MallampatiExercise": 13750,
-    "NeckMovementIntro": 40625,
-    "HeadTiltExercise": 40709,
-    "Final": 4125,
-    "OopsEyeHeight": 10459,
+    "Intro": 28000,
+    "MouthOpeningIntro": 36375,
+    "MouthOpeningExercise": 21792,
+    "MallampatiIntro": 41459,
+    "MallampatiExercise": 16834,
+    "NeckMovementIntro": 45417,
+    "HeadTiltExercise": 47709,
+    "Final": 4084,
+    "OopsEyeHeight": 10417,
     "OopsFaceParallel": 13834,
-    "OopsNoFaceDetected":7167,
+    "OopsNoFaceDetected":7125,
     "OopsTooBright": 5292,
   };
 }
