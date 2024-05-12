@@ -1,7 +1,5 @@
 import 'dart:async';
-import 'dart:io';
 import 'package:camera/camera.dart';
-import 'package:camera_android_camerax/camera_android_camerax.dart';
 import 'package:dart/main.dart';
 import 'dart:developer' as developer; // Import for logging
 import 'dart:typed_data';
