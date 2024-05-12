@@ -55,6 +55,7 @@ class StateManager {
     // If the current state is not error state, change the state to the requested state and save the previous state
     if (_currentState.index < _errorStateIndex) {
       //developer.log("UNDER 8");
+      developer.log("Changing state from $_currentState to $newState", name: 'StateManager');
       _previousState = _currentState;
       _currentState = newState;
     }

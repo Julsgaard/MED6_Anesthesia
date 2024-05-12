@@ -1,13 +1,7 @@
 import 'dart:async';
-import 'dart:isolate';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_3d_controller/flutter_3d_controller.dart';
-import 'package:flutter/services.dart' show rootBundle;
 import 'package:audioplayers/audioplayers.dart';
-
 import '../main.dart';
 import '../state_manager.dart';
 
@@ -33,7 +27,11 @@ class Circle extends StatefulWidget {
 class CircleState extends State<Circle> with WidgetsBindingObserver{
   final StateManager stateManager = GlobalVariables.stateManager;
   late AudioPlayer audioPlayer;
+  bool _isPlaying = false;
+
+
   Future<void> UpdateAvatarAnimations() async {
+    print('UpdateAvatarAnimations called with state: ${stateManager.currentState}');
     try {
       print("I update animations");
       // Fetch the list of available animations
@@ -72,68 +70,47 @@ class CircleState extends State<Circle> with WidgetsBindingObserver{
     }
 
   }
-  bool _isPlaying = false;
-  int _howManyTimesHasSoundRun = 0;
+
+
   Future<void> playSound(States state) async {
-    String audio;
-    if (_isPlaying) return; // Exit if a sound is already being played
-    _isPlaying = true;
-
-    print("Sound has run $_howManyTimesHasSoundRun times");
-    _howManyTimesHasSoundRun++;
-
-
-    // Switch case to check for state 0-11 and set the corresponding audio path
-    switch (state) {
-      case States.intro:
-        audio = "Intro.mp3";
-        break;
-      case States.mouthOpeningIntro:
-        audio = "Mouth_Opening_Intro.mp3";
-        break;
-      case States.mouthOpeningExercise:
-        audio = "Mouth_Opening_Exercise.mp3";
-        break;
-      case States.mallampatiIntro:
-        audio = "Mallampati_Intro.mp3";
-        break;
-      case States.mallampatiExercise:
-        audio = "Mallampati_Exercise.mp3";
-        break;
-      case States.neckMovementIntro:
-        audio = "Neck_Movement_Intro.mp3";
-        break;
-      case States.neckMovementExercise:
-        audio = "Neck_Movement_Exercise.mp3";
-        break;
-      case States.thanks:
-        audio = "Final.mp3";
-        break;
-      case States.oopsEyeHeight:
-        audio = "Wrong_eye_height.mp3";
-        break;
-      case States.oopsFaceParallel:
-        audio = "Wrong_tilt.mp3";
-        break;
-      case States.oopsNoFace:
-        audio = "Wrong_face.mp3";
-        break;
-      case States.oopsBrightness:
-        audio = "Wrong_brightness.mp3";
-        break;
-      default:
-        audio = "How";
-        break;
+    if (_isPlaying) {
+      print('playSound attempt blocked: Audio is already playing for state: $state');
+      return; // Block further execution if audio is already playing
     }
-    audioPlayer.stop();
+
+    _isPlaying = true; // Set the flag to true as soon as playback is attempted
+    String audioPath = getAudioPathForState(state); // Determine the audio file based on state
+
+    print('Attempting to play audio: $audioPath');
     try {
-      print("Attempting to play audio: $audio");
-      audioPlayer.play(AssetSource(audio));
+      await audioPlayer.play(AssetSource(audioPath)); // Await the completion of the audio playback
+      print('Audio playing started successfully for: $audioPath');
     } catch (e) {
-      print('Error loading audio: $e');
+      print('Error loading or playing audio: $e'); // Handle potential errors during audio loading/playing
+    } finally {
+      // Set a delay after playback finishes before allowing further audio playback
+      Future.delayed(const Duration(milliseconds: 100), () {
+        _isPlaying = false;
+        print('Audio player is now free. Is playing: $_isPlaying');
+      });
     }
-    finally {
-      _isPlaying = false; // Reset flag after playing
+  }
+
+  String getAudioPathForState(States state) {
+    switch (state) {
+      case States.intro: return "Intro.mp3";
+      case States.mouthOpeningIntro: return "Mouth_Opening_Intro.mp3";
+      case States.mouthOpeningExercise: return "Mouth_Opening_Exercise.mp3";
+      case States.mallampatiIntro: return "Mallampati_Intro.mp3";
+      case States.mallampatiExercise: return "Mallampati_Exercise.mp3";
+      case States.neckMovementIntro: return "Neck_Movement_Intro.mp3";
+      case States.neckMovementExercise: return "Neck_Movement_Exercise.mp3";
+      case States.thanks: return "Final.mp3";
+      case States.oopsEyeHeight: return "Wrong_eye_height.mp3";
+      case States.oopsFaceParallel: return "Wrong_tilt.mp3";
+      case States.oopsNoFace: return "Wrong_face.mp3";
+      case States.oopsBrightness: return "Wrong_brightness.mp3";
+      default: return "How.mp3"; // Handle unexpected states
     }
   }
 

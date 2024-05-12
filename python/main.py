@@ -149,8 +149,8 @@ if __name__ == '__main__':
                 display_image_queue.put(frame)
 
         elif current_state == 'Error State':
-
             display_image_queue.put(frame)
+            display_image_queue.empty()  # Empty the queue to prevent the images from stacking up
 
             # Reset default lip distance value
             #MouthOpeningRatio.default_lip_distance = None
