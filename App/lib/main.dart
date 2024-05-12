@@ -51,7 +51,7 @@ class GlobalVariables {
     "OopsEyeHeight": 10459,
     "OopsFaceParallel": 13834,
     "OopsNoFaceDetected":7167,
-    "OopsBrightness": 5292,
+    "OopsTooBright": 5292,
   };
 }
 
