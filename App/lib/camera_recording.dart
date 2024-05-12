@@ -131,7 +131,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
   Timer? waitTimer;
   // create a cancelable operation
 
-  Future<void> startTimer(int duration, [int startAfterMilliseconds = 0/*, bool countUp = false*/]) async{
+  Future<void> startTimer(int duration, [int startAfterMilliseconds = 0, bool? switchStateAfterwards /*, bool countUp = false*/]) async{
     stopTimer();
     waitTimer = Timer(Duration(milliseconds: startAfterMilliseconds), () {
       overlayEntry = OverlayEntry(builder: (context) {
@@ -161,7 +161,9 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
       _timer = Timer.periodic(oneSecond, (timer) {
         if (_secondsRemaining <= 0) {
           stopTimer();
-          stateManager.nextState();
+          if (switchStateAfterwards == true){
+            stateManager.nextState();
+          }
           return;
         } else {
           setState(() {
@@ -214,19 +216,19 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
       //write a switch case for each state
       switch(stateManager.currentState){
         case States.mouthOpeningIntro:
-         startTimer(3, 20667);
+         startTimer(3, 20667, true);  
           break;
         case States.mouthOpeningExercise:
-          startTimer(3, 7125);
+          startTimer(3, 7125, true);
           break;
         case States.mallampatiIntro:
-          startTimer(3, 32625);
+          startTimer(3, 32625, true);
           break;
         case States.mallampatiExercise:
-          startTimer(3, 10459);
+          startTimer(3, 10459, true);
           break;
         case States.neckMovementIntro:
-          startTimer(3, 41042);
+          startTimer(3, 41042, true);
           break;
         case States.neckMovementExercise:
           stopTimer();
