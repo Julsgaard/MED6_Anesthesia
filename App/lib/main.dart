@@ -101,7 +101,10 @@ class MyApp extends StatelessWidget {
       ),
       home: InfoPage(
         camera: camera,
-        infoText: 'Hello, to access if you can undergo a standard anesthesia procedure the doctor has ordered a review of your mouth and neck. Therefore we ask you to go through this online video consultation, where you will record yourself as guided by the video. This video recording will then be accessed by an AI, to determine if you can undergo standard procedure, or you need to see a real doctor',
+        infoText: 'Hello, to assess if you can undergo a standard anesthesia procedure I will now instruct you through 3 different exercises.\n\n'
+            'I will start by explaining the exercise and throughout the exercise I will guide you.\n\n'
+            'If any part of the exercise is performed incorrectly, I will assist you in correcting it.\n\n'
+            'If you are ready, please proceed by clicking the button below, and filling in the required information.',
         animationController: animationController,
         showContinueButton: true,
       ),
