@@ -30,11 +30,11 @@ class GlobalVariables {
     States.mouthOpeningExercise: "MouthOpeningExercise",
     States.mallampatiIntro: "MallampatiIntro",
     States.mallampatiExercise: "MallampatiExercise",
-    States.neckMovementIntro: "NeckMovmentIntro",
+    States.neckMovementIntro: "NeckMovementIntro",
     States.neckMovementExercise: "HeadTiltExercise",
     States.thanks: "Final",
     States.oopsEyeHeight: "OopsEyeHeight",
-    States.oopsFaceParallel: "OopsFaceParrallel",
+    States.oopsFaceParallel: "OopsFaceParallel",
     States.oopsNoFace: "OopsNoFaceDetected",
     States.oopsBrightness: "OopsTooBright",
 

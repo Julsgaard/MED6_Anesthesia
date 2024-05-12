@@ -61,13 +61,13 @@ class CircleState extends State<Circle> with WidgetsBindingObserver{
         }
       } else {
         // If no animations are available, retry after a short delay
-        await Future.delayed(const Duration(milliseconds: 100));
+        await Future.delayed(const Duration(milliseconds: 1000));
         UpdateAvatarAnimations();
       }
     } catch (e) {
       // On error, retry after a short delay
       //print("Catch clause");
-      await Future.delayed(const Duration(milliseconds: 100));
+      await Future.delayed(const Duration(milliseconds: 1000));
       UpdateAvatarAnimations();
     }
 
