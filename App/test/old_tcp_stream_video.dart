@@ -6,7 +6,6 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:camera_android_camerax/camera_android_camerax.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
