@@ -45,7 +45,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
     bool showState = true; // Default is true, toggle this to show/hide the state display
 
     stateManager.addListener(_onStateChanged); // Listen to state changes
-    _checkForErrorStateTimer = Timer.periodic(const Duration(milliseconds: 5000), (timer) {
+    _checkForErrorStateTimer = Timer.periodic(const Duration(milliseconds: 500), (timer) {
       _checkGlobalVariables();
     });
 
@@ -96,10 +96,10 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
     } else if (GlobalVariables.eyeLevel == 3 && (stateManager.currentState == States.mouthOpeningExercise || stateManager.currentState == States.oopsEyeHeight)) {
       GlobalVariables.overlayNumber = 5;
       stateManager.changeState(States.oopsEyeHeight);
-    } else if (GlobalVariables.tiltAngle < 90-40 && (stateManager.currentState == States.mouthOpeningExercise || stateManager.currentState == States.mallampatiExercise || stateManager.currentState == States.neckMovementExercise)) {
+    } else if (GlobalVariables.tiltAngle < 75) {
       GlobalVariables.overlayNumber = 6;
       stateManager.changeState(States.oopsFaceParallel);
-    } else if (GlobalVariables.tiltAngle < 90+40 && (stateManager.currentState == States.mouthOpeningExercise || stateManager.currentState == States.mallampatiExercise || stateManager.currentState == States.neckMovementExercise)) {
+    } else if (GlobalVariables.tiltAngle > 105) {
       GlobalVariables.overlayNumber = 7;
       stateManager.changeState(States.oopsFaceParallel);
     } else {
@@ -245,18 +245,18 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
 
 
   // For the app to pause and resume streaming when it is in the background or foreground
-  // @override
-  // void didChangeAppLifecycleState(AppLifecycleState state) {
-  //   super.didChangeAppLifecycleState(state);
-  //   if (state == AppLifecycleState.resumed) {
-  //     // Only restart streaming if it was previously active
-  //     if (CameraServices.isStreaming) {
-  //       CameraServices.streamCameraFootage(_controller, stateManager);
-  //     }
-  //   } else if (state == AppLifecycleState.paused) {
-  //     CameraServices.isStreaming = false; // Stop streaming when the app is paused
-  //   }
-  // }
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed) {
+      // Only restart streaming if it was previously active
+      if (CameraServices.isStreaming) {
+        CameraServices.streamCameraFootage(_controller, stateManager);
+      }
+    } else if (state == AppLifecycleState.paused) {
+      CameraServices.isStreaming = false; // Stop streaming when the app is paused
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
