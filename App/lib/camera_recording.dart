@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:math';
-import 'package:async/async.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +12,6 @@ import 'package:dart/info_page.dart';
 import 'package:dart/Assets/circle.dart';
 import 'main.dart';
 import 'state_manager.dart';
-import 'package:dart/info_page.dart';
 
 class CameraRecording extends StatefulWidget {
   final CameraDescription camera;
@@ -40,6 +37,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
   final StateManager stateManager = GlobalVariables.stateManager;
   Timer? _checkForErrorStateTimer;
   bool _isFinalScreenOpen = false;
+
 
   @override
   void initState() {
@@ -275,19 +273,19 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
     double mouthOverlayScale = 0.3; //Juster den her for at gøre mouthoverlay større/mindre, skal være mellem 0-1 (Sat til 0.3 der hvor vi samlede data til mallampati AI)
 
     if (stateManager.currentState.index == 8 && !_isFinalScreenOpen) { // Thank you page
-      _isFinalScreenOpen = true;
       stopTimer();
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => InfoPage(
             camera: widget.camera,
-            infoText: 'Thanks for participating in the test!',
+            infoText: 'Thanks for participating!',
             animationController: widget.animationController,
             showContinueButton: false,
           )),
         );
       });
+      _isFinalScreenOpen = true;
     }
 
     return Material(
