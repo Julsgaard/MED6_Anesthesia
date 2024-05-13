@@ -46,9 +46,13 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
 
     stateManager.addListener(_onStateChanged); // Listen to state changes
     _checkForErrorStateTimer = Timer.periodic(const Duration(milliseconds: 500), (timer) {
-      if (stateManager.currentState != States.mouthOpeningIntro ||
-          stateManager.currentState != States.mallampatiIntro ||
-          stateManager.currentState != States.neckMovementIntro) {
+      if (stateManager.currentState == States.mouthOpeningExercise ||
+          stateManager.currentState == States.mallampatiExercise ||
+          stateManager.currentState == States.neckMovementExercise ||
+          stateManager.currentState == States.oopsEyeHeight ||
+          stateManager.currentState == States.oopsFaceParallel ||
+          stateManager.currentState == States.oopsNoFace ||
+          stateManager.currentState == States.oopsBrightness) {
         _checkGlobalVariables();
       }
     });
