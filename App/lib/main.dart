@@ -34,7 +34,7 @@ class GlobalVariables {
     States.neckMovementExercise: "HeadTiltExercise",
     States.thanks: "Final",
     States.oopsEyeHeight: "OopsEyeHeight",
-    States.oopsFaceParallel: "OopsFaceParallel",
+    States.oopsFaceParallel: "OopsFaceParrallel",
     States.oopsNoFace: "OopsNoFaceDetected",
     States.oopsBrightness: "OopsTooBright",
 
@@ -49,7 +49,7 @@ class GlobalVariables {
     "HeadTiltExercise": 47709,
     "Final": 4084,
     "OopsEyeHeight": 10417,
-    "OopsFaceParallel": 13834,
+    "OopsFaceParrallel": 13834,
     "OopsNoFaceDetected":7125,
     "OopsTooBright": 5292,
   };

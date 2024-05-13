@@ -34,23 +34,29 @@ class CircleState extends State<Circle> with WidgetsBindingObserver{
       List<String> animations = await widget.animationController.getAvailableAnimations();
 
       if (animations.isNotEmpty) {
-        print("These are the animations $animations");
         // Get the current state and save it to a local variable
         States originalState = stateManager.currentState;
 
         // Get the animation name for the original state
         String? animationName = GlobalVariables.animationList[originalState];
-        print(animationName);
+
         widget.animationController.setCameraOrbit(0, 90, 100);
         // Play the animation for the original state
         if(animationName == null){
+          widget.animationController.pauseAnimation();
           widget.animationController.playAnimation(animationName: "Blinking");
+          widget.animationController.resetAnimation();
           audioPlayer.stop();
         }else {
+          print("I play this animation: $animationName");
+          widget.animationController.pauseAnimation();
           widget.animationController.playAnimation(animationName: animationName);
+          widget.animationController.resetAnimation();
           playSound(stateManager.currentState);
           Future.delayed(Duration(milliseconds: GlobalVariables.animationLength[animationName]!), () {
+            widget.animationController.pauseAnimation();
             widget.animationController.playAnimation(animationName: "Blinking");
+            widget.animationController.resetAnimation();
           });
         }
       } else {
