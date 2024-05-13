@@ -18,6 +18,11 @@ predictions = []
 current_state = None
 timer = TimerScript.TimerClass()  # Create an instance of Timer
 
+# Initialize variables to store the highest angles and their sum
+highest_upper_head_angle = float('-inf')
+highest_lower_head_angle = float('-inf')
+sum_of_highest_angles = 0
+
 if __name__ == '__main__':
     functions.check_for_logs_folder()  # Check if the logs folder exists, if not create it
     functions.delete_empty_folders_in_logs()  # Delete empty folders in the logs folder to prevent clutter
@@ -67,7 +72,7 @@ if __name__ == '__main__':
             time_elapsed = timer.elapsed_time()
             print(f"Time elapsed: {time_elapsed}")
             #Mouth opening state er lidt ligegyldigt om de åbner munden 'for sent', det vigtigste er at de har munden lukket når exercise starter og det må vi gå ud fra de har
-            if time_elapsed > 2:  #Give them X amount of time to open their mouth
+            if time_elapsed > 2:
 
                 # Display the image
                 display_image_queue.put(frame)
@@ -135,7 +140,7 @@ if __name__ == '__main__':
             # Timer
             time_elapsed = timer.elapsed_time()
             print(f"Time elapsed: {time_elapsed}")
-            if time_elapsed > 2:  #Give them X amount of time to open their mouth(?)
+            if time_elapsed > 13:  # Give them X amount of time to open their mouth(?)
                 # Head tilt er det også bare vigtigt at de har head i neutral position i starten. Ellers er det vigtigste at vi ved hvornår det er forward tilt og back tilt
                 nose_tracker, chin_tracker, frame, head_angle = Tracker.add_chin_and_nose_tracker(frame, face_landmarks,
                                                                                                   nose_tracker,
@@ -143,17 +148,29 @@ if __name__ == '__main__':
                 if head_angle:
                     # print(f"Head Angle in degrees: {head_angle}")
 
-                    if time_elapsed < 35:  #Der går cirka 35 sekunder fra at exercise starter til at avatar siger "now, tilt your head forward"
+                    if time_elapsed < 34:  # Der går cirka 35 sekunder fra at exercise starter til at avatar siger "now, tilt your head forward"
+                        if head_angle > highest_upper_head_angle:
+                            highest_upper_head_angle = head_angle
                         functions.save_results_to_file_and_print(f"Upper head angle: {head_angle}", image_path)
 
                     else:
-                        lower_head_angle = head_angle
+                        if head_angle > highest_lower_head_angle:
+                            highest_lower_head_angle = head_angle
                         functions.save_results_to_file_and_print(f"Lower head angle: {head_angle}", image_path)
+
+                    # Calculate the sum of the highest angles
+                    sum_of_highest_angles = highest_upper_head_angle + highest_lower_head_angle
+
+                    # Save and print the highest angles and their sum
+                    functions.save_results_to_file_and_print(f"Highest upper head angle: {highest_upper_head_angle}", image_path)
+                    functions.save_results_to_file_and_print(f"Highest lower head angle: {highest_lower_head_angle}", image_path)
+                    functions.save_results_to_file_and_print(f"Sum of highest head angles: {sum_of_highest_angles}", image_path)
 
                 display_image_queue.put(frame)
 
             else:
                 display_image_queue.put(frame)
+
 
         elif current_state == 'Error State':
 
@@ -161,11 +178,13 @@ if __name__ == '__main__':
             display_image_queue.empty()  # This might not be necessary, but it's here just in case
 
             # Reset default lip distance value
-            #MouthOpeningRatio.default_lip_distance = None
-            #MouthOpeningRatio.distances = None
+            MouthOpeningRatio.default_lip_distance = None
+            MouthOpeningRatio.distances = []
 
             # Reset mallampati predictions
-            #predictions = []
+            predictions = []
 
             # Reset default tracker value
-            #Tracker.default_chin_nose_distance = None
+            Tracker.default_chin_nose_distance = None
+            highest_lower_head_angle = 0
+            highest_upper_head_angle = 0
