@@ -76,8 +76,7 @@ class InfoStage extends State<InfoPage>{
                 ),
               ),
             ),
-            widget.showContinueButton
-                ? Positioned(
+            widget.showContinueButton ? Positioned(
               left: buttonPosW,
               top: mHeight- buttonPosH,
               child: TextButton(
