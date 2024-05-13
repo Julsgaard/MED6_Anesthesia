@@ -1,13 +1,7 @@
 import 'dart:async';
-import 'dart:isolate';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_3d_controller/flutter_3d_controller.dart';
-import 'package:flutter/services.dart' show rootBundle;
 import 'package:audioplayers/audioplayers.dart';
-
 import '../main.dart';
 import '../state_manager.dart';
 

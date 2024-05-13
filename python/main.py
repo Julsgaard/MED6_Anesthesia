@@ -84,7 +84,7 @@ if __name__ == '__main__':
             # Timer
             time_elapsed = timer.elapsed_time()
             print(f"Time elapsed: {time_elapsed}")
-            if time_elapsed > 10:  #Give them X amount of time to open their mouth(?)
+            if time_elapsed > 12:  #Give them X amount of time to open their mouth(?)
                 # Ved mallampati går der cirka 10 sekunder fra at exercise starter til at avatar siger "now, open your mouth" så ja
                 if face_landmarks:
                     cropped_image = MouthCrop.crop_mouth_region(frame, face_landmarks)
