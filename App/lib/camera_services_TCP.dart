@@ -37,7 +37,7 @@ class CameraServices {
 
     // Here we assume that your CameraController has been properly initialized.
     String imageFormat = controller.imageFormatGroup.toString();
-    developer.log('Camera image format: $imageFormat', name: 'camera.info');
+    //developer.log('Camera image format: $imageFormat', name: 'camera.info');
 
     controller.startImageStream((CameraImage image) async {
       if (isStreaming) {
@@ -48,7 +48,7 @@ class CameraServices {
 
           // Get the latest lux value
           int? luxValue = _brightnessController?.getLatestLuxValue();
-          developer.log('Lux value: $luxValue', name: 'camera.info');
+          //developer.log('Lux value: $luxValue', name: 'camera.info');
 
           // Send the image over TCP
           sendImageOverTCP(image, networkClient, stateManager, currentTimestamp);  // Send the image over TCP
