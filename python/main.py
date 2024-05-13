@@ -77,6 +77,8 @@ if __name__ == '__main__':
                     lip_distance = MouthOpeningRatio.lip_distance_monitor(face_landmarks)
                     if lip_distance:
                         functions.save_results_to_file_and_print(f"Lip Distance Increase: {lip_distance:.2f}%.", image_path)
+            else:
+                display_image_queue.put(frame)
 
         elif current_state == 'Mallampati':
             # Timer
@@ -126,6 +128,8 @@ if __name__ == '__main__':
                             functions.save_results_to_file_and_print(
                                 f"User is predicted to be Mallampati Class 3 or 4 | Mean: {mean_prediction}",
                                 image_path, save_only_results=True)
+            else:
+                display_image_queue.put(frame)
 
         elif current_state == 'Neck Movement':
             # Timer
@@ -148,9 +152,13 @@ if __name__ == '__main__':
 
                 display_image_queue.put(frame)
 
+            else:
+                display_image_queue.put(frame)
+
         elif current_state == 'Error State':
 
             display_image_queue.put(frame)
+            display_image_queue.empty()  # This might not be necessary, but it's here just in case
 
             # Reset default lip distance value
             #MouthOpeningRatio.default_lip_distance = None
