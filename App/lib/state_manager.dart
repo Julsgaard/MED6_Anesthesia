@@ -37,7 +37,7 @@ class StateManager {
     print(_listeners);
   }
 
-  notifyListeners(){
+  Future<void> notifyListeners() async{
     //print("I NOTIFY LISTENERS");
     if (_listeners.isEmpty) return; // If there are no listeners, do nothing
     for (var listener in _listeners) {
