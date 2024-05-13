@@ -44,7 +44,7 @@ class StateManager {
       if (listener is Function()) {
         listener(); // Notify all listeners
       }else if(listener is Future Function()){
-        listener();
+        await listener();
       }
     }
   }
