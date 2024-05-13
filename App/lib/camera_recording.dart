@@ -95,13 +95,25 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
     } else if (GlobalVariables.luxValue >= 300) {
       GlobalVariables.overlayNumber = 2;
       stateManager.changeState(States.oopsBrightness);
-    } else if (GlobalVariables.eyeLevel == 0) {
+    } else if (GlobalVariables.eyeLevel == 0 &&
+        (stateManager.currentState != States.mallampatiExercise &&
+        stateManager.currentState != States.neckMovementExercise &&
+        stateManager.previousState != States.neckMovementExercise &&
+        stateManager.previousState != States.mallampatiExercise)) {
       GlobalVariables.overlayNumber = 3;
       stateManager.changeState(States.oopsNoFace);
-    } else if (GlobalVariables.eyeLevel == 2) {
+    } else if (GlobalVariables.eyeLevel == 2 &&
+        (stateManager.currentState != States.mallampatiExercise &&
+            stateManager.currentState != States.neckMovementExercise &&
+            stateManager.previousState != States.neckMovementExercise &&
+            stateManager.previousState != States.mallampatiExercise)) {
       GlobalVariables.overlayNumber = 4;
       stateManager.changeState(States.oopsEyeHeight);
-    } else if (GlobalVariables.eyeLevel == 3) {
+    } else if (GlobalVariables.eyeLevel == 3 &&
+        (stateManager.currentState != States.mallampatiExercise &&
+            stateManager.currentState != States.neckMovementExercise &&
+            stateManager.previousState != States.neckMovementExercise &&
+            stateManager.previousState != States.mallampatiExercise)) {
       GlobalVariables.overlayNumber = 5;
       stateManager.changeState(States.oopsEyeHeight);
     } else if (GlobalVariables.tiltAngle < 90-40) {
