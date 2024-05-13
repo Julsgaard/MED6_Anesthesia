@@ -43,6 +43,7 @@ class CircleState extends State<Circle> with WidgetsBindingObserver{
         widget.animationController.setCameraOrbit(0, 90, 100);
         // Play the animation for the original state
         if(animationName == null){
+          print("I Play blinking animation");
           widget.animationController.pauseAnimation();
           widget.animationController.playAnimation(animationName: "Blinking");
           widget.animationController.resetAnimation();
@@ -56,15 +57,16 @@ class CircleState extends State<Circle> with WidgetsBindingObserver{
           Future.delayed(Duration(milliseconds: GlobalVariables.animationLength[animationName]!), () {
             widget.animationController.pauseAnimation();
             widget.animationController.playAnimation(animationName: "Blinking");
-            widget.animationController.resetAnimation();
           });
         }
       } else {
         // If no animations are available, retry after a short delay
+        //print("No animations available");
         await Future.delayed(const Duration(milliseconds: 1000));
         UpdateAvatarAnimations();
       }
     } catch (e) {
+      //print("on error, retry after a short delay");
       // On error, retry after a short delay
       //print("Catch clause");
       await Future.delayed(const Duration(milliseconds: 1000));
