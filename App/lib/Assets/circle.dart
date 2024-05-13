@@ -27,11 +27,12 @@ class Circle extends StatefulWidget {
 class CircleState extends State<Circle> with WidgetsBindingObserver{
   final StateManager stateManager = GlobalVariables.stateManager;
   late AudioPlayer audioPlayer;
+  Timer? waitForAnimation;
   Future<void> UpdateAvatarAnimations() async {
     try {
       print("I update animations");
       // Fetch the list of available animations
-      List<String> animations = await widget.animationController.getAvailableAnimations();
+      List<String> animations = await GlobalVariables.animationController.getAvailableAnimations();
 
       if (animations.isNotEmpty) {
         // Get the current state and save it to a local variable
@@ -40,23 +41,28 @@ class CircleState extends State<Circle> with WidgetsBindingObserver{
         // Get the animation name for the original state
         String? animationName = GlobalVariables.animationList[originalState];
 
-        widget.animationController.setCameraOrbit(0, 90, 100);
+        GlobalVariables.animationController.setCameraOrbit(0, 90, 100);
         // Play the animation for the original state
         if(animationName == null){
           print("I Play blinking animation");
-          widget.animationController.pauseAnimation();
-          widget.animationController.playAnimation(animationName: "Blinking");
-          widget.animationController.resetAnimation();
+          GlobalVariables.animationController.resetAnimation();
+          GlobalVariables.animationController.pauseAnimation();
+          GlobalVariables.animationController.playAnimation(animationName: "Blinking");
+
           audioPlayer.stop();
-        }else {
+        }else{
+          waitForAnimation?.cancel();
+          waitForAnimation = null;
           print("I play this animation: $animationName");
-          widget.animationController.pauseAnimation();
-          widget.animationController.playAnimation(animationName: animationName);
-          widget.animationController.resetAnimation();
+          GlobalVariables.animationController.resetAnimation();
+          GlobalVariables.animationController.pauseAnimation();
+          GlobalVariables.animationController.playAnimation(animationName: animationName);
           playSound(stateManager.currentState);
-          Future.delayed(Duration(milliseconds: GlobalVariables.animationLength[animationName]!), () {
-            widget.animationController.pauseAnimation();
-            widget.animationController.playAnimation(animationName: "Blinking");
+          print("I play this amount of time: ${GlobalVariables.animationLength[animationName]!}");
+          waitForAnimation = Timer(Duration(milliseconds: GlobalVariables.animationLength[animationName]!), () {
+            GlobalVariables.animationController.resetAnimation();
+            GlobalVariables.animationController.pauseAnimation();
+            GlobalVariables.animationController.playAnimation(animationName: "Blinking");
           });
         }
       } else {
@@ -179,7 +185,7 @@ class CircleState extends State<Circle> with WidgetsBindingObserver{
           height: widget.circleHeight/2 - 20,
           child: IgnorePointer(
             child: Flutter3DViewer(
-              controller: widget.animationController,
+              controller: GlobalVariables.animationController,
               src: "assets/AppAvatar.glb",
             ),
           )

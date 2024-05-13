@@ -114,7 +114,7 @@ class InfoStage extends State<InfoPage>{
               child: IconButton(
                 icon: const Icon(Icons.settings),
                 onPressed: () {
-                  Navigator.push(
+                  Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(builder: (context) => SettingsPage()),
                   );
