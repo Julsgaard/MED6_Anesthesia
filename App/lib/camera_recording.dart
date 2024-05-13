@@ -219,6 +219,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
   void stopTimer() {
     if(waitTimer != null){
       waitTimer!.cancel();
+      waitTimer = null;
       overlayEntry?.remove();
       overlayEntry?.dispose();
       overlayEntry = null;
@@ -307,7 +308,6 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
       });
       _isFinalScreenOpen = true;
     }
-
     return Material(
       child: Stack(
         children: [

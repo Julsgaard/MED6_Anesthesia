@@ -23,6 +23,7 @@ class GlobalVariables {
   static int eyeLevel = 0;
   static int overlayNumber = 0;
   static StateManager stateManager = StateManager();
+  static Flutter3DController animationController = Flutter3DController();
   static bool showState = true;
   static Map<States,String> animationList= {
     States.intro: "Intro",
