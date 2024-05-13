@@ -90,7 +90,7 @@ async def handle_client(reader, writer, image_queue, tilt_queue, eye_level_queue
                 image_counter, lux_value, tilt_angle = await video_stream(reader, image_queue, session_path,
                                                                           current_state, image_counter)
 
-                eye_level = eye_level_queue.get()  # Get the eye level from the queue (To clear the queue)
+                # eye_level = eye_level_queue.get()  # Get the eye level from the queue (To clear the queue)
 
                 send_data = {
                     "test": "test"

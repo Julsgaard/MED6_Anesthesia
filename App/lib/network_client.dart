@@ -65,7 +65,7 @@ class NetworkClient {
           // Access the variables
           var eyeLevel = variables['eye_level'];
           GlobalVariables.eyeLevel = eyeLevel;
-          developer.log('Received from server: $eyeLevel');
+          //developer.log('Received from server: $eyeLevel');
 
 
           var test = variables['test'];
