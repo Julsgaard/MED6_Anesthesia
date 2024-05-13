@@ -46,7 +46,11 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
 
     stateManager.addListener(_onStateChanged); // Listen to state changes
     _checkForErrorStateTimer = Timer.periodic(const Duration(milliseconds: 500), (timer) {
-      _checkGlobalVariables();
+      if (stateManager.currentState != States.mouthOpeningIntro ||
+          stateManager.currentState != States.mallampatiIntro ||
+          stateManager.currentState != States.neckMovementIntro) {
+        _checkGlobalVariables();
+      }
     });
 
     // Listener for accelerometer events
@@ -87,19 +91,19 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
     } else if (GlobalVariables.luxValue >= 300) {
       GlobalVariables.overlayNumber = 2;
       stateManager.changeState(States.oopsBrightness);
-    } else if (GlobalVariables.eyeLevel == 0 && (stateManager.currentState == States.mouthOpeningExercise || stateManager.currentState == States.oopsNoFace)) {
+    } else if (GlobalVariables.eyeLevel == 0) {
       GlobalVariables.overlayNumber = 3;
       stateManager.changeState(States.oopsNoFace);
-    } else if (GlobalVariables.eyeLevel == 2 && (stateManager.currentState == States.mouthOpeningExercise || stateManager.currentState == States.oopsEyeHeight)) {
+    } else if (GlobalVariables.eyeLevel == 2) {
       GlobalVariables.overlayNumber = 4;
       stateManager.changeState(States.oopsEyeHeight);
-    } else if (GlobalVariables.eyeLevel == 3 && (stateManager.currentState == States.mouthOpeningExercise || stateManager.currentState == States.oopsEyeHeight)) {
+    } else if (GlobalVariables.eyeLevel == 3) {
       GlobalVariables.overlayNumber = 5;
       stateManager.changeState(States.oopsEyeHeight);
     } else if (GlobalVariables.tiltAngle < 90-40) {
       GlobalVariables.overlayNumber = 6;
       stateManager.changeState(States.oopsFaceParallel);
-    } else if (GlobalVariables.tiltAngle < 90+40) {
+    } else if (GlobalVariables.tiltAngle > 90+40) {
       GlobalVariables.overlayNumber = 7;
       stateManager.changeState(States.oopsFaceParallel);
     } else {
