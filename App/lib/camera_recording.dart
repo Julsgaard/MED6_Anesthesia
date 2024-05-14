@@ -126,6 +126,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
       // Default case if no other condition is met
       GlobalVariables.overlayNumber = 0;
       if (stateManager.currentState.index >= stateManager.errorStateIndex) {
+        timerRuns = 0;
         stateManager.changeState(stateManager.previousState); // Change state back to the previous state
       }
     }
