@@ -72,7 +72,7 @@ if __name__ == '__main__':
             time_elapsed = timer.elapsed_time()
             print(f"Time elapsed: {time_elapsed}")
             #Mouth opening state er lidt ligegyldigt om de åbner munden 'for sent', det vigtigste er at de har munden lukket når exercise starter og det må vi gå ud fra de har
-            if time_elapsed > 2:
+            if time_elapsed > 6:
 
                 # Display the image
                 display_image_queue.put(frame)
