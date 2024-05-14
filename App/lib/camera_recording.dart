@@ -116,10 +116,10 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
             stateManager.previousState != States.mallampatiExercise)) {
       GlobalVariables.overlayNumber = 5;
       stateManager.changeState(States.oopsEyeHeight);
-    } else if (GlobalVariables.tiltAngle < 90-40) {
+    } else if (GlobalVariables.tiltAngle < 90-15) {
       GlobalVariables.overlayNumber = 6;
       stateManager.changeState(States.oopsFaceParallel);
-    } else if (GlobalVariables.tiltAngle > 90+40) {
+    } else if (GlobalVariables.tiltAngle > 90+15) {
       GlobalVariables.overlayNumber = 7;
       stateManager.changeState(States.oopsFaceParallel);
     } else {
