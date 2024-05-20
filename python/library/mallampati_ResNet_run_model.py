@@ -5,7 +5,6 @@ from torchvision import models, transforms
 from PIL import Image
 from library.mallampati_image_prep import prepare_loader
 
-
 def load_model_ResNet(device, model_path='mallampati_models/loss_0.0183_1000_epochs/model.pth'):
     """Load the pre-trained ResNet model"""
 
@@ -26,7 +25,6 @@ def load_model_ResNet(device, model_path='mallampati_models/loss_0.0183_1000_epo
 
     return model
 
-
 def process_image(image_path, image_size):
     """Process a single image for model prediction"""
     transform = transforms.Compose([
@@ -37,7 +35,6 @@ def process_image(image_path, image_size):
     image = Image.open(image_path).convert('RGB')  # Assuming RGB images
     image = transform(image)
     return image
-
 
 def run_predictions_on_image(model, image, device):
     """Run predictions on a single image from the pipeline and return the predicted class"""
@@ -51,11 +48,13 @@ def run_predictions_on_image(model, image, device):
 
     return predicted.item()
 
-
 def run_predictions_on_folder(model, folder_path, device, output_file, image_size):
     """Run predictions on all images in a folder and save the predictions to a text file"""
 
     model.eval()  # Set the model to evaluation mode
+
+    # Map model predictions to the desired output format
+    prediction_mapping = {0: "1+2", 1: "3+4"}
 
     with open(output_file, 'w') as file:
         for image_name in os.listdir(folder_path):
@@ -64,8 +63,8 @@ def run_predictions_on_folder(model, folder_path, device, output_file, image_siz
                 image = process_image(image_path, image_size)  # Process the image
                 image = image.unsqueeze(0)  # Add batch dimension
                 prediction = run_predictions_on_image(model, image, device)
-                file.write(f"{image_name}: {prediction}\n")
-
+                mapped_prediction = prediction_mapping[prediction]
+                file.write(f"{image_name}: {mapped_prediction}\n")
 
 if __name__ == '__main__':
     # Set the device to GPU if available
@@ -77,7 +76,7 @@ if __name__ == '__main__':
     model = load_model_ResNet(device, model_path)
 
     # Parameters
-    test_folder_path = 'mallampati_datasets/KatrineBilleder'
+    test_folder_path = 'mallampati_datasets/CroppedImagesKatrine'
     output_file_path = 'predictions.txt'
     image_size = 64  # Assuming the image size used in training
 
