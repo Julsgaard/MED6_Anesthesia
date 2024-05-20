@@ -42,8 +42,7 @@ if __name__ == '__main__':
 
     # Load the model (either CNN or ResNet)
     # model = mallampati_CNN_run_model.load_model_CNN(device, model_path='library/mallampati_models/model_mallampati_CNN_Best_Model_CUDA.pth')
-    model = mallampati_ResNet_run_model.load_model_ResNet(device,
-                                                          model_path='library/mallampati_models/loss_0.0183_1000_epochs/model.pth')
+    model = mallampati_ResNet_run_model.load_model_ResNet(device, model_path='library/mallampati_models/loss_0.0183_1000_epochs/model.pth')
 
     while True:
         # Get the image path from the server image queue
