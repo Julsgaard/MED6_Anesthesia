@@ -18,12 +18,15 @@ def run_mallampati_model():
     train_loader = prepare_loader(path='mallampati_datasets/training_data(ManualSplit)')
     validation_loader = prepare_loader(path='mallampati_datasets/validation_data(ManualSplit)')
 
+    # Load the pre-trained model
     model = models.resnet34(weights='ResNet34_Weights.DEFAULT')
+    # Freeze the parameters for all layers
     for param in model.parameters():
         param.requires_grad = False
-    num_ftrs = model.fc.in_features
+    # Replace the final layer with a new layer
+    num_features = model.fc.in_features
     model.fc = nn.Sequential(
-        nn.Linear(num_ftrs, 512),
+        nn.Linear(num_features, 512),
         nn.ReLU(),
         nn.Dropout(0.5),
         nn.Linear(512, num_classes)
