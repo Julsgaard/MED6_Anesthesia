@@ -1,6 +1,5 @@
 import datetime
 import os
-
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -39,7 +38,7 @@ def find_device():
     return device
 
 
-def train_model(model, train_loader, validation_loader, criterion, optimizer, device, num_epochs=15):
+def train_model(model, train_loader, validation_loader, test_loader, criterion, optimizer, device, num_epochs=15):
     """Train the model using the training and validation data loaders for a specified number of epochs"""
 
     model.to(device)  # Move the model to the GPU if available
@@ -74,8 +73,7 @@ def train_model(model, train_loader, validation_loader, criterion, optimizer, de
 
         with torch.no_grad():
             for val_images, val_labels in validation_loader:
-                val_images, val_labels = val_images.to(device), val_labels.to(
-                    device)  # Move validation data to the device
+                val_images, val_labels = val_images.to(device), val_labels.to(device)  # Move validation data to the device
                 val_outputs = model(val_images)
                 val_loss += criterion(val_outputs, val_labels).item() * val_images.size(0)
                 _, val_predicted = torch.max(val_outputs, 1)
@@ -87,6 +85,8 @@ def train_model(model, train_loader, validation_loader, criterion, optimizer, de
 
         print(
             f'Epoch {epoch + 1}: Train Loss: {epoch_loss:.4f} Acc: {epoch_acc:.4f} | Validation Loss: {val_epoch_loss:.4f} Acc: {val_epoch_acc:.4f}')
+
+        test_model(model, test_loader, device)
 
     print('Training complete')
     return model
@@ -101,25 +101,54 @@ def save_model(model):
     print(f'Model saved as {filename}')
 
 
+def test_model(model, test_loader, device):
+    """Run predictions on the test dataset and return the accuracy"""
+
+    model.eval()  # Set the model to evaluation mode
+
+    correct = 0
+    total = 0
+
+    with torch.no_grad():
+        for images, labels in test_loader:
+            images, labels = images.to(device), labels.to(device)
+            outputs = model(images)
+            _, predicted = torch.max(outputs, 1)
+            total += labels.size(0)
+            correct += (predicted == labels).sum().item()
+
+    accuracy = correct / total
+
+    print(f'Test Accuracy: {accuracy:.4f}')
+
+
 if __name__ == '__main__':
-    # Initialize model, optimizer, and loss function
-    model, optimizer, criterion = initialize_model()
-
-    # Random split training and validation data
-    # train_loader, validation_loader = prepare_training_and_validation_loaders(image_pixel_size=64, display_images=False, path='mallampati_datasets/New Data')
-
-    # Manual split training and validation data
-    train_loader = prepare_loader(path='mallampati_datasets/training_data(ManualSplit)', image_pixel_size=64)
-    validation_loader = prepare_loader(path='mallampati_datasets/validation_data(ManualSplit)', image_pixel_size=64)
-
     # Find the device to run the model on (GPU or CPU)
     device = find_device()
 
+    # Initialize model, optimizer, and loss function
+    model, optimizer, criterion = initialize_model()
+
+    # Manual split training and validation data
+    train_loader = prepare_loader(path='mallampati_datasets/training_data', image_pixel_size=64, normalization=False, data_augmentation=True)
+    validation_loader = prepare_loader(path='mallampati_datasets/validation_data', image_pixel_size=64, normalization=False)
+
+    # Prepare test data loader
+    test_loader = prepare_loader(path='mallampati_datasets/test_data', image_pixel_size=64, normalization=False)
+    # test_loader_discarded = prepare_loader(path='mallampati_datasets/test_data(discarded)', image_pixel_size=64, normalization=False)
+
     # Train the model
-    trained_model = train_model(model, train_loader, validation_loader, criterion, optimizer, device, num_epochs=15)
+    trained_model = train_model(model, train_loader, validation_loader, test_loader, criterion, optimizer, device, num_epochs=5)
 
     # Create folder for model if it does not exist
     os.makedirs('mallampati_models/CNN models', exist_ok=True)
 
     # Save the model
     save_model(trained_model)
+
+    # Test the model on the test data
+    print('Testing on: test data')
+    test_model(trained_model, test_loader, device)
+    # print('Testing on: test data discarded')
+    # test_model(trained_model, test_loader_discarded, device)
+

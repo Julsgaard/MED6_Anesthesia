@@ -1,9 +1,7 @@
-import os
 import torch
-from torchvision import transforms
-from PIL import Image
-from library.mallampati_image_prep import prepare_loader  # If needed for loading the entire dataset
-from library.mallampati_CNN_train_model import initialize_model, find_device
+from library.mallampati_CNN_train_model import initialize_model, find_device, test_model
+from library.mallampati_image_prep import prepare_loader
+
 
 def load_model_CNN(device, model_path='mallampati_models/model_mallampati_CNN_Best_Model_CUDA.pth'):
     """Load the pre-trained model and run predictions on the test set"""
@@ -18,16 +16,6 @@ def load_model_CNN(device, model_path='mallampati_models/model_mallampati_CNN_Be
 
     return model
 
-def process_image(image_path, image_size):
-    """Process a single image for model prediction"""
-    transform = transforms.Compose([
-        transforms.Resize((image_size, image_size)),
-        transforms.ToTensor(),
-        transforms.Normalize((0.5,), (0.5,))
-    ])
-    image = Image.open(image_path).convert('RGB')  # Assuming RGB images
-    image = transform(image)
-    return image
 
 def run_predictions_on_image(model, image, device):
     """Run predictions on a single image from the pipeline and return the predicted class"""
@@ -41,37 +29,18 @@ def run_predictions_on_image(model, image, device):
 
     return predicted.item()
 
-def run_predictions_on_folder(model, folder_path, device, output_file, image_size):
-    """Run predictions on all images in a folder and save the predictions to a text file"""
-
-    model.eval()  # Set the model to evaluation mode
-
-    # Map model predictions to the desired output format
-    prediction_mapping = {0: "1+2", 1: "3+4"}
-
-    with open(output_file, 'w') as file:
-        for image_name in os.listdir(folder_path):
-            image_path = os.path.join(folder_path, image_name)
-            if os.path.isfile(image_path):
-                image = process_image(image_path, image_size)  # Process the image
-                image = image.unsqueeze(0)  # Add batch dimension
-                prediction = run_predictions_on_image(model, image, device)
-                mapped_prediction = prediction_mapping[prediction]
-                file.write(f"{image_name}: {mapped_prediction}\n")
 
 if __name__ == '__main__':
     # Find the device
     device = find_device()
 
     # Load the model and move to device
-    model = load_model_CNN(device)
+    model = load_model_CNN(device, model_path='mallampati_models/CNN models/model_mallampati_CNN_20240601_160726_82%_test_data.pth')
 
-    # Parameters
-    test_folder_path = 'mallampati_datasets/CroppedImagesKatrine'
-    output_file_path = 'predictions.txt'
-    image_size = 64  # Assuming the image size used in training
+    # Prepare the test loader
+    test_loader = prepare_loader(path='mallampati_datasets/test_data', image_pixel_size=64)
+    test_loader_discarded = prepare_loader(path='mallampati_datasets/test_data(discarded)', image_pixel_size=64)
 
-    # Run predictions on all images in the folder and save to file
-    run_predictions_on_folder(model, test_folder_path, device, output_file_path, image_size)
-
-    print(f"Predictions saved to {output_file_path}")
+    # Test the model on the test data
+    test_model(model, test_loader, device)
+    test_model(model, test_loader_discarded, device)

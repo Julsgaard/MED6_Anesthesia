@@ -23,22 +23,31 @@ def prepare_mallampati_image_for_loader(image, image_pixel_size=224):
     return transform(image)
 
 
-def prepare_transform(image_pixel_size=224):
+def prepare_transform(image_pixel_size=224, normalization=True, data_augmentation=False):
     """Prepare the transformations for the images in the dataset"""
 
-    return transforms.Compose([
+    transform_list = [
         transforms.Resize(image_pixel_size),
         transforms.CenterCrop(image_pixel_size),
-        transforms.ToTensor(),
-        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-    ])
+        transforms.ToTensor()
+    ]
+    if data_augmentation:
+        transform_list.append(transforms.RandomHorizontalFlip())
+        transform_list.append(transforms.RandomRotation(10))
+        print("Data augmentation enabled")
+    if normalization:
+        transform_list.append(transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]))
+        print("Normalization enabled")
+
+    transform = transforms.Compose(transform_list)
+
+    return transform
 
 
-def prepare_loader(path, image_pixel_size=224, display_images=False):
+def prepare_loader(path, image_pixel_size=224, normalization=True, data_augmentation=False, display_images=False):
     """Prepare the data loader when the data already is manually split (So just provide the folder)"""
 
-    transform = prepare_transform(image_pixel_size)
-    # data_loader = prepare_data_loader(path, batch_size=4, shuffle=True, transform=transform)
+    transform = prepare_transform(image_pixel_size, normalization, data_augmentation)
 
     dataset = ImageFolder(root=path, transform=transform)
     data_loader = DataLoader(dataset, batch_size=4, shuffle=True)
@@ -56,10 +65,10 @@ def prepare_loader(path, image_pixel_size=224, display_images=False):
     return data_loader
 
 
-if __name__ == "__main__":
-    prepare_loader('mallampati_datasets/mallampati_training_data (2 classes)', image_pixel_size=64,
-                   display_images=True)
-
+# if __name__ == "__main__":
+#     prepare_loader('mallampati_datasets/mallampati_training_data (2 classes)', image_pixel_size=64,
+#                    display_images=True)
+#
 # def prepare_training_validation_and_test_loaders(image_pixel_size=224,
 #                                                  path='mallampati_datasets/mallampati_training_data (2 classes)',
 #                                                  display_images=False):
