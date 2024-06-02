@@ -1,9 +1,10 @@
 import torch
 import torch.nn as nn
 import numpy as np
+from torchvision import transforms
 from scipy.spatial.distance import mahalanobis
 from library.mallampati_image_prep import prepare_loader
-from library.mallampati_CNN_run_model import load_model_CNN
+from library.mallampati_CNN_run_model import load_model_CNN, run_predictions_on_image
 
 
 # Define the Feature Extractor
@@ -52,18 +53,33 @@ def mahalanobis_classifier(features, labels, regularization=1e-5):
     class1_features = features[labels == 1].numpy()
     mean0 = np.mean(class0_features, axis=0)
     mean1 = np.mean(class1_features, axis=0)
-    combined_features = np.vstack([class0_features, class1_features])
-    cov = np.cov(combined_features.T)
-    reg_cov = cov + np.eye(cov.shape[0]) * regularization
-    cov_inv = np.linalg.inv(reg_cov)
+    cov_class0 = np.cov(class0_features.T)
+    cov_class1 = np.cov(class1_features.T)
+    reg_cov_class0 = cov_class0 + np.eye(cov_class0.shape[0]) * regularization
+    cov_inv_class0 = np.linalg.inv(reg_cov_class0)
+    reg_cov_class1 = cov_class1 + np.eye(cov_class1.shape[0]) * regularization
+    cov_inv_class1 = np.linalg.inv(reg_cov_class1)
 
     def classify(x):
-        dist0 = mahalanobis(x, mean0, cov_inv)
-        dist1 = mahalanobis(x, mean1, cov_inv)
+        dist0 = mahalanobis(x, mean0, cov_inv_class0)
+        dist1 = mahalanobis(x, mean1, cov_inv_class1)
         return 0 if dist0 < dist1 else 1
 
     return classify
 
+
+def test_model_CNN(dataloader, model):
+    model.eval()
+    correct = 0
+    total = 0
+    with torch.no_grad():
+        for images, labels in dataloader:
+            outputs = model(images)
+            _, predicted = torch.max(outputs.data, 1)
+            total += labels.size(0)
+            correct += (predicted == labels).sum().item()
+    accuracy = 100 * correct / total
+    return accuracy
 # Main function
 def main():
     # layers_config = [
@@ -96,15 +112,20 @@ def main():
     device = torch.device("cpu")
 
     # If you want to use a pretrained model, use this code:
-    feature_extractor_model = FeatureExtractor(load_model_CNN(device, 'mallampati_models/CNN models/model_mallampati_CNN_Best.pth'))
+
+    feature_extractor_model = FeatureExtractor(load_model_CNN(device, 'mallampati_models/model_mallampati_CNN_Best.pth'))
     train_features, train_labels = extract_features(train_loader, feature_extractor_model, device)
     test_features, test_labels = extract_features(test_loader, feature_extractor_model, device)
-
+    normal_model = load_model_CNN(device, 'mallampati_models/model_mallampati_CNN_Best.pth')
     # Train and apply classifier
     classifier = mahalanobis_classifier(train_features, train_labels, regularization=1e-5)
     predictions = [classifier(f.numpy()) for f in test_features]
     accuracy = np.mean(np.array(predictions) == test_labels.numpy())
-    print(f"Accuracy on test dataset: {accuracy * 100:.2f}%")
+    print(f"Accuracy on test Mahalanobis: {accuracy * 100:.2f}%")
+    CNNAccuracy = test_model_CNN(test_loader,normal_model)
+    print(f"Accuracy on test CNN: {CNNAccuracy:.2f}%")
+
+
 
     # After extracting features
     #np.save('AIP_Feature_Data/train_features.npy', train_features.numpy())

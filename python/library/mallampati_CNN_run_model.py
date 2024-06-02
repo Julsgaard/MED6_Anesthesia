@@ -5,7 +5,7 @@ from PIL import Image
 from library.mallampati_image_prep import prepare_loader  # If needed for loading the entire dataset
 from library.mallampati_CNN_train_model import initialize_model, find_device
 
-def load_model_CNN(device, model_path='mallampati_models/model_mallampati_CNN_Best_Model_CUDA.pth'):
+def load_model_CNN(device, model_path='mallampati_models/model_mallampati_CNN_Best.pth'):
     """Load the pre-trained model and run predictions on the test set"""
 
     # Initialize the model
