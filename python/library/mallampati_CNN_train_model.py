@@ -39,7 +39,7 @@ def find_device():
     return device
 
 
-def train_model(model, train_loader, validation_loader, test_loader, criterion, optimizer, device, num_epochs=15):
+def train_model(model, train_loader, validation_loader, criterion, optimizer, device, num_epochs=15):
     """Train the model using the training and validation data loaders for a specified number of epochs"""
 
     model.to(device)  # Move the model to the GPU if available
@@ -137,7 +137,7 @@ if __name__ == '__main__':
     # test_loader_discarded = prepare_loader(path='mallampati_datasets/test_data(discarded)', image_pixel_size=64, normalization=False)
 
     # Train the model
-    trained_model = train_model(model, train_loader, validation_loader, test_loader, criterion, optimizer, device, num_epochs=15)
+    trained_model = train_model(model, train_loader, validation_loader, criterion, optimizer, device, num_epochs=15)
 
     # Create folder for model if it does not exist
     os.makedirs('mallampati_models/CNN models', exist_ok=True)
