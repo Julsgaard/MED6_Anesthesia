@@ -22,6 +22,7 @@ def initialize_model():
         nn.Flatten(),
         nn.Linear(128 * 8 * 8, 512),
         nn.ReLU(),
+        nn.Dropout(0.5),
         nn.Linear(512, 2)
     )
     optimizer = optim.Adam(model.parameters(), lr=0.001)  # Using Adam optimizer
@@ -86,8 +87,6 @@ def train_model(model, train_loader, validation_loader, test_loader, criterion, 
         print(
             f'Epoch {epoch + 1}: Train Loss: {epoch_loss:.4f} Acc: {epoch_acc:.4f} | Validation Loss: {val_epoch_loss:.4f} Acc: {val_epoch_acc:.4f}')
 
-        test_model(model, test_loader, device)
-
     print('Training complete')
     return model
 
@@ -138,7 +137,7 @@ if __name__ == '__main__':
     # test_loader_discarded = prepare_loader(path='mallampati_datasets/test_data(discarded)', image_pixel_size=64, normalization=False)
 
     # Train the model
-    trained_model = train_model(model, train_loader, validation_loader, test_loader, criterion, optimizer, device, num_epochs=5)
+    trained_model = train_model(model, train_loader, validation_loader, test_loader, criterion, optimizer, device, num_epochs=15)
 
     # Create folder for model if it does not exist
     os.makedirs('mallampati_models/CNN models', exist_ok=True)

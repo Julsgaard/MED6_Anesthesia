@@ -5,18 +5,19 @@ import torch.nn as nn
 import torch.optim as optim
 from torchvision import models
 from mallampati_image_prep import prepare_loader
+from mallampati_CNN_train_model import test_model, find_device
 from functions import imshow_cv
 import matplotlib.pyplot as plt
 
 # Hyperparameters
 num_classes = 2  # The number of classes in the dataset
 learning_rate = 0.001  # The learning rate for the optimizer
-num_epochs = 1000  # The number of epochs to train the model
+num_epochs = 50  # The number of epochs to train the model
 
 
-def run_mallampati_model():
-    train_loader = prepare_loader(path='mallampati_datasets/training_data(ManualSplit)')
-    validation_loader = prepare_loader(path='mallampati_datasets/validation_data(ManualSplit)')
+def run_mallampati_model(device):
+    train_loader = prepare_loader(path='mallampati_datasets/training_data', data_augmentation=True)
+    validation_loader = prepare_loader(path='mallampati_datasets/validation_data')
 
     # Load the pre-trained model
     model = models.resnet34(weights='ResNet34_Weights.DEFAULT')
@@ -32,7 +33,6 @@ def run_mallampati_model():
         nn.Linear(512, num_classes)
     )
 
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     model.to(device)
 
     criterion = nn.CrossEntropyLoss()
@@ -114,6 +114,8 @@ def run_mallampati_model():
     plot_file_path = os.path.join(folder_name, 'training_validation_plot.png')
     plot_training(training_losses, validation_losses, accuracies, plot_file_path)
 
+    return model
+
 
 def plot_training(training_losses, validation_losses, accuracies, plot_file_path):
     epochs = range(1, len(training_losses) + 1)
@@ -140,4 +142,14 @@ def plot_training(training_losses, validation_losses, accuracies, plot_file_path
 
 
 if __name__ == "__main__":
-    run_mallampati_model()
+    # Find the device (GPU or CPU)
+    device = find_device()
+
+    # Train the model
+    trained_model = run_mallampati_model(device)
+
+    # Prepare the test loader
+    test_loader = prepare_loader(path='mallampati_datasets/test_data')
+
+    # Test the model on the test data
+    test_model(trained_model, test_loader, device)
