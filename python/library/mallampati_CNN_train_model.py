@@ -22,7 +22,6 @@ def initialize_model():
         nn.Flatten(),
         nn.Linear(128 * 8 * 8, 512),
         nn.ReLU(),
-        nn.Dropout(0.5),
         nn.Linear(512, 2)
     )
     optimizer = optim.Adam(model.parameters(), lr=0.001)  # Using Adam optimizer
