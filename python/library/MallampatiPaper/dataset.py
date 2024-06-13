@@ -25,15 +25,15 @@ class MaDataset(Dataset):
 
     def get_img_info(self, data_dir):
         data_info = list()
-        print(f'Scanning directory: {data_dir}')
+        # print(f'Scanning directory: {data_dir}')
         for root, dirs, _ in os.walk(data_dir):
-            print(f'Found subdirectories: {dirs} in {root}')
+            # print(f'Found subdirectories: {dirs} in {root}')
             for sub_dir in dirs:
                 full_dir_path = os.path.join(root, sub_dir)
                 img_names = os.listdir(full_dir_path)
-                print(f'Files in {full_dir_path}: {img_names}')
+                # print(f'Files in {full_dir_path}: {img_names}')
                 img_names = list(filter(lambda x: x.endswith('.jpeg') or x.endswith('.jpg'), img_names))
-                print(f'Filtered JPEG images in {sub_dir}: {img_names}')
+                # print(f'Filtered JPEG images in {sub_dir}: {img_names}')
 
                 for i in range(len(img_names)):
                     img_name = img_names[i]
@@ -48,9 +48,9 @@ class MaDataset(Dataset):
                     data_info.append((path_img, label))
                     #print(f'Added image: {path_img, label}')
                     #print(f'Added image: {path_img, label}')
-        print(f'Total images found: {len(data_info)}')
+        # print(f'Total images found: {len(data_info)}')
         unique_labels = set([label for _, label in data_info])
-        print(f'Unique labels: {unique_labels}')
+        # print(f'Unique labels: {unique_labels}')
         return data_info
 
 

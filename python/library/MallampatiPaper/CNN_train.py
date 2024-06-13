@@ -25,9 +25,9 @@ log_interval=3
 val_interval=1
 
 # ============================ step 1/5 数据 ============================
-split_dir=os.path.join(".","data","Aug_mouth")
-train_dir='Dataset/training_data'   #所有训练数据Trian_all的80%
-valid_dir='Dataset/validation_data'  #所有训练数据Trian_all的20%
+# split_dir=os.path.join(".","data","Aug_mouth")
+train_dir='..//mallampati_datasets/training_data'   #所有训练数据Trian_all的80%
+valid_dir='..//mallampati_datasets/validation_data'  #所有训练数据Trian_all的20%
 
 #对训练集所需要做的预处理   
 train_transform=transforms.Compose([
@@ -46,11 +46,8 @@ valid_transform=transforms.Compose([
 train_data=MaDataset(data_dir=train_dir,transform=train_transform)
 valid_data=MaDataset(data_dir=valid_dir,transform=valid_transform)
 
-# train_data=ImageFolder(root=train_dir, transform=train_transform)
-# valid_data=ImageFolder(root=valid_dir, transform=valid_transform)
-
-print(f'Number of training samples: {len(train_data)}')  # Debug statement
-print(f'Number of validation samples: {len(valid_data)}')  # Debug statement
+print(f'Number of training samples: {len(train_data)}')
+print(f'Number of validation samples: {len(valid_data)}')
 
 # 构建DataLoader
 # 训练集数据最好打乱
