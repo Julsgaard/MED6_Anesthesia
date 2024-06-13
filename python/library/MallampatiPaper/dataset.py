@@ -9,44 +9,49 @@ import numpy as np
 random.seed(1)
 
 class MaDataset(Dataset):
-    # 自定义Dataset类，必须继承Dataset并重写__init__和__getitem__函数
     def __init__(self, data_dir, transform=None):
-        # data_info存储所有图片路径和标签（元组的列表），在DataLoader中通过index读取样本
-        self.data_info = self.get_img_info(data_dir)
         self.transform = transform
+        self.data_info = self.get_img_info(data_dir)
 
     def __getitem__(self, index):
         path_img, label = self.data_info[index]
-        # 打开图片，默认为PIL，需要转成RGB
         img = Image.open(path_img).convert('RGB')
-        # 如果预处理的条件不为空，应该进行预处理操作
         if self.transform is not None:
             img = self.transform(img)
-        return img, label      #返回RGB图像及标签
+        return img, label
 
     def __len__(self):
         return len(self.data_info)
 
-    # 自定义方法，用于返回所有图片的路径以及标签
-    @staticmethod
-    def get_img_info(data_dir):
+    def get_img_info(self, data_dir):
         data_info = list()
+        print(f'Scanning directory: {data_dir}')
         for root, dirs, _ in os.walk(data_dir):
-            # 遍历类别
-            for sub_dir in dirs:           #0 1
-                # listdir为列出文件夹下所有文件和文件夹名
-                img_names = os.listdir(os.path.join(root, sub_dir))
-                # 过滤出所有后缀名为jpg的文件名（那当然也就把文件夹过滤掉了）
-                img_names = list(filter(lambda x: x.endswith('.jpg'), img_names))      #图
-                # 遍历图片
+            print(f'Found subdirectories: {dirs} in {root}')
+            for sub_dir in dirs:
+                full_dir_path = os.path.join(root, sub_dir)
+                img_names = os.listdir(full_dir_path)
+                print(f'Files in {full_dir_path}: {img_names}')
+                img_names = list(filter(lambda x: x.endswith('.jpeg') or x.endswith('.jpg'), img_names))
+                print(f'Filtered JPEG images in {sub_dir}: {img_names}')
+
                 for i in range(len(img_names)):
                     img_name = img_names[i]
                     path_img = os.path.join(root, sub_dir, img_name)
-                    # 在我们的命名设置中，文件夹名等于标签名
-                    label = sub_dir
-                    data_info.append((path_img, int(label)))
+                    # Assign labels based on directory name
+                    if sub_dir == 'Class1+2':
+                        label = 0  # Assign 0 for Class1+2
+                    elif sub_dir == 'Class3+4':
+                        label = 1  # Assign 1 for Class3+4
+                    else:
+                        raise ValueError(f"Unexpected directory name: {sub_dir}")
+                    data_info.append((path_img, label))
+                    #print(f'Added image: {path_img, label}')
+                    #print(f'Added image: {path_img, label}')
+        print(f'Total images found: {len(data_info)}')
+        unique_labels = set([label for _, label in data_info])
+        print(f'Unique labels: {unique_labels}')
         return data_info
-
 
 
 class M_Dataset(Dataset):

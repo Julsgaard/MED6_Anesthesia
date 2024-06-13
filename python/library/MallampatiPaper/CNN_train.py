@@ -1,4 +1,5 @@
 import sys
+from torchvision.datasets import ImageFolder
 sys.path.append('./data')
 import os
 import random
@@ -25,33 +26,43 @@ val_interval=1
 
 # ============================ step 1/5 数据 ============================
 split_dir=os.path.join(".","data","Aug_mouth")
-train_dir='mallampati_datasets/training_data'   #所有训练数据Trian_all的80%
-valid_dir='mallampati_datasets/validation_data'  #所有训练数据Trian_all的20%
+train_dir='Dataset/training_data'   #所有训练数据Trian_all的80%
+valid_dir='Dataset/validation_data'  #所有训练数据Trian_all的20%
 
 #对训练集所需要做的预处理   
 train_transform=transforms.Compose([
+    transforms.Resize(224),
+    transforms.CenterCrop(224),
     transforms.ToTensor(),
     transforms.Normalize((0.485,0.456,0.406),(0.229,0.224,0.225))
 ])
 #对验证集所需要做的预处理
 valid_transform=transforms.Compose([
+    transforms.Resize(224),
+    transforms.CenterCrop(224),
     transforms.ToTensor(),
     transforms.Normalize((0.485,0.456,0.406),(0.229,0.224,0.225))
 ])
 
 # 构建MyDataset实例
-#train_data=MaDataset(data_dir=train_dir,transform=train_transform)
-#valid_data=MaDataset(data_dir=valid_dir,transform=valid_transform)
+train_data=MaDataset(data_dir=train_dir,transform=train_transform)
+valid_data=MaDataset(data_dir=valid_dir,transform=valid_transform)
+
+# train_data=ImageFolder(root=train_dir, transform=train_transform)
+# valid_data=ImageFolder(root=valid_dir, transform=valid_transform)
+
+print(f'Number of training samples: {len(train_data)}')  # Debug statement
+print(f'Number of validation samples: {len(valid_data)}')  # Debug statement
 
 # 构建DataLoader
 # 训练集数据最好打乱
 # DataLoader的实质就是把数据集加上一个索引号，再返回
-#train_loader=DataLoader(dataset=train_data,batch_size=BATCH_SIZE,shuffle=True)
-#valid_loader=DataLoader(dataset=valid_data,batch_size=BATCH_SIZE)
+train_loader=DataLoader(dataset=train_data,batch_size=BATCH_SIZE,shuffle=True)
+valid_loader=DataLoader(dataset=valid_data,batch_size=BATCH_SIZE)
 
-train_loader = prepare_loader(path='C:\\Users\krill\Documents\Github\MED6_Anesthesia\python\library\mallampati_datasets\\training_data', image_pixel_size=224, normalization=True,
-                              data_augmentation=True)
-valid_loader = prepare_loader(path='C:\\Users\krill\Documents\Github\MED6_Anesthesia\python\library\mallampati_datasets\\validation_data', image_pixel_size=224, normalization=True)
+# train_loader = prepare_loader(path='C:\\Users\krill\Documents\Github\MED6_Anesthesia\python\library\mallampati_datasets\\training_data', image_pixel_size=224, normalization=True,
+#                               data_augmentation=True)
+# valid_loader = prepare_loader(path='C:\\Users\krill\Documents\Github\MED6_Anesthesia\python\library\mallampati_datasets\\validation_data', image_pixel_size=224, normalization=True)
 
 # ============================ step 2/5 模型 ==============================
 net = VGG19CA()    #添加了CA attention模块的VGG19
