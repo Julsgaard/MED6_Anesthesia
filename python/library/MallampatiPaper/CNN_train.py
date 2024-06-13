@@ -49,15 +49,15 @@ valid_transform=transforms.Compose([
 #train_loader=DataLoader(dataset=train_data,batch_size=BATCH_SIZE,shuffle=True)
 #valid_loader=DataLoader(dataset=valid_data,batch_size=BATCH_SIZE)
 
-train_loader = prepare_loader(path='C:\\Users\Kristian\Desktop\Github\MED6_Anesthesia\python\library\mallampati_datasets\\training_data', image_pixel_size=224, normalization=False,
+train_loader = prepare_loader(path='C:\\Users\krill\Documents\Github\MED6_Anesthesia\python\library\mallampati_datasets\\training_data', image_pixel_size=224, normalization=True,
                               data_augmentation=True)
-valid_loader = prepare_loader(path='C:\\Users\Kristian\Desktop\Github\MED6_Anesthesia\python\library\mallampati_datasets\\validation_data', image_pixel_size=224, normalization=False)
+valid_loader = prepare_loader(path='C:\\Users\krill\Documents\Github\MED6_Anesthesia\python\library\mallampati_datasets\\validation_data', image_pixel_size=224, normalization=True)
 
 # ============================ step 2/5 模型 ==============================
 net = VGG19CA()    #添加了CA attention模块的VGG19
 #print(net)
 #将在ImageNet上预训练好的VGG19的参数加载到我们的模型上
-net.load_state_dict(torch.load('C:/Users/Kristian/.cache/torch/hub/checkpoints/vgg19-dcbb9e9d.pth'),strict=False)
+net.load_state_dict(torch.load('C:/Users/krill/.cache/torch/hub/checkpoints/vgg19-dcbb9e9d.pth'),strict=False)
 if torch.cuda.is_available():
     net.cuda()
 
@@ -111,8 +111,7 @@ for epoch in range(MAX_EPOCH):
     T_loss_curve.append(loss_mean)
     accurancy=correct / total
     T_acc_curve.append(accurancy.data.cpu().numpy())
-    print('第%d个epoch的训练集识别准确率为：%d%%' % (epoch + 1, 100*accurancy))
-
+    print('The recognition accuracy of the training set for epoch %d is: %d%%' % (epoch + 1, 100 * accurancy))
 
     #模型评估
     net.eval()
@@ -137,7 +136,7 @@ for epoch in range(MAX_EPOCH):
     V_acc_curve.append(valid_accurancy.data.cpu().numpy())
     V_loss_mean=valid_loss/len(valid_loader)
     V_loss_curve.append(V_loss_mean)
-    print("验证集准确率为:",valid_accurancy)
+    print("The validation set accuracy is:", valid_accurancy)
 
     torch.save(net.state_dict(), "./weight/VGG19_CA_%d.pkl"% epoch)   #保存每一次epoch的模型权重
 
