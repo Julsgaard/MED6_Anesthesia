@@ -50,7 +50,7 @@ def prepare_loader(path, image_pixel_size=224, normalization=True, data_augmenta
     transform = prepare_transform(image_pixel_size, normalization, data_augmentation)
 
     dataset = ImageFolder(root=path, transform=transform)
-    data_loader = DataLoader(dataset, batch_size=4, shuffle=True)
+    data_loader = DataLoader(dataset, batch_size=16, shuffle=True)
 
     path_name = path.split('/')[-1]
     print(f"Number of {path_name} samples: {len(data_loader.dataset)}")

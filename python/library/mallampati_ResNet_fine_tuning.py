@@ -30,6 +30,7 @@ def run_mallampati_model(device):
         nn.Linear(num_features, 512),
         nn.ReLU(),
         nn.Dropout(0.5),
+        nn.
         nn.Linear(512, num_classes)
     )
 

@@ -1,0 +1,6 @@
+Num Classes: 2
+Learning Rate: 1e-05
+Num Epochs: 8
+Weight Decay: 0.001
+Optimizer Type: adam
+Best Validation Loss: 0.0463 at epoch: 8
