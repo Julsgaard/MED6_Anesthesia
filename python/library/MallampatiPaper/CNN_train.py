@@ -55,15 +55,17 @@ print(f'Number of validation samples: {len(valid_data)}')
 train_loader=DataLoader(dataset=train_data,batch_size=BATCH_SIZE,shuffle=True)
 valid_loader=DataLoader(dataset=valid_data,batch_size=BATCH_SIZE)
 
-# train_loader = prepare_loader(path='C:\\Users\krill\Documents\Github\MED6_Anesthesia\python\library\mallampati_datasets\\training_data', image_pixel_size=224, normalization=True,
-#                               data_augmentation=True)
-# valid_loader = prepare_loader(path='C:\\Users\krill\Documents\Github\MED6_Anesthesia\python\library\mallampati_datasets\\validation_data', image_pixel_size=224, normalization=True)
+# TODO: At bruge vores dataloader ser ikke ud til at gøre en forskel
+# train_loader = prepare_loader(path='../mallampati_datasets/training_data', image_pixel_size=224, normalization=True, data_augmentation=True)
+# valid_loader = prepare_loader(path='../mallampati_datasets/validation_data', image_pixel_size=224, normalization=True)
 
 # ============================ step 2/5 模型 ==============================
 net = VGG19CA()    #添加了CA attention模块的VGG19
 #print(net)
 #将在ImageNet上预训练好的VGG19的参数加载到我们的模型上
-net.load_state_dict(torch.load('C:/Users/krill/.cache/torch/hub/checkpoints/vgg19-dcbb9e9d.pth'),strict=False)
+# JEG HAR BARE COPY PASTED DEN TIL MALLAMPATIPAPER MAPPEN SÅ VI IKKE SKAL ÆNDRE PATH HELE TIDEN
+net.load_state_dict(torch.load('vgg19-dcbb9e9d.pth'),strict=False)
+
 if torch.cuda.is_available():
     net.cuda()
 
