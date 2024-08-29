@@ -45,6 +45,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
     bool showState = true; // Default is true, toggle this to show/hide the state display
 
     stateManager.addListener(_onStateChanged); // Listen to state changes
+    /*
     _checkForErrorStateTimer = Timer.periodic(const Duration(milliseconds: 500), (timer) {
       if (stateManager.currentState == States.mouthOpeningExercise ||
           stateManager.currentState == States.mallampatiExercise ||
@@ -56,6 +57,7 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
         _checkGlobalVariables();
       }
     });
+     */
 
     // Listener for accelerometer events
     accelerometerSubscription = accelerometerEvents.listen((AccelerometerEvent event) {

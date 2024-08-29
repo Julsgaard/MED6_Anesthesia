@@ -24,7 +24,7 @@ class GlobalVariables {
   static int overlayNumber = 0;
   static StateManager stateManager = StateManager();
   static Flutter3DController animationController = Flutter3DController();
-  static bool showState = true;
+  static bool showState = false;
   static Map<States,String> animationList= {
     States.intro: "Intro",
     States.mouthOpeningIntro: "MouthOpeningIntro",
