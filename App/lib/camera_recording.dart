@@ -92,16 +92,29 @@ class _CameraRecordingState extends State<CameraRecording> with WidgetsBindingOb
     if (GlobalVariables.luxValue < 0) {
       GlobalVariables.overlayNumber = 1;
       stateManager.changeState(States.oopsBrightness);
-    } else if (GlobalVariables.luxValue >= 300) {
+    } else if (GlobalVariables.luxValue >= 2000) {
       GlobalVariables.overlayNumber = 2;
       stateManager.changeState(States.oopsBrightness);
-    } else if (GlobalVariables.eyeLevel == 0 &&
+    }else if(stateManager.currentState == States.oopsBrightness && GlobalVariables.luxValue >= 0 && GlobalVariables.luxValue < 2000) {
+      // If the brightness is now okay, reset the overlay number
+      GlobalVariables.overlayNumber = 0;
+      if (stateManager.currentState.index >= stateManager.errorStateIndex) {
+        timerRuns = 0;
+        stateManager.changeState(stateManager.previousState); // Change state back to the previous state
+      }
+    } else if (GlobalVariables.circleKey.currentContext == null) {
+      // If the circle key context is null, it means the circle is not visible
+      GlobalVariables.overlayNumber = 3;
+      stateManager.changeState(States.oopsNoFace);
+        timerRuns = 0;
+        stateManager.changeState(stateManager.previousState);
+    }else if (GlobalVariables.eyeLevel == 0 &&
         (stateManager.currentState != States.mallampatiExercise &&
         stateManager.currentState != States.neckMovementExercise &&
         stateManager.previousState != States.neckMovementExercise &&
         stateManager.previousState != States.mallampatiExercise)) {
-      GlobalVariables.overlayNumber = 3;
-      stateManager.changeState(States.oopsNoFace);
+      //GlobalVariables.overlayNumber = 3;
+      //stateManager.changeState(States.oopsNoFace);
     } else if (GlobalVariables.eyeLevel == 2 &&
         (stateManager.currentState != States.mallampatiExercise &&
             stateManager.currentState != States.neckMovementExercise &&

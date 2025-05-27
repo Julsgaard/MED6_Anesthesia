@@ -51,9 +51,9 @@ class CameraServices {
           //developer.log('Lux value: $luxValue', name: 'camera.info');
 
           // Send the image over TCP
-          sendImageOverTCP(image, networkClient, stateManager, currentTimestamp);  // Send the image over TCP
-          sendBrightnessOverTCP(GlobalVariables.luxValue, networkClient);
-          sendTiltAngleOverTCP(GlobalVariables.tiltAngle, networkClient);
+          //sendImageOverTCP(image, networkClient, stateManager, currentTimestamp);  // Send the image over TCP
+          //sendBrightnessOverTCP(GlobalVariables.luxValue, networkClient);
+          //sendTiltAngleOverTCP(GlobalVariables.tiltAngle, networkClient);
         }
       }
     });
